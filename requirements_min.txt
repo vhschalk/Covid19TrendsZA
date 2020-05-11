@@ -1,0 +1,10 @@
+django
+gunicorn
+urllib
+base64
+io
+matplotlib
+scipy
+pandas
+numpy
+django-heroku==0.3.1
