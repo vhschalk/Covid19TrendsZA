@@ -20,3 +20,8 @@ The dashboard is build with Django. The analytics engine currently runs on the [
 - Change plot visuals to Plotly
 - Consider if a cron job should store the latest rt data in sqllite
 - Consider running the analytics engine in this project
+
+## Installing
+
+1. `$ brew install postgresql`
+1. `$ pip install -r requirement.txt`
