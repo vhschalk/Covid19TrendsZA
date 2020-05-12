@@ -42,12 +42,12 @@ def home(request):
 
     # Plot provinces
     states_filter = states_raw.loc[['EC','FS','GP','KZN','LP','MP','NC','NW','WC']]
-    fig_states = state_plot(states_filter, 'South African Provinces', plotscale = 0.92, num = 2)
+    fig_states = state_plot(states_filter, 'South African provinces', plotscale = 0.92, num = 2)
     uri_states = format_fig(fig_states)
 
 
     # Plot districts
-    uri_districts1 = plot_districts('gp', plotscale = 0.78, num = 3)
+    uri_districts1 = plot_districts('gp', plotscale = 0.78, num = 3, title_key=district_gp_key)
     uri_districts2 = plot_districts('wc', plotscale = 0.90, num = 4, title_key=district_wc_key)
 
     return render(request, 'home.html', {'country':uri_country,'states':uri_states, 'districts1':uri_districts1, 'districts2':uri_districts2, 'debug':''})
@@ -166,6 +166,11 @@ def plot_rt(result, ax, state_name):
     #fig.set_facecolor('w')
     return ax
 
+district_gp_key = {
+'ekurhuleni':'Ekurhuleni',
+'johannesburg':'Johannesburg',
+'tshwane':'Tshwane'
+}
 
 district_wc_key = {
 'CT':'City of Cape Town (D)',
