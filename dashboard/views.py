@@ -16,6 +16,7 @@ import pandas as pd
 import numpy as np
 
 repo = 'dsfsi'
+credit = 'Dashboard: covid19trends.co.za - Data: DSFSI'
 
 def home(request):
 
@@ -30,9 +31,9 @@ def home(request):
     country = states_raw.filter(like='Total RSA', axis=0)
 
     fig_country, ax = plt.subplots(figsize=(600/72,400/72))
-    ax = plot_rt(country, ax, '')
-    ax.set_title(f'COVID-19 Confirmed Cases: Real-time $R_t$ for South Africa', size=14)
-    fig_country.text(0, 0, 'covid19trends.co.za - Data: DSFSI', size=12, weight='demibold')
+    ax = plot_rt(country, ax, state_name = '')
+    ax.set_title(f'Fig 1: $R_t$ for COVID-19 in South Africa', size=14)
+    fig_country.text(0.13, 0, credit, size=12, weight='demibold')
     ax.xaxis.set_major_locator(mdates.WeekdayLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
 
@@ -40,25 +41,49 @@ def home(request):
 
 
     # Plot provinces
-    fig_states = state_plot(states_raw, 'South African Provinces', plotscale = 0.92)
+    states_filter = states_raw.loc[['EC','FS','GP','KZN','LP','MP','NC','NW','WC']]
+    fig_states = state_plot(states_filter, 'South African Provinces', plotscale = 0.92, num = 2)
     uri_states = format_fig(fig_states)
 
 
     # Plot districts
-    uri_districts1 = plot_districts('gp', 0.78)
-    uri_districts2 = plot_districts('wc', 0.90)
+    uri_districts1 = plot_districts('gp', plotscale = 0.78, num = 3)
+    uri_districts2 = plot_districts('wc', plotscale = 0.90, num = 4, title_key=district_wc_key)
 
     return render(request, 'home.html', {'country':uri_country,'states':uri_states, 'districts1':uri_districts1, 'districts2':uri_districts2, 'debug':''})
 
 
-def plot_districts(state, plotscale):
+def state_plot(final_results, title, plotscale, num, title_key=None):
+    state_groups = final_results.groupby('state')
+
+    ncols = 3
+    nrows = int(np.ceil(len(state_groups) / ncols))
+
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(15, nrows*3))
+
+    for i, (state_name, result) in enumerate(state_groups):
+        if (title_key != None):
+            state_name = title_key[state_name]
+        axes.flat[i] = plot_rt(result, axes.flat[i], state_name)
+
+    fig.tight_layout()
+    fig.set_facecolor('w')
+
+    fig.suptitle(f'Fig ' + str(num) + ': $R_t$ for COVID-19 in ' + title, size=20)
+    fig.text(0, 0, credit, size=16, weight='demibold')
+    fig.subplots_adjust(top = plotscale)
+
+    return fig
+
+
+def plot_districts(state, plotscale, num, title_key=None):
     # Get sa province rt data
     url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/calc/calculated_rt_' + state + '_district_cumulative.csv'
     districts_raw = pd.read_csv(url,
                          parse_dates=['date'], dayfirst=True,
                          squeeze=True, index_col=[0,1])
     # Plot provinces
-    fig_districts = state_plot(districts_raw, state.upper() + ' districts', plotscale)
+    fig_districts = state_plot(districts_raw, state.upper() + ' districts', plotscale, num = num, title_key=title_key)
     return format_fig(fig_districts)
 
 
@@ -131,6 +156,7 @@ def plot_rt(result, ax, state_name):
     ax.spines['left'].set_visible(False)
     ax.spines['bottom'].set_visible(False)
     ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
     ax.margins(0)
     ax.grid(which='major', axis='y', c='k', alpha=.1, zorder=-2)
     ax.margins(0)
@@ -141,22 +167,43 @@ def plot_rt(result, ax, state_name):
     return ax
 
 
-def state_plot(final_results, title, plotscale):
-    state_groups = final_results.groupby('state')
-
-    ncols = 3
-    nrows = int(np.ceil(len(state_groups) / ncols))
-
-    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(15, nrows*3))
-
-    for i, (state_name, result) in enumerate(state_groups):
-        axes.flat[i] = plot_rt(result, axes.flat[i], state_name)
-
-    fig.tight_layout()
-    fig.set_facecolor('w')
-
-    fig.suptitle(f'COVID-19 Confirmed Cases: Real-time $R_t$ for ' + title, size=20)
-    fig.text(0, 0, 'covid19trends.co.za - Data: DSFSI', size=16, weight='demibold')
-    fig.subplots_adjust(top = plotscale)
-
-    return fig
+district_wc_key = {
+'CT':'City of Cape Town (D)',
+'CT-WE':'Western',
+'CT-SO':'Southern',
+'CT-NO':'Northern',
+'CT-TB':'Tygerberg',
+'CT-EA':'Eastern',
+'CT-KF':'Klipfontein',
+'CT-MP':'Mitchells Plain',
+'CT-KL':'Khayelitsha',
+'CW':'Cape Winelands (D)',
+'CW-BV':'Breede Valley',
+'CW-DS':'Drakenstein',
+'CW-LB':'Langeberg',
+'CW-SB':'Stellenbosch',
+'CW-WB':'Witzenberg',
+'CK':'Central Karoo (D)',
+'CK-BW':'Beaufort West',
+'CK-LB':'Laingsburg',
+'CK-PA':'Prince Albert',
+'GR':'Eden (D)',
+'GR-BT':'Bitou',
+'GR-GE':'George',
+'GR-HQ':'Hessequa',
+'GR-KL':'Kannaland',
+'GR-KN':'Knysna',
+'GR-MB':'Mossel Bay',
+'GR-OS':'Oudtshoorn',
+'OB':'Overberg (D)',
+'OB-CA':'Cape Agulhas',
+'OB-OS':'Overstrand',
+'OB-SD':'Swellendam',
+'OB-TK':'Theewaterskloof',
+'WC':'West Coast (D)',
+'WC-BR':'Bergrivier',
+'WC-CB':'Cederberg',
+'WC-MZ':'Matzikama',
+'WC-SB':'Saldanha Bay',
+'WC-SL':'Swartland'
+}
