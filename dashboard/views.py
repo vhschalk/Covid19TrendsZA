@@ -16,7 +16,7 @@ import pandas as pd
 import numpy as np
 
 repo = 'dsfsi'
-credit = 'Dashboard: covid19trends.co.za - Data: DSFSI'
+credit = 'Source: covid19trends.co.za - Data: DSFSI'
 
 def home(request):
 
@@ -42,7 +42,7 @@ def home(request):
 
     # Plot provinces
     states_filter = states_raw.loc[['EC','FS','GP','KZN','LP','MP','NC','NW','WC']]
-    fig_states = state_plot(states_filter, 'South African provinces', plotscale = 0.92, num = 2)
+    fig_states = state_plot(states_filter, 'South African provinces', plotscale = 0.92, num = 2, title_key=provice_key)
     uri_states = format_fig(fig_states)
 
 
@@ -53,7 +53,7 @@ def home(request):
     return render(request, 'home.html', {'country':uri_country,'states':uri_states, 'districts1':uri_districts1, 'districts2':uri_districts2, 'debug':''})
 
 
-def state_plot(final_results, title, plotscale, num, title_key=None):
+def state_plot(final_results, title, plotscale, num, title_key):
     state_groups = final_results.groupby('state')
 
     ncols = 3
@@ -76,7 +76,7 @@ def state_plot(final_results, title, plotscale, num, title_key=None):
     return fig
 
 
-def plot_districts(state, plotscale, num, title_key=None):
+def plot_districts(state, plotscale, num, title_key):
     # Get sa province rt data
     url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/calc/calculated_rt_' + state + '_district_cumulative.csv'
     districts_raw = pd.read_csv(url,
@@ -166,6 +166,18 @@ def plot_rt(result, ax, state_name):
     #fig.set_facecolor('w')
     return ax
 
+provice_key = {
+'EC':'Eastern Cape',
+'FS':'Free State',
+'GP':'Gauteng',
+'KZN':'Kwazulu Natal',
+'LP':'Limpopo',
+'MP':'Mpumalanga',
+'NC':'Northern Cape',
+'NW':'North-West',
+'WC':'Western Cape'
+}
+
 district_gp_key = {
 'ekurhuleni':'Ekurhuleni',
 'johannesburg':'Johannesburg',
@@ -174,11 +186,11 @@ district_gp_key = {
 
 district_wc_key = {
 'CT':'City of Cape Town (D)',
-'CT-WE':'Western',
-'CT-SO':'Southern',
-'CT-NO':'Northern',
+'CT-WE':'Western Suburbs',
+'CT-SO':'Southern Suburbs',
+'CT-NO':'Northern Suburbs',
 'CT-TB':'Tygerberg',
-'CT-EA':'Eastern',
+'CT-EA':'Eastern Suburbs',
 'CT-KF':'Klipfontein',
 'CT-MP':'Mitchells Plain',
 'CT-KL':'Khayelitsha',
