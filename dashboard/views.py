@@ -186,11 +186,11 @@ district_gp_key = {
 
 district_wc_key = {
 'CT':'City of Cape Town (D)',
-'CT-WE':'Western Suburbs',
+'CT-WE':'Western',
 'CT-SO':'Southern Suburbs',
 'CT-NO':'Northern Suburbs',
 'CT-TB':'Tygerberg',
-'CT-EA':'Eastern Suburbs',
+'CT-EA':'Eastern',
 'CT-KF':'Klipfontein',
 'CT-MP':'Mitchells Plain',
 'CT-KL':'Khayelitsha',
