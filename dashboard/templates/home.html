@@ -1,17 +1,84 @@
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <title>Covid-19 Treads in South Africa</title>
+    {% load django_simple_bulma %}
+    {% bulma %}
+    {% font_awesome %}
+    <title>Covid-19 Trends in South Africa</title>
   </head>
   <body>
-    <div><img src="data:image/png;base64,{{ country }}" alt="" width="800"></div><br>
-    <div><img src="data:image/png;base64,{{ states }}" alt="" width="800"></div><br>
-    <div><img src="data:image/png;base64,{{ districts1 }}" alt="" width="800"></div><br>
-    <div><img src="data:image/png;base64,{{ districts2 }}" alt="" width="800"></div><br>
+    <section class="hero is-medium is-dark is-bold">
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title">Covid-19 Trends in South Africa</h1>
+          <h2 class="subtitle">Effective Reproduction Number</h2>
+        </div>
+      </div>
+    </section>
+
+    <nav class="level">
+      <div class="container">
+        <div class="level-right">
+          <p class="level-item"><a class="button" href="https://sacoronavirus.co.za/" target="_blank">COVID-19 SA Goverment Portal</a></p>
+        </div>
+      </div>
+    </nav>
+
+    <section class="section">
+      <div class="container">
+        <div class="content">To find out how fast Convid-19 is spreading, we can
+          calculate the Effective Reproduction Number (Rt). This number tells us,
+          on average, how many people each infected person infects.</div>
+        <div class="content">While Rt is above 1 the virus will spread rapidly.
+          Getting it below 1 is key to stop the spread.</div>
+        <div class="content">This website provides up to date Rt charts for the
+          country, provinces, districts and subdistrict (were data is available).
+          Only areas with significant spreading will be shown.</div>
+      </div>
+    </section>
+
+    <section class="hero is-warning is-bold">
+      <div class="hero-body">
+        <div class="container">
+          <h2 class="subtitle">With enough applied knowledge we can beat the virus!</h2>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="container"><img src="data:image/png;base64,{{ country }}" alt="" width="800"></div><br>
+      </div>
+    </section>
+
+    <section class="section>">
+      <div class="container">
+        <div class="container"><img src="data:image/png;base64,{{ states }}" alt="" width="800"></div><br>
+      </div>
+    </section>
+
+    <section class="section>">
+      <div class="container">
+        <div><img src="data:image/png;base64,{{ states }}" alt="" width="800"></div><br>
+      </div>
+    </section>
+
+    <section class="section>">
+      <div class="container">
+      <div><img src="data:image/png;base64,{{ districts1 }}" alt="" width="800"></div><br>
+      <div><img src="data:image/png;base64,{{ districts2 }}" alt="" width="800"></div><br>
+      </div>
+    </section>
 
     <div>{{ debug }}</div>
 
-    <div>Source: Data Science for Social Impact Research Group @ University of Pretoria, Coronavirus COVID-19 (2019-nCoV) Data Repository for South Africa. Available on: https://github.com/dsfsi/covid19za.</div>
-    <div>Copyright © covid19trends.co.za</div>
+    <footer class="footer">
+      <div class="container">
+        <p>DSFSI: Data Science for Social Impact Research Group @ University of
+          Pretoria, Coronavirus COVID-19 (2019-nCoV) Data Repository for South
+          Africa. Available on: <a href="https://github.com/dsfsi/covid19za" target="_blank">https://github.com/dsfsi/covid19za</a></p>
+        <p>Copyright © covid19trends.co.za</p>
+      </div>
+    </footer>
   </body>
 </html>
