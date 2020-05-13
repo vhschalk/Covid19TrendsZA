@@ -42,13 +42,13 @@ def home(request):
 
     # Plot provinces
     states_filter = states_raw.loc[['EC','FS','GP','KZN','LP','MP','NC','NW','WC']]
-    fig_states = state_plot(states_filter, 'South African provinces', plotscale = 0.92, num = 2, title_key=provice_key)
+    fig_states = state_plot(states_filter, 'South African provinces', plotscale = 0.92, num = 2, title_key=state_key)
     uri_states = format_fig(fig_states)
 
 
     # Plot districts
-    uri_districts1 = plot_districts('gp', plotscale = 0.78, num = 3, title_key=district_gp_key)
-    uri_districts2 = plot_districts('wc', plotscale = 0.90, num = 4, title_key=district_wc_key)
+    uri_districts1 = plot_districts('GP', plotscale = 0.78, num = 3, title_key=district_gp_key)
+    uri_districts2 = plot_districts('WC', plotscale = 0.90, num = 4, title_key=district_wc_key)
 
     return render(request, 'home.html', {'country':uri_country,'states':uri_states, 'districts1':uri_districts1, 'districts2':uri_districts2, 'debug':''})
 
@@ -78,12 +78,12 @@ def state_plot(final_results, title, plotscale, num, title_key):
 
 def plot_districts(state, plotscale, num, title_key):
     # Get sa province rt data
-    url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/calc/calculated_rt_' + state + '_district_cumulative.csv'
+    url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/calc/calculated_rt_' + state.lower() + '_district_cumulative.csv'
     districts_raw = pd.read_csv(url,
                          parse_dates=['date'], dayfirst=True,
                          squeeze=True, index_col=[0,1])
     # Plot provinces
-    fig_districts = state_plot(districts_raw, state.upper() + ' districts', plotscale, num = num, title_key=title_key)
+    fig_districts = state_plot(districts_raw, state_key[state] + ' districts', plotscale, num = num, title_key=title_key)
     return format_fig(fig_districts)
 
 
@@ -166,7 +166,7 @@ def plot_rt(result, ax, state_name):
     #fig.set_facecolor('w')
     return ax
 
-provice_key = {
+state_key = {
 'EC':'Eastern Cape',
 'FS':'Free State',
 'GP':'Gauteng',
