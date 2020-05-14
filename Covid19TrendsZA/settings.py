@@ -130,6 +130,7 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
+# For Bulma module
 STATICFILES_FINDERS = [
   # First add the two default Finders, since this will overwrite the default.
   'django.contrib.staticfiles.finders.FileSystemFinder',
