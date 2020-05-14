@@ -5,6 +5,7 @@
     {% bulma %}
     {% font_awesome %}
     <title>Covid-19 Trends in South Africa</title>
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
   </head>
   <body>
     <section class="hero is-medium is-dark is-bold">
@@ -45,25 +46,21 @@
       </div>
     </section>
 
-    <section class="section">
-      <div class="container">
-        <div class="container"><img src="data:image/png;base64,{{ country }}" alt="" width="800"></div><br>
-      </div>
-    </section>
+    <div id="output_box">
+      <section class="hero is-info is-bold">
+        <div class="hero-body">
+          <div class="container">
+            <h2 class="subtitle">Please wait while the latest Rt data is fetched...</h2>
+          </div>
+        </div>
+      </section>
+    </div>
 
-    <section class="section>">
-      <div class="container">
-        <div class="container"><img src="data:image/png;base64,{{ states }}" alt="" width="800"></div><br>
-      </div>
-    </section>
-
-    <section class="section>">
-      <div class="container">
-      <div><img src="data:image/png;base64,{{ districts1 }}" alt="" width="800"></div><br>
-      <div class="content is-small">(D) indicates district level data.</div>
-      <div><img src="data:image/png;base64,{{ districts2 }}" alt="" width="800"></div><br>
-      </div>
-    </section>
+    <script>
+      $(document).ready(function() {
+        $('#output_box').load('/graph/')
+      });
+    </script>
 
     <section class="section">
       <div class="container">
