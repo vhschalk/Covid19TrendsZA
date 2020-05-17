@@ -15,6 +15,7 @@ from scipy.interpolate import interp1d
 import pandas as pd
 import numpy as np
 
+#'dsfsi'
 repo = 'dsfsi'
 credit = 'Source: covid19trends.co.za - Data: DSFSI'
 
@@ -54,10 +55,10 @@ def graph(request):
 
 
     # Plot districts
-    uri_districts1 = plot_districts('GP', title_y = 0.78, plotscale = 0.58, num = 3, title_key=district_gp_key)
-    uri_districts2 = plot_districts('WC', title_y = 0.94, plotscale = 0.90, num = 4, title_key=district_wc_key)
+    #uri_districts1 = plot_districts('GP', title_y = 0.78, plotscale = 0.58, num = 3, title_key=district_gp_key)
+    #uri_districts2 = plot_districts('WC', title_y = 0.94, plotscale = 0.90, num = 4, title_key=district_wc_key)
 
-    return render(request, 'graph.html', {'country':uri_country,'states':uri_states, 'districts1':uri_districts1, 'districts2':uri_districts2, 'debug':''})
+    return render(request, 'graph.html', {'country':uri_country,'states':uri_states, 'districts1':'', 'districts2':'', 'debug':''})
 
 
 def state_plot(final_results, title, title_y, plotscale, num, title_key):
