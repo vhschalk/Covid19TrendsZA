@@ -1,19 +1,23 @@
-
     <section class="section">
       <div class="container">
-        <div class="container"><img src="data:image/png;base64,{{ country }}" alt="" width="800"></div><br>
-      </div>
+        <div class="content">
+          The latest Rt value for the country is {{ latestrt }}, last calculated on {{ latestd }}.
+        </div>
     </section>
 
+    <section class="section">
+      <div class="container"><img src="data:image/png;base64,{{ country }}" alt="" width="800"></div>
+    </section>
+
+
     <section class="section>">
-      <div class="container">
-        <div class="container"><img src="data:image/png;base64,{{ states }}" alt="" width="800"></div><br>
-      </div>
+      <div class="container"><img src="data:image/png;base64,{{ states }}" alt="" width="800"></div>
     </section>
 
     <!-- <section class="section>">
       <div class="container">
       <div><img src="data:image/png;base64,{{ districts1 }}" alt="" width="800"></div><br>
+      <div class="content is-small">(D) indicates district level data</div>
       <div><img src="data:image/png;base64,{{ districts2 }}" alt="" width="800"></div><br>
       </div>
     </section> -->
