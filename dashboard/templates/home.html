@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -5,13 +7,16 @@
     {% bulma %}
     {% font_awesome %}
     <title>Covid-19 Trends in South Africa</title>
+    <link rel="icon"
+      type="image/x-icon"
+      href="favicon.ico">
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
   </head>
   <body>
     <section class="hero is-medium is-dark is-bold">
       <div class="hero-body">
         <div class="container">
-          <h1 class="title">Covid-19 Trends in South Africa</h1>
+          <h1 class="title">Covid-19 Trends in South Africa <img src="{% static "flag-za-s.png" %}" height="25"></img></h1>
           <h2 class="subtitle">Effective Reproduction Number</h2>
         </div>
       </div>
@@ -19,9 +24,10 @@
 
     <nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
-        <a class="navbar-item" href="http://www.covid19trends.co.za">
+        <a class="navbar-item" href="/">
           <span class="icon is-large">
-            <i class="fas fa-chart-area"></i>
+            <img src="{% static "icon.svg" %}"></img>
+            <!-- <i class="fas fa-chart-area"></i> -->
           </span>
         </a>
 
@@ -35,7 +41,7 @@
       <div id="navbarTrends" class="navbar-menu">
         <div class="navbar-start">
 
-          <a class="navbar-item" href="http://www.covid19trends.co.za" target="_blank">Rt</a>
+          <a class="navbar-item" href="/">Rt</a>
 
           <a class="navbar-item">
             Data
