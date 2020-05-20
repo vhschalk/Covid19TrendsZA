@@ -9,7 +9,7 @@
     <title>Covid-19 Trends in South Africa</title>
     <link rel="icon"
       type="image/x-icon"
-      href="favicon.ico">
+      href="{% static "favicon.ico" %}">
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
   </head>
   <body>
@@ -40,19 +40,10 @@
 
       <div id="navbarTrends" class="navbar-menu">
         <div class="navbar-start">
-
           <a class="navbar-item" href="/">Rt</a>
-
-          <a class="navbar-item">
-            Data
-          </a>
-
-          <a class="navbar-item">
-            Forecast
-          </a>
-
+          <a class="navbar-item" href="">Data</a>
+          <a class="navbar-item" href="">Forecast</a>
           <a class="navbar-item" href="https://sacoronavirus.co.za/" target="_blank">COVID-19 SA Goverment Portal</a>
-
         </div>
 
         <div class="navbar-end">
@@ -63,11 +54,10 @@
       </div>
     </nav>
 
-
     <section class="section">
       <div class="container">
         <div class="content">To find out how fast Covid-19 is spreading, we can
-          calculate the Effective Reproduction Number (Rt). This number tells us,
+          calculate the Effective Reproduction Number, <strong>Rt</strong>, as the pandemic progresses. This number tells us,
           on average, how many people each infected person is likely to infect.</div>
         <div class="content">For as long as Rt is above 1, the virus is spreading rapidly.
           The challenge is to get Rt below 1 to stop the spread.</div>
