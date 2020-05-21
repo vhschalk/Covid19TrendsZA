@@ -2,6 +2,7 @@
 
 <!DOCTYPE html>
 <html>
+
   <head>
     {% load django_simple_bulma %}
     {% bulma %}
@@ -11,7 +12,18 @@
       type="image/x-icon"
       href="{% static "favicon.ico" %}">
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ analytics_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '{{ analytics_id }}');
+    </script>
   </head>
+
   <body>
     <section class="hero is-medium is-dark is-bold">
       <div class="hero-body">

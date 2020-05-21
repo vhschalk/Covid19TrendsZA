@@ -2,6 +2,7 @@ from django.shortcuts import render
 
 import urllib, base64
 import io
+import os
 
 from matplotlib import pyplot as plt
 from matplotlib.dates import date2num, num2date
@@ -21,7 +22,9 @@ credit = 'Source: covid19trends.co.za - Data: DSFSI'
 
 def home(request):
 
-    return render(request, 'home.html')
+    analytics_id = os.environ['G_ANALYTICS_ID']
+
+    return render(request, 'home.html', {'analytics_id':analytics_id})
 
 
 def graph(request):
@@ -55,11 +58,11 @@ def graph(request):
     states_filter = states_raw.loc[list(state_key.keys())]
     fig_states = state_plot(states_filter, 'South African provinces', title_y = 0.90, plotscale = 0.85, num = 2, title_key=state_key)
     uri_states = format_fig(fig_states)
-
-
     # Plot districts
     #uri_districts1 = plot_districts('GP', title_y = 0.78, plotscale = 0.58, num = 3, title_key=district_gp_key)
     #uri_districts2 = plot_districts('WC', title_y = 0.94, plotscale = 0.90, num = 4, title_key=district_wc_key)
+
+    # impliment this beter
 
     return render(request, 'graph.html', {'country':uri_country,'states':uri_states, 'latestrt':latestrt, 'latestd':latestdate, 'districts1':'', 'districts2':'', 'debug':''})
 
