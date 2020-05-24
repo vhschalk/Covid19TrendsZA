@@ -15,9 +15,6 @@ from scipy.interpolate import interp1d
 import pandas as pd
 import numpy as np
 
-import plotly.offline as offline
-import cufflinks as cf
-
 #'dsfsi'
 repo = 'dsfsi'
 credit = 'Source: covid19trends.co.za - Data: DSFSI'
@@ -57,11 +54,6 @@ def get_matplot():
     # Plot districts
     #uri_districts1 = plot_districts('GP', title_y = 0.78, plotscale = 0.58, num = 3, title_key=district_gp_key)
     #uri_districts2 = plot_districts('WC', title_y = 0.94, plotscale = 0.90, num = 4, title_key=district_wc_key)
-
-    #table_states = states_filter.groupby('state').last()['ML']
-    cf.go_offline()
-    cf.set_config_file(theme='white')
-    colorscale=cf.colors.get_scales('paired')
 
     # TODO create states summary table
     table_states = ''
