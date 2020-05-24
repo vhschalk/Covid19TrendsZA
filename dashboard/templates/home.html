@@ -1,131 +1,88 @@
+{% extends "base.html" %}
 {% load static %}
 
-<!DOCTYPE html>
-<html>
+{% block head %}
+  <title>Covid-19 Trends in South Africa</title>
+{% endblock %}
 
-  <head>
-    {% load django_simple_bulma %}
-    {% bulma %}
-    {% font_awesome %}
-    <title>Covid-19 Trends in South Africa</title>
-    <link rel="icon"
-      type="image/x-icon"
-      href="{% static "favicon.ico" %}">
-    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+{% block content %}
+<section class="hero is-medium is-dark is-bold">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">Covid-19 Trends in South Africa <img src="{% static "flag-za-s.png" %}" height="25"></img></h1>
+      <h2 class="subtitle">Effective Reproduction Number</h2>
+    </div>
+  </div>
+</section>
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ analytics_id }}"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="/">
+      <span class="icon is-large">
+        <img src="{% static "icon.svg" %}"></img>
+        <!-- <i class="fas fa-chart-area"></i> -->
+      </span>
+    </a>
 
-      gtag('config', '{{ analytics_id }}');
-    </script>
-  </head>
+    <!--<a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarTrends">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a> -->
+  </div>
 
-  <body>
-    <section class="hero is-medium is-dark is-bold">
-      <div class="hero-body">
-        <div class="container">
-          <h1 class="title">Covid-19 Trends in South Africa <img src="{% static "flag-za-s.png" %}" height="25"></img></h1>
-          <h2 class="subtitle">Effective Reproduction Number</h2>
-        </div>
-      </div>
-    </section>
-
-    <nav class="navbar" role="navigation" aria-label="main navigation">
-      <div class="navbar-brand">
-        <a class="navbar-item" href="/">
-          <span class="icon is-large">
-            <img src="{% static "icon.svg" %}"></img>
-            <!-- <i class="fas fa-chart-area"></i> -->
-          </span>
-        </a>
-
-        <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarTrends">
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-        </a>
-      </div>
-
-      <div id="navbarTrends" class="navbar-menu">
-        <div class="navbar-start">
-          <a class="navbar-item" href="/">Rt</a>
-          <a class="navbar-item" href="">Data</a>
-          <a class="navbar-item" href="">Forecast</a>
-          <a class="navbar-item" href="https://sacoronavirus.co.za/" target="_blank">COVID-19 SA Goverment Portal</a>
-        </div>
-
-        <div class="navbar-end">
-          <div class="navbar-item">
-
-          </div>
-        </div>
-      </div>
-    </nav>
-
-    <section class="section">
-      <div class="container">
-        <div class="content">To find out how fast Covid-19 is spreading, we can
-          calculate the Effective Reproduction Number, <strong>Rt</strong>, as the pandemic progresses. This number tells us,
-          on average, how many people each infected person is likely to infect.</div>
-        <div class="content">For as long as Rt is above 1, the virus is spreading rapidly.
-          The challenge is to get Rt below 1 to stop the spread.</div>
-        <div class="content">This website provides up to date Rt charts for the
-          country, provinces, districts and subdistricts (were data is available).
-          Only areas with significant spreading will be shown.</div>
-      </div>
-    </section>
-
-    <section class="hero is-warning is-bold">
-      <div class="hero-body">
-        <div class="container">
-          <h2 class="subtitle">With enough applied knowledge we can beat the virus!</h2>
-        </div>
-      </div>
-    </section>
-
-    <div id="output_box">
-      <section class="hero is-info is-bold">
-        <div class="hero-body">
-          <div class="container">
-            <h2 class="subtitle">Please wait while the latest Rt data is fetched.</h2>
-            <progress class="progress is-large is-info" max="100"></progress>
-          </div>
-        </div>
-      </section>
+  <div id="navbarTrends" class="navbar-menu">
+    <div class="navbar-start">
+      <a class="navbar-item" href="/">Rt</a>
+      <a class="navbar-item" href="">Data</a>
+      <a class="navbar-item" href="">Forecast</a>
+      <a class="navbar-item" href="https://sacoronavirus.co.za/" target="_blank">COVID-19 SA Goverment Portal</a>
     </div>
 
-    <script>
-      $(document).ready(function() {
-        $('#output_box').load('/graph/')
-      });
-    </script>
+    <div class="navbar-end">
+      <div class="navbar-item">
 
-    <section class="section">
-      <div class="container">
-        <div class="content">Website maintained by Schalk van Heerden</div>
-        <div class="content">Use this <a href="mailto:schalkv@heerden.com">contact</a>
-          to contribute to the report and dashboard</div>
-    </section>
-
-    <div>{{ debug }}</div>
-
-    <footer class="footer">
-      <div class="container">
-        <div class="content">
-          <h4 >References:</h4>
-          <p><strong>DSFSI:</strong> Data Science for Social Impact Research Group @ University of
-            Pretoria, Coronavirus COVID-19 (2019-nCoV) Data Repository for South
-            Africa. Available on: <a href="https://github.com/dsfsi/covid19za"
-            target="_blank">https://github.com/dsfsi/covid19za</a></p>
-        </div>
-        <div class="content">
-          <p>Copyright © 2020 covid19trends.co.za</p>
-        </div>
       </div>
-    </footer>
-  </body>
-</html>
+    </div>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container">
+    <div class="content">To find out how fast Covid-19 is spreading, we can
+      calculate the Effective Reproduction Number, <strong>Rt</strong>, as the pandemic progresses. This number tells us,
+      on average, how many people each infected person is likely to infect.</div>
+    <div class="content">For as long as Rt is above 1, the virus is spreading rapidly.
+      The challenge is to get Rt below 1 to stop the spread.</div>
+    <div class="content">This website provides up to date Rt charts for the
+      country, provinces, districts and subdistricts (were data is available).
+      Only areas with significant spreading will be shown.</div>
+  </div>
+</section>
+
+<section class="hero is-warning is-bold">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="subtitle">With enough applied knowledge we can beat the virus!</h2>
+    </div>
+  </div>
+</section>
+
+<div id="output_box">
+  <section class="hero is-info is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h2 class="subtitle">Please wait while the latest Rt data is fetched.</h2>
+        <progress class="progress is-large is-info" max="100"></progress>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  $(document).ready(function() {
+    $('#output_box').load('/matplot/')
+  });
+</script>
+
+{% endblock %}
