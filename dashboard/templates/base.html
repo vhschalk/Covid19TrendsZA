@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    {% load django_simple_bulma %}
+    {% bulma %}
+    {% font_awesome %}
+    <link rel="icon"
+      type="image/x-icon"
+      href="{% static "favicon.ico" %}">
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+    {% block head %}
+
+    {% endblock %}
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ analytics_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '{{ analytics_id }}');
+    </script>
+  </head>
+
+  <body>
+
+    {% block content %}
+    <!-- Content here -->
+    {% endblock %}
+
+    {% block tail %}
+    <div>{{ debug }}</div>
+    {% endblock %}
+
+    <footer class="footer">
+      <div class="container">
+        <div class="content">Website maintained by Schalk van Heerden</div>
+        <div class="content">Use this <a href="mailto:schalkv@heerden.com">contact</a>
+          to contribute to the report and dashboard</div>
+
+        <div class="content">
+          <h4 >References:</h4>
+          <p><strong>DSFSI:</strong> Data Science for Social Impact Research Group @ University of
+            Pretoria, Coronavirus COVID-19 (2019-nCoV) Data Repository for South
+            Africa. Available on <a href="https://github.com/dsfsi/covid19za"
+            target="_blank">here.</a></p>
+        </div>
+        <div class="content">
+          <p>Copyright © 2020 covid19trends.co.za</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
