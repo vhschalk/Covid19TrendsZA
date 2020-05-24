@@ -1,5 +1,5 @@
 from django.shortcuts import render
-#import matplot
+from .matplot import get_matplot
 import os
 
 import urllib, base64
@@ -13,4 +13,6 @@ def home(request):
 
 def matplot(request):
 
-    return render(request, 'matplot.html', get_matplot())
+    matplot_fig = get_matplot()
+
+    return render(request, 'matplot.html', matplot_fig)
