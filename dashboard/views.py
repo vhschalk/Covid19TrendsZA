@@ -1,16 +1,20 @@
 from django.shortcuts import render
 from .matplot import get_matplot
-from .graphly import plot1d
-import os
+from .graphly import plotStates
 
-import urllib, base64
+def base(request):
+
+    return render(request, 'home.html', {'graphly':''})
 
 def home(request):
 
-    analytics_id = os.environ['G_ANALYTICS_ID']
-    graphly = plot1d()
+    return render(request, 'home.html', {'graphly':''})
 
-    return render(request, 'home.html', {'graphly':graphly})
+def data(request):
+    
+    graphly = plotStates()
+
+    return render(request, 'data.html', {'graphly':graphly})
 
 def matplot(request):
 
