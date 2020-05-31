@@ -3,6 +3,8 @@ import glob
 import os
 
 import numpy as np
+import pandas as pd
+import plotly.express as px
 import plotly.graph_objs as go
 from plotly.offline import plot
 
@@ -30,3 +32,31 @@ def plot1d():
     fig = go.Figure(data=data, layout=layout)
     plot_div = plot(fig, output_type='div', include_plotlyjs=False)
     return plot_div
+
+def plotStates():
+    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
+    states = pd.read_csv(url,
+                     parse_dates=['date'], dayfirst=True,
+                     squeeze=True)
+    state_filter = list(state_key.keys())
+    state_filter.insert(0,'date')
+    state_plot = states[state_filter]
+    state_plotly = state_plot.melt(id_vars='date')
+
+    fig = px.bar(state_plotly, x='date', y='value', color='variable')
+    fig.update_layout(hovermode='x')
+    plot_div = plot(fig, output_type='div', include_plotlyjs=False)
+    return plot_div
+
+
+state_key = {
+    'EC':'Eastern Cape',
+    'FS':'Free State',
+    'GP':'Gauteng',
+    'KZN':'Kwazulu Natal',
+    'LP':'Limpopo',
+    'MP':'Mpumalanga',
+    'NC':'Northern Cape',
+    'NW':'North-West',
+    'WC':'Western Cape'
+}

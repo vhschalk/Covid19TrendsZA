@@ -16,18 +16,60 @@
 
     {% endblock %}
 
+    {% load tags %}
+
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ analytics_id }}"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id={% analytics_id %}"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
-      gtag('config', '{{ analytics_id }}');
+      gtag('config', '{% analytics_id %}');
     </script>
   </head>
 
   <body>
+    <section class="hero is-medium is-dark is-bold">
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title">Covid-19 Trends in South Africa <img src="{% static "flag-za-s.png" %}" height="25"></img></h1>
+          <h2 class="subtitle">Effective Reproduction Number</h2>
+        </div>
+      </div>
+    </section>
+
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="/">
+          <span class="icon is-large">
+            <img src="{% static "icon.svg" %}"></img>
+            <!-- <i class="fas fa-chart-area"></i> -->
+          </span>
+        </a>
+
+        <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarTrends">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+
+      <div id="navbarTrends" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="/">Rt</a>
+          <a class="navbar-item" href="data">Data</a>
+          <a class="navbar-item" href="">Forecast</a>
+          <a class="navbar-item" href="https://sacoronavirus.co.za/" target="_blank">COVID-19 SA Goverment Portal</a>
+        </div>
+
+        <div class="navbar-end">
+          <div class="navbar-item">
+
+          </div>
+        </div>
+      </div>
+    </nav>
 
     {% block content %}
     <!-- Content here -->
@@ -39,16 +81,15 @@
 
     <footer class="footer">
       <div class="container">
-        <div class="content">Website maintained by Schalk van Heerden</div>
-        <div class="content">Use this <a href="mailto:schalkv@heerden.com">contact</a>
-          to contribute to the report and dashboard</div>
+        <div class="content">Website maintained by Schalk van Heerden. Contribute
+          to the report and dashbboard on
+          <a href="https://github.com/heerden/Covid19TrendsZA" target="_blank">GitHub</a>.</div>
 
         <div class="content">
           <h4 >References:</h4>
           <p><strong>DSFSI:</strong> Data Science for Social Impact Research Group @ University of
-            Pretoria, Coronavirus COVID-19 (2019-nCoV) Data Repository for South
-            Africa. Available on <a href="https://github.com/dsfsi/covid19za"
-            target="_blank">here.</a></p>
+            Pretoria, Coronavirus COVID-19 (2019-nCoV) Data Repository for South Africa. Available
+            <a href="https://github.com/dsfsi/covid19za" target="_blank">here.</a></p>
         </div>
         <div class="content">
           <p>Copyright © 2020 covid19trends.co.za</p>
