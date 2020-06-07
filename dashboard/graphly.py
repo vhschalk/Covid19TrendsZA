@@ -38,13 +38,17 @@ def plotStates():
     states = pd.read_csv(url,
                      parse_dates=['date'], dayfirst=True,
                      squeeze=True)
+
     state_filter = list(state_key.keys())
     state_filter.insert(0,'date')
-    state_plot = states[state_filter]
-    state_plotly = state_plot.melt(id_vars='date')
 
-    fig = px.bar(state_plotly, x='date', y='value', color='variable')
-    fig.update_layout(hovermode='x')
+    state_plot = states[state_filter]
+    state_plot = state_plot.rename(columns={'date':'Date'})
+    state_plotly = state_plot.melt(id_vars='Date', var_name='Province', value_name='Cases')
+
+    fig = px.bar(state_plotly, x='Date', y='Cases', color='Province')
+    fig.update_traces(hovertemplate=None)
+    fig.update_layout(hovermode="x")
     plot_div = plot(fig, output_type='div', include_plotlyjs=False)
     return plot_div
 

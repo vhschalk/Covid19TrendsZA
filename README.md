@@ -17,14 +17,14 @@ The dashboard is build with Django. The analytics engine currently runs on the [
 
 ### TODOs
 
-1. Improve front-end layout!
-1. Change the plots to Plotly
+1. Improve front-end layout
+1. Change all plots to Plotly
 1. Consider using a cron job to store the latest Rt data with PostgreSQL DB
 1. Consider running the analytics engine directly in this project (low priority)
 
 ## Installing
 
 1. `$ brew install postgresql`
-1. `$ pip install -r requirement.txt`
+1. `$ pip install -r requirements.txt`
 1. `$ python manage.py collectstatic --noinput `
 1. `$ python manage.py runserver`
