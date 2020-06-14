@@ -1,32 +1,8 @@
-    <section class="section">
-      <div class="container">
-        <div class="content">
-          The latest Rt value for the country is <strong>{{ latestrt }}</strong>,
-          last calculated on {{ latestd }}. This means that each newly infected
-          person is likely to infect {{ latestrt }} more people.
-        </div>
-    </section>
 
     <section class="section">
       <div class="container"><img src="data:image/png;base64,{{ country }}" alt="" width="800"></div>
     </section>
 
-    <section class="section">
-      <div class="container">
-        <div class="content">
-          {{ tablesstates }}
-        </div>
-      </div>
-    </section>
-
     <section class="section>">
       <div class="container"><img src="data:image/png;base64,{{ states }}" alt="" width="800"></div>
     </section>
-
-    <!-- <section class="section>">
-      <div class="container">
-      <div><img src="data:image/png;base64,{{ districts1 }}" alt="" width="800"></div><br>
-      <div class="content is-small">(D) indicates district level data</div>
-      <div><img src="data:image/png;base64,{{ districts2 }}" alt="" width="800"></div><br>
-      </div>
-    </section> -->
