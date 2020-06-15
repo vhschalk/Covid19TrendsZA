@@ -5,12 +5,19 @@ import copy
 
 import numpy as np
 import pandas as pd
+
 import plotly.express as px
 import plotly.graph_objs as go
 from plotly.offline import plot
+from plotly.subplots import make_subplots
 
 
 def plots_rt():
+
+    # Setup common variables
+
+    state_labels = list(state_key.values())
+    
 
     # Data
 
@@ -49,14 +56,21 @@ def plots_rt():
 
     states_rt = states_all_rt.query("Province != 'Total RSA'")
 
-    grid_key = pd.DataFrame({'Province':['EC', 'FS', 'GP', 'KZN', 'LP', 'MP', 'NC', 'NW', 'WC'],
-                          'Row':[1,1,1,2,2,2,3,3,3],
-                          'Col':[1,2,3,1,2,3,1,2,3]})
+    fig_px = px.line(states_rt, x='Date', y='ML', color='Province')
+    fig_len = len(fig_px['data'])
 
-    states_grid = states_rt.join(grid_key.set_index('Province'), on='Province')
+    fig2 = make_subplots(rows=3, cols=3,
+                    subplot_titles=state_labels,
+                    shared_xaxes=True, shared_yaxes=True)
 
-    fig2 = px.line(states_grid, x='Date', y='ML', color='Province', facet_row='Row', facet_col='Col',
-             title='Rt for Covid-19 in South African Provinces')
+    r = 0
+    for p in range(fig_len):
+        c = (p % 3) + 1
+        if (c == 1):
+            r+=1
+        fig2.add_trace(fig_px['data'][p], row=r, col=c)
+
+    fig2.update_layout(title_text="Rt for Covid-19 in South African Provinces")
     fig2.update_traces(hovertemplate=None)
     fig2.update_layout(hovermode="x")
 
