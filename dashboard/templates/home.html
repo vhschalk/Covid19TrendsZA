@@ -76,7 +76,7 @@
     </div>
       <div class="column">
         <div class="box">
-          <p class="heading">Reproduction Number</p>
+          <p class="heading">Reproduction No.</p>
           <p class="title">{{ latestrt}}</p> 
       </div>
     </div>
@@ -92,7 +92,8 @@
 
   <section class="hero is-danger is-bold">
     <div class="hero-body">
-        <h2 class="title">The following assumptions were applied to calculate the trends</h2>
+      <div class="content">
+        <h3 class="subtitle">The following assumptions were applied to calculate the trends</h3>
         <ol>
           <li>Smoothed average data is used.</li>
           <li>The error bands indicate the 90% credibility interval.</li>
@@ -101,6 +102,7 @@
           <li>The background rate of the spread is not known.</li>
           <li>Any future trends will use the latest calculated Rt for the region.</li>
         </ol>
+      </div>
     </div>
   </section>
 
@@ -136,7 +138,7 @@
 <div class="container">
 
   <section class="section">
-      <div class="content">Coming soon...</div>
+    <div class="content">{{ G6|safe }}</div>
   </section>
 
 </div>

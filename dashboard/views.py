@@ -1,23 +1,19 @@
 from django.shortcuts import render
 from .matplot import get_matplot
-from .graphly import plots_data, plots_rt
+from .graphly import plots_trends
 
 
 def home(request):
 
-    plot_rt_country, plot_rt_states, latestrt, latestd  = plots_rt()
-
-    plot_combined_cases, plot_daily_cases, plot_stats, summary  = plots_data()
+    plot_rt_country, plot_rt_states, latestrt, latestd, plot_combined_cases, plot_daily_cases, plot_stats, plot_future, summary  = plots_trends()
 
     return render(request, 'home.html', {'G1':plot_rt_country, 'G2':plot_rt_states,'latestrt':latestrt, 'latestd':latestd, 
-                  'G3':plot_stats, 'G4':plot_combined_cases, 'G5':plot_daily_cases, 'summary':summary})
+                  'G3':plot_stats, 'G4':plot_combined_cases, 'G5':plot_daily_cases, 'G6':plot_future, 'summary':summary})
 
 
 def data(request):
 
-    plot_combined_cases, plot_daily_cases, plot_stats, summary  = plots_data()
-
-    return render(request, 'data.html', {'G1':plot_stats, 'G2':plot_combined_cases, 'G3':plot_daily_cases, 'summary':summary})
+    return render(request)
 
 
 def export(request):

@@ -2,6 +2,7 @@ import datetime
 import glob
 import os
 import copy, math
+from datetime import timedelta
 
 import numpy as np
 import pandas as pd
@@ -12,7 +13,7 @@ from plotly.offline import plot
 from plotly.subplots import make_subplots
 
 
-def plots_rt():
+def plots_trends():
 
     # Setup common variables
 
@@ -24,6 +25,7 @@ def plots_rt():
     url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
     states_all_rt = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
     states_all_rt = states_all_rt.rename(columns={'date':'Date'})
+    states_all_rt = states_all_rt.rename(columns={'ML':'Rt'})
     states_all_rt = states_all_rt.rename(columns={'state':'Province'})
 
     state_single = states_all_rt.query("Province == 'Total RSA'")
@@ -32,7 +34,7 @@ def plots_rt():
     # Simple Stats
 
     latestresult = state_single.iloc[-1,:]
-    rt = latestresult['ML']
+    rt = round(latestresult['Rt'], 2)
     latestrt = '%.2f'%rt
 
     d = latestresult['Date']
@@ -41,10 +43,10 @@ def plots_rt():
 
     # Graph 1
 
-    state_single["e_plus"] = state_single['High_90'].sub(state_single['ML'])
-    state_single["e_minus"] = state_single['ML'].sub(state_single['Low_90'])
+    state_single["e_plus"] = state_single['High_90'].sub(state_single['Rt'])
+    state_single["e_minus"] = state_single['Rt'].sub(state_single['Low_90'])
 
-    fig1 = px.line(state_single, x='Date', y='ML', color='Province',
+    fig1 = px.line(state_single, x='Date', y='Rt', color='Province',
               error_y='e_plus', error_y_minus='e_minus',
               title='Rt for Covid-19 in South Africa', line_shape='spline')
     fig1.update_traces(hovertemplate=None)
@@ -58,7 +60,7 @@ def plots_rt():
 
     states_rt = states_all_rt.query("Province != 'Total RSA'")
 
-    fig_px = px.line(states_rt, x='Date', y='ML', color='Province')
+    fig_px = px.line(states_rt, x='Date', y='Rt', color='Province')
     fig_len = len(fig_px['data'])
 
     fig2 = make_subplots(rows=3, cols=3,
@@ -79,9 +81,7 @@ def plots_rt():
     plot_rt_states = plot(fig2, output_type='div', include_plotlyjs=False)
 
 
-    return plot_rt_country, plot_rt_states, latestrt, latestd
 
-def plots_data():
 
     # Setup common variables
 
@@ -147,20 +147,18 @@ def plots_data():
     states_all_deaths = pd.read_csv(url,
                         parse_dates=['date'], dayfirst=True,
                         squeeze=True,index_col=0).sort_index()
-    state_deaths = states_all_deaths[state_filter]
 
     url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_recoveries.csv'
     states_all_recover = pd.read_csv(url,
                      parse_dates=['date'], dayfirst=True,
                      squeeze=True,index_col=0).sort_index()
-    states_recover = states_all_recover[state_filter]
 
-    states_series = pd.Series(states_all_i['total'].values, index=states_all_i.index.values, name='Cases')
+    cases_series = pd.Series(states_all_i['total'].values, index=states_all_i.index.values, name='Cases')
 
     deaths_series = pd.Series(states_all_deaths['total'].values, index=states_all_deaths.index, name='Deaths')
     recover_series = pd.Series(states_all_recover['total'].values, index=states_all_recover.index, name='Recovered')
 
-    states_combine = pd.concat([states_series, recover_series, deaths_series], axis=1)
+    states_combine = pd.concat([cases_series, recover_series, deaths_series], axis=1)
 
     states_master = states_combine.ffill(axis=0)
 
@@ -182,6 +180,48 @@ def plots_data():
     plot_stats = plot(fig3, output_type='div', include_plotlyjs=False)
 
 
+    # Future
+    # Graph 4
+
+    latestresult = state_single.iloc[-1,:]
+    rt = round(latestresult['Rt'], 2)
+
+    future = cases_series.copy()
+    
+    f = 30
+
+    lasti = future.index[-1]
+
+    future_dates = []
+    for i in range(f):
+        future_dates.append(lasti)
+        lasti = lasti + timedelta(days=1)
+
+    lastc = future.values[-1]
+    lastc *= 1.0
+
+    future_cases = []
+    for i in range(f):
+        future_cases.append(math.trunc(round(lastc,0)))
+        lastc *= rt
+
+    future_series = pd.Series(future_cases, index=future_dates, name='Projected Cases')
+
+    future_wide = pd.concat([cases_series, future_series], axis=1)
+
+    future_wide = future_wide.reset_index()
+    future_wide = future_wide.rename(columns={'index':'Date'})
+
+    future_wide_plotly = future_wide.melt(id_vars='Date', var_name='Data', value_name='Cases')
+
+    fig6 = px.line(future_wide_plotly, x='Date', y='Cases', color='Data',
+              title='Projected Cases Based on Current Trends')
+    fig6.update_traces(hovertemplate=None)
+    fig6.update_layout(hovermode="x")
+
+    plot_future = plot(fig6, output_type='div', include_plotlyjs=False)
+
+
     # Simple Stats
 
     latestcases = states_wide.iloc[-1,:]
@@ -189,7 +229,7 @@ def plots_data():
     summary = [int(num) for num in latest]
 
 
-    return plot_combined_cases, plot_daily_cases, plot_stats, summary
+    return plot_rt_country, plot_rt_states, latestrt, latestd, plot_combined_cases, plot_daily_cases, plot_stats, plot_future, summary
 
 
 state_key = {
