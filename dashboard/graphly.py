@@ -17,7 +17,7 @@ def plots_rt():
     # Setup common variables
 
     state_labels = list(state_key.values())
-    
+
 
     # Data
 
@@ -48,6 +48,7 @@ def plots_rt():
               title='Rt for Covid-19 in South Africa', line_shape='spline')
     fig1.update_traces(hovertemplate=None)
     fig1.update_layout(hovermode="x")
+    fig1['data'][0]['error_y']['color'] = 'lightblue'
 
     plot_rt_country = plot(fig1, output_type='div', include_plotlyjs=False)
 
@@ -70,7 +71,7 @@ def plots_rt():
             r+=1
         fig2.add_trace(fig_px['data'][p], row=r, col=c)
 
-    fig2.update_layout(title_text="Rt for Covid-19 in South African Provinces")
+    fig2.update_layout(title_text="Rt for Covid-19 in South African Provinces", height=700)
     fig2.update_traces(hovertemplate=None)
     fig2.update_layout(hovermode="x")
 

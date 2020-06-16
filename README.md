@@ -22,9 +22,26 @@ The dashboard is build with Django. The analytics engine currently runs on the [
 1. Consider using a cron job to store the latest Rt data with PostgreSQL DB
 1. Consider running the analytics engine directly in this project (low priority)
 
-## Running locally
+## Local install
 
-1. `$ brew install postgresql`
-1. `$ pip install -r requirements.txt`
-1. `$ python manage.py collectstatic --noinput`
-1. `$ python manage.py runserver`
+### Setup
+
+1. `brew install postgresql`
+1. `pip install virtualenv`
+1. `cd /your_project_folder` 
+1. `virtualenv env`
+1. `cd env/bin`
+1. `activate`
+1. `cd ../..pip`
+1. `pip install -r requirements.txt`
+
+### Run
+
+After adding new images:
+1. `python manage.py collectstatic --noinput`
+
+Local run:
+1. `python manage.py runserver`
+
+After session changes (due to WSGI config): 
+1. `touch Covid19TrendsZA/wsgi.py`
