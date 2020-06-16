@@ -32,7 +32,7 @@ The dashboard is build with Django. The analytics engine currently runs on the [
 1. `virtualenv env`
 1. `cd env/bin`
 1. `activate`
-1. `cd ../..pip`
+1. `cd ../..`
 1. `pip install -r requirements.txt`
 
 ### Run

@@ -36,8 +36,11 @@ def get_matplot():
     ax = plot_rt(country, ax, state_name = '')
     ax.set_title(credit, size=12, weight='light')
     fig_country.suptitle(f'Fig 1: $R_t$ for COVID-19 in South Africa', size=14)
-    ax.xaxis.set_major_locator(mdates.WeekdayLocator())
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
+
+    # Week labels are to close for longer time ranges
+    #ax.xaxis.set_major_locator(mdates.WeekdayLocator())
+    #ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
+
     #fig_country.text(0, 0.95, credit, size=12, weight='light')
     #fig_country.subplots_adjust(top = 0.90)
 
@@ -51,6 +54,7 @@ def get_matplot():
     states_filter = states_raw.loc[list(state_key.keys())]
     fig_states = state_plot(states_filter, 'South African provinces', title_y = 0.90, plotscale = 0.85, num = 2, title_key=state_key)
     uri_states = format_fig(fig_states)
+
     # Plot districts
     #uri_districts1 = plot_districts('GP', title_y = 0.78, plotscale = 0.58, num = 3, title_key=district_gp_key)
     #uri_districts2 = plot_districts('WC', title_y = 0.94, plotscale = 0.90, num = 4, title_key=district_wc_key)
@@ -186,51 +190,4 @@ state_key = {
 'NC':'Northern Cape',
 'NW':'North-West',
 'WC':'Western Cape'
-}
-
-district_gp_key = {
-'ekurhuleni':'Ekurhuleni',
-'johannesburg':'Johannesburg',
-'tshwane':'Tshwane'
-}
-
-district_wc_key = {
-'CT':'City of Cape Town (D)',
-'CT-WE':'Western',
-'CT-SO':'Southern Suburbs',
-'CT-NO':'Northern Suburbs',
-'CT-TB':'Tygerberg',
-'CT-EA':'Eastern',
-'CT-KF':'Klipfontein',
-'CT-MP':'Mitchells Plain',
-'CT-KL':'Khayelitsha',
-'CW':'Cape Winelands (D)',
-'CW-BV':'Breede Valley',
-'CW-DS':'Drakenstein',
-'CW-LB':'Langeberg',
-'CW-SB':'Stellenbosch',
-'CW-WB':'Witzenberg',
-'CK':'Central Karoo (D)',
-'CK-BW':'Beaufort West',
-'CK-LB':'Laingsburg',
-'CK-PA':'Prince Albert',
-'GR':'Eden (D)',
-'GR-BT':'Bitou',
-'GR-GE':'George',
-'GR-HQ':'Hessequa',
-'GR-KL':'Kannaland',
-'GR-KN':'Knysna',
-'GR-MB':'Mossel Bay',
-'GR-OS':'Oudtshoorn',
-'OB':'Overberg (D)',
-'OB-CA':'Cape Agulhas',
-'OB-OS':'Overstrand',
-'OB-SD':'Swellendam',
-'OB-TK':'Theewaterskloof',
-'WC':'West Coast (D)',
-'WC-BR':'Bergrivier',
-'WC-CB':'Cederberg',
-'WC-MZ':'Matzikama',
-'WC-SB':'Saldanha Bay',
-'WC-SL':'Swartland'
 }

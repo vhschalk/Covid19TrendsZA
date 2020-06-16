@@ -1,7 +1,7 @@
 import datetime
 import glob
 import os
-import copy
+import copy, math
 
 import numpy as np
 import pandas as pd
@@ -31,11 +31,12 @@ def plots_rt():
 
     # Simple Stats
 
-    last = state_single.iloc[-1,:]['ML']
-    latestrt = '%.2f'%last
+    latestresult = state_single.iloc[-1,:]
+    rt = latestresult['ML']
+    latestrt = '%.2f'%rt
 
-    latestdate = state_single.iloc[-1,:]['Date']
-    latestd = latestdate.strftime("%d %B %Y")
+    d = latestresult['Date']
+    latestd = d.strftime("%d %B %Y")
 
 
     # Graph 1
@@ -108,7 +109,7 @@ def plots_data():
     state_plot = states_all[state_filter_i]
     state_plotly = state_plot.melt(id_vars='Date', var_name='Province', value_name='Cases')
 
-    fig1 = px.bar(state_plotly, title='Combined Cases Per Province', x='Date', y='Cases', color='Province',
+    fig1 = px.bar(state_plotly, title='Total Cases Per Province', x='Date', y='Cases', color='Province',
                 barmode='relative', color_discrete_sequence=colour_series)
     fig1.update_traces(hovertemplate=None)
     fig1.update_layout(hovermode="x")
@@ -181,7 +182,14 @@ def plots_data():
     plot_stats = plot(fig3, output_type='div', include_plotlyjs=False)
 
 
-    return plot_combined_cases, plot_daily_cases, plot_stats
+    # Simple Stats
+
+    latestcases = states_wide.iloc[-1,:]
+    latest = [latestcases['Cases'], latestcases['Recovered'], latestcases['Deaths'], latestcases['Active']]
+    summary = [int(num) for num in latest]
+
+
+    return plot_combined_cases, plot_daily_cases, plot_stats, summary
 
 
 state_key = {
@@ -194,4 +202,51 @@ state_key = {
     'NC':'Northern Cape',
     'NW':'North-West',
     'WC':'Western Cape'
+}
+
+district_gp_key = {
+'ekurhuleni':'Ekurhuleni',
+'johannesburg':'Johannesburg',
+'tshwane':'Tshwane'
+}
+
+district_wc_key = {
+'CT':'City of Cape Town (D)',
+'CT-WE':'Western',
+'CT-SO':'Southern Suburbs',
+'CT-NO':'Northern Suburbs',
+'CT-TB':'Tygerberg',
+'CT-EA':'Eastern',
+'CT-KF':'Klipfontein',
+'CT-MP':'Mitchells Plain',
+'CT-KL':'Khayelitsha',
+'CW':'Cape Winelands (D)',
+'CW-BV':'Breede Valley',
+'CW-DS':'Drakenstein',
+'CW-LB':'Langeberg',
+'CW-SB':'Stellenbosch',
+'CW-WB':'Witzenberg',
+'CK':'Central Karoo (D)',
+'CK-BW':'Beaufort West',
+'CK-LB':'Laingsburg',
+'CK-PA':'Prince Albert',
+'GR':'Eden (D)',
+'GR-BT':'Bitou',
+'GR-GE':'George',
+'GR-HQ':'Hessequa',
+'GR-KL':'Kannaland',
+'GR-KN':'Knysna',
+'GR-MB':'Mossel Bay',
+'GR-OS':'Oudtshoorn',
+'OB':'Overberg (D)',
+'OB-CA':'Cape Agulhas',
+'OB-OS':'Overstrand',
+'OB-SD':'Swellendam',
+'OB-TK':'Theewaterskloof',
+'WC':'West Coast (D)',
+'WC-BR':'Bergrivier',
+'WC-CB':'Cederberg',
+'WC-MZ':'Matzikama',
+'WC-SB':'Saldanha Bay',
+'WC-SL':'Swartland'
 }

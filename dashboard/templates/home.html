@@ -11,47 +11,134 @@
 
 {% block content %}
 
-<section class="section">
-  <div class="container">
+<div class="container">
+
+  <section class="section">
     <div class="content">To find out how fast Covid-19 is spreading, we can
-      calculate the Effective Reproduction Number, <strong>Rt</strong>, as the pandemic progresses. This number tells us,
+      calculate the Effective Reproduction Number (<strong>Rt</strong>) as the pandemic progresses. This number tells us,
       on average, how many people each infected person is likely to infect.</div>
     <div class="content">For as long as Rt is above 1, the virus is spreading rapidly.
       The challenge is to get Rt below 1 to stop the spread.</div>
     <div class="content">This website provides up to date Rt charts for the
-      country, provinces, districts and subdistricts (were data is available).
+      country, provinces, districts and subdistricts (where data is available).
       Only areas with significant spreading will be shown.</div>
-  </div>
-</section>
+  </section>
+
+</div>
 
 <section class="hero is-warning is-bold">
   <div class="hero-body">
-    <div class="container">
       <h2 class="subtitle">With enough applied knowledge we can beat the virus!</h2>
-    </div>
   </div>
 </section>
 
-<section class="section">
-  <div class="container">
+<div class="container">
+
+  <section class="section">
     <div class="content">
       The latest Rt value for the country is <strong>{{ latestrt }}</strong>,
       last calculated on {{ latestd }}. This means that each newly infected
       person is likely to infect {{ latestrt }} more people.
     </div>
-</section>
 
-<section class="section">
-  <div class="container">
-    <div class="content">{{ G1|safe }}</div>
-    <div class="content">The error bands for all analytical plots on this website, indicates the 90% credibility interval.</div>
+    <div class="columns is-mobile has-text-centered">
+      <div class="column">
+        <div class="box">
+          <p class="heading">South African Covid-19 Summary</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns is-mobile has-text-centered">
+      <div class="column">
+        <div class="box">
+          <p class="heading">Total Cases</p>
+          <p class="title">{{ summary.0 }}</p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="box">
+          <p class="heading">Total Recovered</p>
+          <p class="title">{{ summary.1 }}</p> 
+      </div>
+    </div>
+      <div class="column">
+        <div class="box">
+          <p class="heading">Total Deaths</p>
+          <p class="title">{{ summary.2 }}</p> 
+      </div>
+    </div>
+      <div class="column">
+        <div class="box">
+          <p class="heading">Total Active</p>
+          <p class="title">{{ summary.3 }}</p> 
+      </div>
+    </div>
+      <div class="column">
+        <div class="box">
+          <p class="heading">Reproduction Number</p>
+          <p class="title">{{ latestrt}}</p> 
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+      <div class="content">{{ G1|safe }}</div>
+  </section>
+
+  <section class="section">
+      <div class="content">{{ G2|safe }}</div>
+  </section>
+
+  <section class="hero is-danger is-bold">
+    <div class="hero-body">
+        <h2 class="title">The following assumptions were applied to calculate the trends</h2>
+        <ol>
+          <li>Smoothed average data is used.</li>
+          <li>The error bands indicate the 90% credibility interval.</li>
+          <li>For regions with low case rates, only the date ranges with the most significant change is shown.</li>
+          <li>The lag time between testing and positive case identification is not taken into account yet, due to the difficulty to obtain access to testing data.</li>
+          <li>The background rate of the spread is not known.</li>
+          <li>Any future trends will use the latest calculated Rt for the region.</li>
+        </ol>
+    </div>
+  </section>
+
+  <section class="section">
+      <div class="content"><a href="export">Download</a> a png version of the Rt plots for publication.</div>
+  </section>
+
+</div>
+
+  <section class="hero is-dark is-bold">
+    <div class="hero-body">
+        <h2 class="subtitle">Covid-19 Case Data</h2>
+    </div>
+  </section>
+
+<div class="container">
+
+  <section class="section">
+      <div class="content">{{ G3|safe }}</div>
+      <div class="content">{{ G4|safe }}</div>
+      <div class="content">{{ G5|safe }}</div>
+  </section>
+
+</div>
+
+
+<section class="hero is-warning is-bold">
+  <div class="hero-body">
+      <h2 class="subtitle">Future projections</h2>
   </div>
 </section>
 
-<section class="section">
-  <div class="container">
-    <div class="content">{{ G2|safe }}</div>
-  </div>
-</section>
+<div class="container">
+
+  <section class="section">
+      <div class="content">Coming soon...</div>
+  </section>
+
+</div>
 
 {% endblock %}
