@@ -188,13 +188,13 @@ def plots_trends():
     cases_df = cases_df.rename(columns={'index':'Date'})
     cases_df
 
-    f = 60
+    f = 30
 
     diff = cases_df['Cases'].diff()
 
     d = diff.values[-1]
 
-    r_scenarios = [3.0, 2.0, 1.5, 1.0, 0.75, 0.5, 0.1]
+    r_scenarios = [1.5, 1.4, 1.3, 1.25, 1.2, 1.15, 1.1, 1.075, 1.05, 1.025, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.25, 0.1]
     r_scenarios.append(rt)
     r_scenarios.sort(reverse=True)
 
@@ -204,29 +204,35 @@ def plots_trends():
         projection = cases_df.copy()
         lastd = cases_df['Date'].iloc[-1]
         lastc = cases_df['Cases'].iloc[-1]
+        d = diff.values[-1]
 
         for i in range(f):
             lastd += timedelta(days=1)
-            lastc = lastc + (d * r)
+            newc = lastc + (d * r)
+            d = newc - lastc
+            lastc = newc
 
             calc = pd.DataFrame([[lastd, lastc]], columns=['Date', 'Cases'])
             # TODO: consider concat opertion here for faster processing
             projection = projection.append(calc)
             
-        projection['Rt'] = r
+        projection['R'] = r
         
         if future_projections is None:
             future_projections = projection
         else:
             future_projections = pd.concat([future_projections, projection])
 
-        fig6 = px.line(future_projections, x='Date', y='Cases',
-                animation_frame='Rt', height=600,
-                title='Projected Convid-19 Cases Based for Different Rt Scenarios')
-        fig6.update_layout(hovermode="x")
-        plot_future = plot(fig6, output_type='div', include_plotlyjs=False)
+        max_cases = max(future_projections['Cases']) * 1.05
 
-    project = future_projections.query(f"Date == '{lastd}' and Rt == {rt}")['Cases'][0]
+        fig6 = px.line(future_projections, x='Date', y='Cases',
+                animation_frame='R', height=600, range_y=[0, max_cases],
+                title='Projected Convid-19 Cases for Different Constant R Scenarios')
+        fig6.update_layout(hovermode="x")
+        #fig6["layout"].pop("updatemenus")
+        plot_future = plot(fig6, output_type='div', include_plotlyjs=False, auto_play=False)
+
+    project = future_projections.query(f"Date == '{lastd}' and R == {rt}")['Cases'][0]
     future = math.trunc(project)
 
 

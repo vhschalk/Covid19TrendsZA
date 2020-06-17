@@ -86,6 +86,14 @@
       <div class="content">{{ G1|safe }}</div>
   </section>
 
+  <section class="hero is-info is-bold">
+    <div class="hero-body">
+        <h2 class="subtitle">Tip</h2>
+        <div class="content">You can interact with all the plots. 
+          Use the home icon (<span class="icon"><i class="fas fa-home"></i></span>) to reset the plot to its original zoom.</div>
+    </div>
+  </section>
+
   <section class="section">
       <div class="content">{{ G2|safe }}</div>
   </section>
@@ -112,11 +120,11 @@
 
 </div>
 
-  <section class="hero is-dark is-bold">
-    <div class="hero-body">
-        <h2 class="subtitle">Covid-19 Case Data</h2>
-    </div>
-  </section>
+<section class="hero is-dark is-bold">
+  <div class="hero-body">
+      <h2 class="subtitle">Covid-19 Case Data</h2>
+  </div>
+</section>
 
 <div class="container">
 
@@ -139,11 +147,12 @@
 
   <section class="section">
     <div class="content">
-      If Rt is to rename at <strong>{{ latestrt }}</strong>,
+      If R is to remain at <strong>{{ latestrt }}</strong>,
       the projected number of total cases in South Africa will be <strong>{{ future }}</strong> in 30 days.
     </div>
     <div class="content">
-      More scenarios are calculated in plot below.
+      More scenarios are calcualted in the plot below. Move the slider to see the effect of different Rt values.
+      Use the arrows icon (<span class="icon"><i class="fas fa-expand-arrows-alt"></i></span>) to auto zoom if changes on the plot seem to small.
     </div>
   </section>
 
