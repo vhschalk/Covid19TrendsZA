@@ -183,43 +183,51 @@ def plots_trends():
     # Future
     # Graph 4
 
-    latestresult = state_single.iloc[-1,:]
-    rt = round(latestresult['Rt'], 2)
+    cases_df = cases_series.to_frame()
+    cases_df = cases_df.reset_index()
+    cases_df = cases_df.rename(columns={'index':'Date'})
+    cases_df
 
-    future = cases_series.copy()
-    
-    f = 30
+    f = 60
 
-    lasti = future.index[-1]
+    diff = cases_df['Cases'].diff()
 
-    future_dates = []
-    for i in range(f):
-        future_dates.append(lasti)
-        lasti = lasti + timedelta(days=1)
+    d = diff.values[-1]
 
-    lastc = future.values[-1]
-    lastc *= 1.0
+    r_scenarios = [3.0, 2.0, 1.5, 1.0, 0.75, 0.5, 0.1]
+    r_scenarios.append(rt)
+    r_scenarios.sort(reverse=True)
 
-    future_cases = []
-    for i in range(f):
-        future_cases.append(math.trunc(round(lastc,0)))
-        lastc *= rt
+    future_projections = None
 
-    future_series = pd.Series(future_cases, index=future_dates, name='Projected Cases')
+    for r in r_scenarios:
+        projection = cases_df.copy()
+        lastd = cases_df['Date'].iloc[-1]
+        lastc = cases_df['Cases'].iloc[-1]
 
-    future_wide = pd.concat([cases_series, future_series], axis=1)
+        for i in range(f):
+            lastd += timedelta(days=1)
+            lastc = lastc + (d * r)
 
-    future_wide = future_wide.reset_index()
-    future_wide = future_wide.rename(columns={'index':'Date'})
+            calc = pd.DataFrame([[lastd, lastc]], columns=['Date', 'Cases'])
+            # TODO: consider concat opertion here for faster processing
+            projection = projection.append(calc)
+            
+        projection['Rt'] = r
+        
+        if future_projections is None:
+            future_projections = projection
+        else:
+            future_projections = pd.concat([future_projections, projection])
 
-    future_wide_plotly = future_wide.melt(id_vars='Date', var_name='Data', value_name='Cases')
+        fig6 = px.line(future_projections, x='Date', y='Cases',
+                animation_frame='Rt', height=600,
+                title='Projected Convid-19 Cases Based for Different Rt Scenarios')
+        fig6.update_layout(hovermode="x")
+        plot_future = plot(fig6, output_type='div', include_plotlyjs=False)
 
-    fig6 = px.line(future_wide_plotly, x='Date', y='Cases', color='Data',
-              title='Projected Cases Based on Current Trends')
-    fig6.update_traces(hovertemplate=None)
-    fig6.update_layout(hovermode="x")
-
-    plot_future = plot(fig6, output_type='div', include_plotlyjs=False)
+    project = future_projections.query(f"Date == '{lastd}' and Rt == {rt}")['Cases'][0]
+    future = math.trunc(project)
 
 
     # Simple Stats
@@ -229,7 +237,7 @@ def plots_trends():
     summary = [int(num) for num in latest]
 
 
-    return plot_rt_country, plot_rt_states, latestrt, latestd, plot_combined_cases, plot_daily_cases, plot_stats, plot_future, summary
+    return plot_rt_country, plot_rt_states, latestrt, latestd, plot_combined_cases, plot_daily_cases, plot_stats, plot_future, summary, future
 
 
 state_key = {
