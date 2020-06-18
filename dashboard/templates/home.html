@@ -139,26 +139,29 @@
 
 <section class="hero is-warning is-bold">
   <div class="hero-body">
-      <h2 class="subtitle">Future projections</h2>
+      <h2 class="subtitle">Forecast</h2>
   </div>
 </section>
 
 <div class="container">
 
-  <section class="section">
-    <div class="content">
-      If R is to remain at <strong>{{ latestrt }}</strong>,
-      the projected number of total cases in South Africa will be <strong>{{ future }}</strong> in 30 days.
-    </div>
-    <div class="content">
-      More scenarios are calcualted in the plot below. Move the slider to see the effect of different Rt values.
-      Use the arrows icon (<span class="icon"><i class="fas fa-expand-arrows-alt"></i></span>) to auto zoom if changes on the plot seem to small.
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="content">{{ G6|safe }}</div>
-  </section>
+  <div id="output_box">
+    <br>
+    <section class="hero is-link is-bold">
+      <div class="hero-body">
+        <div class="container">
+          <h2 class="subtitle">Crunching the latest numbers...</h2>
+          <progress class="progress is-large is-info" max="100"></progress>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <script>
+    $(document).ready(function() {
+      $('#output_box').load('/forecast/')
+    });
+  </script>
 
 </div>
 

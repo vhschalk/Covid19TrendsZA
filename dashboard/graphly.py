@@ -13,7 +13,7 @@ from plotly.offline import plot
 from plotly.subplots import make_subplots
 
 
-def plots_trends():
+def trend_plots():
 
     # Setup common variables
 
@@ -31,7 +31,7 @@ def plots_trends():
     state_single = states_all_rt.query("Province == 'Total RSA'")
 
 
-    # Simple Stats
+    # Stats
 
     latestresult = state_single.iloc[-1,:]
     rt = round(latestresult['Rt'], 2)
@@ -104,7 +104,7 @@ def plots_trends():
     states_all = states_all.rename(columns={'date':'Date'})
 
 
-    # Graph 1
+    # Graph 3
 
     state_plot = states_all[state_filter_i]
     state_plotly = state_plot.melt(id_vars='Date', var_name='Province', value_name='Cases')
@@ -116,7 +116,7 @@ def plots_trends():
     plot_combined_cases = plot(fig1, output_type='div', include_plotlyjs=False)
 
 
-    # Graph 2
+    # Graph 4
 
     states_all['Actual Data'] = states_all['total'].diff()
 
@@ -141,7 +141,7 @@ def plots_trends():
     plot_daily_cases = plot(fig2, output_type='div', include_plotlyjs=False)
 
 
-    # Graph 3
+    # Graph 5
 
     url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_deaths.csv'
     states_all_deaths = pd.read_csv(url,
@@ -180,8 +180,45 @@ def plots_trends():
     plot_stats = plot(fig3, output_type='div', include_plotlyjs=False)
 
 
-    # Future
-    # Graph 4
+    # Stats
+
+    latestcases = states_wide.iloc[-1,:]
+    latest = [latestcases['Cases'], latestcases['Recovered'], latestcases['Deaths'], latestcases['Active']]
+    summary = [int(num) for num in latest]
+
+
+    return plot_rt_country, plot_rt_states, latestrt, latestd, plot_combined_cases, plot_daily_cases, plot_stats, summary
+
+
+def future_plots():
+
+    # TODO Get data from other method
+
+    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
+    states_all_rt = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
+
+    state_single = states_all_rt.query("state == 'Total RSA'")
+    
+
+    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
+    states_all_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=0)
+    states_all_i.tail()
+
+    states_all = states_all_i.copy()
+    states_all = states_all.reset_index()
+    states_all = states_all.rename(columns={'date':'Date'})
+
+    cases_series = pd.Series(states_all_i['total'].values, index=states_all_i.index.values, name='Cases')
+
+
+    # Simple Stats
+
+    latestresult = state_single.iloc[-1,:]
+    rt = round(latestresult['ML'], 2)
+    latestrt = '%.2f'%rt
+
+
+    # Forecast Calc
 
     cases_df = cases_series.to_frame()
     cases_df = cases_df.reset_index()
@@ -223,27 +260,37 @@ def plots_trends():
         else:
             future_projections = pd.concat([future_projections, projection])
 
-        max_cases = max(future_projections['Cases']) * 1.05
 
-        fig6 = px.line(future_projections, x='Date', y='Cases',
-                animation_frame='R', height=600, range_y=[0, max_cases],
-                title='Projected Convid-19 Cases for Different Constant R Scenarios')
-        fig6.update_layout(hovermode="x")
-        #fig6["layout"].pop("updatemenus")
-        plot_future = plot(fig6, output_type='div', include_plotlyjs=False, auto_play=False)
+    # Graph 1
 
-    project = future_projections.query(f"Date == '{lastd}' and R == {rt}")['Cases'][0]
-    future = math.trunc(project)
+    current_forecast = future_projections.query(f"R == {rt}")
+
+    fig6 = px.line(current_forecast, x='Date', y='Cases',
+               title='Covid-19 Cases Forecast for Current Rt')
+    fig6.update_traces(hovertemplate=None)
+    fig6.update_layout(hovermode="x")
+    plot_forecast = plot(fig6, output_type='div', include_plotlyjs=False)
+
+    
+    # Graph 2
+
+    max_cases = max(future_projections['Cases']) * 1.05
+
+    fig7 = px.line(future_projections, x='Date', y='Cases',
+            animation_frame='R', height=600, range_y=[0, max_cases],
+            title='Covid-19 Cases Forecast for Rt Scenarios')
+    fig7.update_layout(hovermode="x")
+    plot_scenarios = plot(fig7, output_type='div', include_plotlyjs=False, auto_play=False)
 
 
     # Simple Stats
 
-    latestcases = states_wide.iloc[-1,:]
-    latest = [latestcases['Cases'], latestcases['Recovered'], latestcases['Deaths'], latestcases['Active']]
-    summary = [int(num) for num in latest]
+    last_forecast = current_forecast.iloc[-1]
+    future = math.trunc(last_forecast['Cases'])
+    future
 
 
-    return plot_rt_country, plot_rt_states, latestrt, latestd, plot_combined_cases, plot_daily_cases, plot_stats, plot_future, summary, future
+    return latestrt, future, plot_forecast, plot_scenarios
 
 
 state_key = {
