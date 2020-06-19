@@ -19,7 +19,7 @@ def forecast(request):
 
     latestrt, future, plot_forecast, plot_scenarios = future_plots()
 
-    return render(request, 'forecast.html', {'latestrt':latestrt, 'latestd':future, 'G1':plot_forecast, 'G2':plot_scenarios})
+    return render(request, 'forecast.html', {'latestrt':latestrt, 'future':future, 'G1':plot_forecast, 'G2':plot_scenarios})
 
 
 def matplot(request):

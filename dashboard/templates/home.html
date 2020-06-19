@@ -14,6 +14,49 @@
 <div class="container">
 
   <section class="section">
+    <div class="columns is-mobile has-text-centered">
+      <div class="column">
+        <div class="box">
+          <p class="heading">South African Covid-19 Summary</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns is-mobile has-text-centered">
+      <div class="column">
+        <div class="box">
+          <p class="heading">Total Cases</p>
+          <p class="title">{{ summary.0 }}</p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="box">
+          <p class="heading">Total Recovered</p>
+          <p class="title">{{ summary.1 }}</p> 
+        </div>
+      </div>
+      <div class="column">
+        <div class="box">
+          <p class="heading">Total Deaths</p>
+          <p class="title">{{ summary.2 }}</p> 
+        </div>
+      </div>
+      <div class="column">
+        <div class="box">
+          <p class="heading">Total Active</p>
+          <p class="title">{{ summary.3 }}</p> 
+        </div>
+      </div>
+      <div class="column">
+        <div class="box">
+          <p class="heading">Reproduction No.</p>
+          <p class="title">{{ latestrt}}</p> 
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
     <div class="content">To find out how fast Covid-19 is spreading, we can
       calculate the Effective Reproduction Number (<strong>Rt</strong>) as the pandemic progresses. This number tells us,
       on average, how many people each infected person is likely to infect.</div>
@@ -40,46 +83,6 @@
       last calculated on {{ latestd }}. This means that each newly infected
       person is likely to infect {{ latestrt }} more people.
     </div>
-
-    <div class="columns is-mobile has-text-centered">
-      <div class="column">
-        <div class="box">
-          <p class="heading">South African Covid-19 Summary</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="columns is-mobile has-text-centered">
-      <div class="column">
-        <div class="box">
-          <p class="heading">Total Cases</p>
-          <p class="title">{{ summary.0 }}</p>
-        </div>
-      </div>
-      <div class="column">
-        <div class="box">
-          <p class="heading">Total Recovered</p>
-          <p class="title">{{ summary.1 }}</p> 
-      </div>
-    </div>
-      <div class="column">
-        <div class="box">
-          <p class="heading">Total Deaths</p>
-          <p class="title">{{ summary.2 }}</p> 
-      </div>
-    </div>
-      <div class="column">
-        <div class="box">
-          <p class="heading">Total Active</p>
-          <p class="title">{{ summary.3 }}</p> 
-      </div>
-    </div>
-      <div class="column">
-        <div class="box">
-          <p class="heading">Reproduction No.</p>
-          <p class="title">{{ latestrt}}</p> 
-      </div>
-    </div>
   </section>
 
   <section class="section">
@@ -88,9 +91,13 @@
 
   <section class="hero is-info is-bold">
     <div class="hero-body">
-        <h2 class="subtitle">Tip</h2>
-        <div class="content">You can interact with all the plots. 
-          Use the home icon (<span class="icon"><i class="fas fa-home"></i></span>) to reset the plot to its original zoom.</div>
+        <h2 class="subtitle">Tips</h2>
+        <div class="content">
+          <ul>
+            <li>You can interact with all the plots. </li>
+            <li>Use the home icon (<span class="icon"><i class="fas fa-home"></i></span>) to reset the plot to its original zoom.</li>
+          </ul>
+        </div>
     </div>
   </section>
 
@@ -107,8 +114,8 @@
           <li>The error bands indicate the 90% credibility interval.</li>
           <li>For regions with low case rates, only the date ranges with the most significant change is shown.</li>
           <li>The lag time between testing and positive case identification is not taken into account yet, due to the difficulty to obtain access to testing data.</li>
-          <li>The background rate of the spread is not known.</li>
-          <li>Any future trends will use the latest calculated Rt for the region.</li>
+          <li>Any other disturbances on the calculation is not known.</li>
+          <li>Forecasted plots will use the latest calculated Rt for the region.</li>
         </ol>
       </div>
     </div>

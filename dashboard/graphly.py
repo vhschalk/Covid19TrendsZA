@@ -287,7 +287,6 @@ def future_plots():
 
     last_forecast = current_forecast.iloc[-1]
     future = math.trunc(last_forecast['Cases'])
-    future
 
 
     return latestrt, future, plot_forecast, plot_scenarios
