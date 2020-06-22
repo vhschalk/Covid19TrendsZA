@@ -2,7 +2,7 @@ import datetime
 import glob
 import os
 import copy, math
-from datetime import timedelta
+from datetime import timedelta, date
 
 import numpy as np
 import pandas as pd
@@ -183,8 +183,20 @@ def trend_plots():
     # Stats
 
     latestcases = states_wide.iloc[-1,:]
-    latest = [latestcases['Cases'], latestcases['Recovered'], latestcases['Deaths'], latestcases['Active']]
-    summary = [int(num) for num in latest]
+    a = latestcases['Cases']
+    a = format_comma(a)
+
+    b = latestcases['Recovered']
+    b = format_comma(b)
+
+    c = latestcases['Deaths']
+    c = format_comma(c)
+
+    d = latestcases['Active']
+    d = format_comma(d)
+    
+    latest = [a, b, c, d]
+    summary = [num for num in latest]
 
 
     return plot_rt_country, plot_rt_states, latestrt, latestd, plot_combined_cases, plot_daily_cases, plot_stats, summary
@@ -211,6 +223,11 @@ def future_plots():
     cases_series = pd.Series(states_all_i['total'].values, index=states_all_i.index.values, name='Cases')
 
 
+    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/za_province_pop.csv'
+    province_pops = pd.read_csv(url, header=None, names=['Province','Pop'])
+    country_pop = province_pops['Pop'].sum()
+
+
     # Simple Stats
 
     latestresult = state_single.iloc[-1,:]
@@ -231,7 +248,7 @@ def future_plots():
 
     d = diff.values[-1]
 
-    r_scenarios = [1.5, 1.4, 1.3, 1.25, 1.2, 1.15, 1.1, 1.075, 1.05, 1.025, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.25, 0.1]
+    r_scenarios = [1.5, 1.4, 1.3, 1.25, 1.2, 1.15, 1.1, 1.075, 1.05, 1.025, 1.0, 0.975, 0.95, 0.925, 0.9, 0.85, 0.8, 0.7, 0.6, 0.5, 0.25, 0.1]
     r_scenarios.append(rt)
     r_scenarios.sort(reverse=True)
 
@@ -261,36 +278,129 @@ def future_plots():
             future_projections = pd.concat([future_projections, projection])
 
 
-    # Graph 1
+    # Simple Stats
 
     current_forecast = future_projections.query(f"R == {rt}")
+    last_forecast = current_forecast.iloc[-1]
+    future_f = math.trunc(last_forecast['Cases'])
+    future = format_comma(future_f)
+
+    infected = future_f / country_pop * 100
+    future_perc = f'{infected:.1f}%'
+
+
+    #X0 = current_forecast.iloc[0]['Date']
+    #X1 = last_forecast['Date']
+    X2 = date.today()
+
+    max_forecast = max(current_forecast['Cases']) * 1.05
+    max_country = country_pop * 1.1
+    max_future = min(max_forecast, max_country)
+
+
+    # Graph 1
 
     fig6 = px.line(current_forecast, x='Date', y='Cases',
-               title='Covid-19 Cases Forecast for Current Rt')
+                   range_y=[0, max_future],
+                   title='Covid-19 Cases Forecast for Current Rt')
     fig6.update_traces(hovertemplate=None)
     fig6.update_layout(hovermode="x")
+
+    fig6.add_shape(
+        type="line",
+        xref="x",
+        yref="y",
+        x0=X2,
+        y0=0,
+        x1=X2,
+        y1=max_future,
+        opacity=0.6,
+        line=dict(
+            color="Black",
+            width=2,
+            dash='dashdot'
+    ))
+
     plot_forecast = plot(fig6, output_type='div', include_plotlyjs=False)
 
     
     # Graph 2
 
-    max_cases = max(future_projections['Cases']) * 1.05
+    increasing_forecast = future_projections.query(f"R > 1")
 
-    fig7 = px.line(future_projections, x='Date', y='Cases',
-            animation_frame='R', height=600, range_y=[0, max_cases],
-            title='Covid-19 Cases Forecast for Rt Scenarios')
+    fig7 = px.line(increasing_forecast, x='Date', y='Cases',
+               animation_frame='R', height=600, range_y=[0, max_country],
+               title='Covid-19 Cases Forecast for Increasing Cases (Rt is bigger than 1)')
     fig7.update_layout(hovermode="x")
-    plot_scenarios = plot(fig7, output_type='div', include_plotlyjs=False, auto_play=False)
+
+    plot_scenarios1 = plot(fig7, output_type='div', include_plotlyjs=False, auto_play=False)
 
 
-    # Simple Stats
+    # Graph 3
 
-    last_forecast = current_forecast.iloc[-1]
-    future = math.trunc(last_forecast['Cases'])
+    linear_forecast = future_projections.query(f"R == 1")
+    max_linear = max(linear_forecast['Cases'])
+
+    fig8 = px.line(linear_forecast, x='Date', y='Cases',
+                range_y=[0, max_linear],
+                title='Covid-19 Cases Forecast for Increasing Cases (Rt is 1)')
+    fig8.update_traces(hovertemplate=None)
+    fig8.update_layout(hovermode="x")
+
+    fig8.add_shape(
+        type="line",
+        xref="x",
+        yref="y",
+        x0=X2,
+        y0=0,
+        x1=X2,
+        y1=max_future,
+        opacity=0.6,
+        line=dict(
+            color="Black",
+            width=2,
+            dash='dashdot'
+    ))
+
+    plot_scenarios2 = plot(fig8, output_type='div', include_plotlyjs=False, auto_play=False)
 
 
-    return latestrt, future, plot_forecast, plot_scenarios
+    # Graph 4
 
+    decline_forecast = future_projections.query(f"R < 1")
+    max_decline = max(decline_forecast['Cases']) * 1.05
+
+    fig9 = px.line(decline_forecast, x='Date', y='Cases',
+               animation_frame='R', height=600, range_y=[0, max_decline],
+               title='Covid-19 Cases Forecast for Decreasing Cases (Rt is less than 1)')
+    fig9.update_traces(hovertemplate=None)
+    fig9.update_layout(hovermode="x")
+
+    fig9.add_shape(
+        type="line",
+        xref="x",
+        yref="y",
+        x0=X2,
+        y0=0,
+        x1=X2,
+        y1=max_decline,
+        opacity=0.6,
+        line=dict(
+            color="Black",
+            width=2,
+            dash='dashdot'
+    ))
+
+    plot_scenarios3 = plot(fig9, output_type='div', include_plotlyjs=False, auto_play=False)
+
+
+    return latestrt, future, future_perc, plot_forecast, plot_scenarios1, plot_scenarios2, plot_scenarios3
+
+
+def format_comma(num):
+    return f'{num:,.0f}'
+
+# Global keys
 
 state_key = {
     'EC':'Eastern Cape',
