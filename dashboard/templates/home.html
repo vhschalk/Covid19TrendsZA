@@ -26,31 +26,31 @@
       <div class="column">
         <div class="box">
           <p class="heading">Total Cases</p>
-          <p class="title">{{ summary.0 }}</p>
+          <p class="title">{{ content.cases }}</p>
         </div>
       </div>
       <div class="column">
         <div class="box">
           <p class="heading">Total Recovered</p>
-          <p class="title">{{ summary.1 }}</p> 
+          <p class="title">{{ content.recovered }}</p> 
         </div>
       </div>
       <div class="column">
         <div class="box">
           <p class="heading">Total Deaths</p>
-          <p class="title">{{ summary.2 }}</p> 
+          <p class="title">{{ content.deaths }}</p> 
         </div>
       </div>
       <div class="column">
         <div class="box">
           <p class="heading">Total Active</p>
-          <p class="title">{{ summary.3 }}</p> 
+          <p class="title">{{ content.active }}</p> 
         </div>
       </div>
       <div class="column">
         <div class="box">
           <p class="heading">Reproduction No.</p>
-          <p class="title">{{ latestrt}}</p> 
+          <p class="title">{{ content.latestrt}}</p> 
         </div>
       </div>
     </div>
@@ -79,14 +79,14 @@
 
   <section class="section">
     <div class="content">
-      The latest Rt value for the country is <strong>{{ latestrt }}</strong>,
-      last calculated on {{ latestd }}. This means that each newly infected
-      person is likely to infect {{ latestrt }} more people.
+      The latest Rt value for the country is <strong>{{ content.latestrt }}</strong>,
+      last calculated on {{ content.latestd }}. This means that each newly infected
+      person is likely to infect {{ content.latestrt }} more people.
     </div>
   </section>
 
   <section class="section">
-      <div class="content">{{ G1|safe }}</div>
+      <div class="content">{{ content.plot_rt_country|safe }}</div>
   </section>
 
   <section class="hero is-info is-bold">
@@ -102,7 +102,7 @@
   </section>
 
   <section class="section">
-      <div class="content">{{ G2|safe }}</div>
+      <div class="content">{{ content.plot_rt_states|safe }}</div>
   </section>
 
   <section class="hero is-danger is-bold">
@@ -136,9 +136,9 @@
 <div class="container">
 
   <section class="section">
-      <div class="content">{{ G3|safe }}</div>
-      <div class="content">{{ G4|safe }}</div>
-      <div class="content">{{ G5|safe }}</div>
+      <div class="content">{{ content.plot_combined_cases|safe }}</div>
+      <div class="content">{{ content.plot_stats|safe }}</div>
+      <div class="content">{{ content.plot_daily_cases|safe }}</div>
   </section>
 
 </div>

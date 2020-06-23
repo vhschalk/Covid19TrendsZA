@@ -5,10 +5,9 @@ from .graphly import trend_plots, future_plots
 
 def home(request):
 
-    plot_rt_country, plot_rt_states, latestrt, latestd, plot_combined_cases, plot_daily_cases, plot_stats, summary  = trend_plots()
+    content  = trend_plots()
 
-    return render(request, 'home.html', {'G1':plot_rt_country, 'G2':plot_rt_states,'latestrt':latestrt, 'latestd':latestd, 
-                  'G3':plot_stats, 'G4':plot_combined_cases, 'G5':plot_daily_cases, 'summary':summary})
+    return render(request, 'home.html', {'content':content})
 
 def export(request):
 
@@ -17,10 +16,9 @@ def export(request):
 
 def forecast(request):
 
-    latestrt, future, future_perc, plot_forecast, plot_scenarios1, plot_scenarios2, plot_scenarios3 = future_plots()
+    content = future_plots()
 
-    return render(request, 'forecast.html', {'latestrt':latestrt, 'future':future, 'future_perc':future_perc, 
-                  'G1':plot_forecast, 'G2':plot_scenarios1, 'G3':plot_scenarios2, 'G4':plot_scenarios3})
+    return render(request, 'forecast.html', {'content':content})
 
 
 def matplot(request):

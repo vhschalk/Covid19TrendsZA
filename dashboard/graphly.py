@@ -17,6 +17,8 @@ def trend_plots():
 
     # Setup common variables
 
+    trend_content = {}
+
     state_labels = list(state_key.values())
 
 
@@ -195,14 +197,26 @@ def trend_plots():
     d = latestcases['Active']
     d = format_comma(d)
     
-    latest = [a, b, c, d]
-    summary = [num for num in latest]
 
+    trend_content['plot_rt_country'] = plot_rt_country
+    trend_content['plot_rt_states'] = plot_rt_states
+    trend_content['latestrt'] = latestrt
+    trend_content['latestd'] = latestd
+    trend_content['plot_combined_cases'] = plot_combined_cases
+    trend_content['plot_daily_cases'] = plot_daily_cases
+    trend_content['plot_stats'] = plot_stats
+    trend_content['cases'] = a
+    trend_content['recovered'] = b
+    trend_content['deaths'] = c
+    trend_content['active'] = d
 
-    return plot_rt_country, plot_rt_states, latestrt, latestd, plot_combined_cases, plot_daily_cases, plot_stats, summary
+    return trend_content
 
 
 def future_plots():
+
+    # Setup common variables
+
 
     # TODO Get data from other method
 
@@ -354,7 +368,7 @@ def future_plots():
         x0=X2,
         y0=0,
         x1=X2,
-        y1=max_future,
+        y1=max_linear,
         opacity=0.6,
         line=dict(
             color="Black",
@@ -394,7 +408,17 @@ def future_plots():
     plot_scenarios3 = plot(fig9, output_type='div', include_plotlyjs=False, auto_play=False)
 
 
-    return latestrt, future, future_perc, plot_forecast, plot_scenarios1, plot_scenarios2, plot_scenarios3
+    future_content = {}
+
+    future_content['latestrt'] = latestrt
+    future_content['future'] = future
+    future_content['future_perc'] = future_perc
+    future_content['plot_forecast'] = plot_forecast
+    future_content['plot_scenarios1'] = plot_scenarios1
+    future_content['plot_scenarios2'] = plot_scenarios2
+    future_content['plot_scenarios3'] = plot_scenarios3
+
+    return future_content
 
 
 def format_comma(num):

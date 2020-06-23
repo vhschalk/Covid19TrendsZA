@@ -1,15 +1,15 @@
 
   <section class="section">
     <div class="content">
-      If Rt is to remain at <strong>{{ latestrt }}</strong>,
-      the projected number of total cases in South Africa will be <strong>{{ future }}</strong> 
-      or <strong>{{ future_perc }}</strong> of the population,
+      If Rt is to remain at <strong>{{ content.latestrt }}</strong>,
+      the projected number of total cases in South Africa will be <strong>{{ content.future }}</strong> 
+      or <strong>{{ content.future_perc }}</strong> of the population,
       in 30 days.
     </div>
   </section>
 
   <section class="section">
-    <div class="content">{{ G1|safe }}</div>
+    <div class="content">{{ content.plot_forecast|safe }}</div>
   </section>
 
   <section class="hero is-info is-bold">
@@ -29,13 +29,13 @@
   </section>
 
   <section class="section">
-    <div class="content">{{ G2|safe }}</div>
+    <div class="content">{{ content.plot_scenarios1|safe }}</div>
   </section>
 
   <section class="section">
-    <div class="content">{{ G3|safe }}</div>
+    <div class="content">{{ content.plot_scenarios2|safe }}</div>
   </section>
 
   <section class="section">
-    <div class="content">{{ G4|safe }}</div>
+    <div class="content">{{ content.plot_scenarios3|safe }}</div>
   </section>
