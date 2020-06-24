@@ -17,7 +17,7 @@ def trend_plots():
 
     # Setup common variables
 
-    trend_content = {}
+    content_trend = {}
 
     state_labels = list(state_key.values())
 
@@ -198,24 +198,26 @@ def trend_plots():
     d = format_comma(d)
     
 
-    trend_content['plot_rt_country'] = plot_rt_country
-    trend_content['plot_rt_states'] = plot_rt_states
-    trend_content['latestrt'] = latestrt
-    trend_content['latestd'] = latestd
-    trend_content['plot_combined_cases'] = plot_combined_cases
-    trend_content['plot_daily_cases'] = plot_daily_cases
-    trend_content['plot_stats'] = plot_stats
-    trend_content['cases'] = a
-    trend_content['recovered'] = b
-    trend_content['deaths'] = c
-    trend_content['active'] = d
+    content_trend['plot_rt_country'] = plot_rt_country
+    content_trend['plot_rt_states'] = plot_rt_states
+    content_trend['latestrt'] = latestrt
+    content_trend['latestd'] = latestd
+    content_trend['plot_combined_cases'] = plot_combined_cases
+    content_trend['plot_daily_cases'] = plot_daily_cases
+    content_trend['plot_stats'] = plot_stats
+    content_trend['cases'] = a
+    content_trend['recovered'] = b
+    content_trend['deaths'] = c
+    content_trend['active'] = d
 
-    return trend_content
+    return content_trend
 
 
 def future_plots():
 
     # Setup common variables
+
+    content_future = {}
 
 
     # TODO Get data from other method
@@ -263,8 +265,9 @@ def future_plots():
     d = diff.values[-1]
 
     r_scenarios = [1.5, 1.4, 1.3, 1.25, 1.2, 1.15, 1.1, 1.075, 1.05, 1.025, 1.0, 0.975, 0.95, 0.925, 0.9, 0.85, 0.8, 0.7, 0.6, 0.5, 0.25, 0.1]
-    r_scenarios.append(rt)
-    r_scenarios.sort(reverse=True)
+    if (rt not in r_scenarios):
+        r_scenarios.append(rt)
+        r_scenarios.sort(reverse=True)
 
     future_projections = None
 
@@ -408,17 +411,15 @@ def future_plots():
     plot_scenarios3 = plot(fig9, output_type='div', include_plotlyjs=False, auto_play=False)
 
 
-    future_content = {}
+    content_future['latestrt'] = latestrt
+    content_future['future'] = future
+    content_future['future_perc'] = future_perc
+    content_future['plot_forecast'] = plot_forecast
+    content_future['plot_scenarios1'] = plot_scenarios1
+    content_future['plot_scenarios2'] = plot_scenarios2
+    content_future['plot_scenarios3'] = plot_scenarios3
 
-    future_content['latestrt'] = latestrt
-    future_content['future'] = future
-    future_content['future_perc'] = future_perc
-    future_content['plot_forecast'] = plot_forecast
-    future_content['plot_scenarios1'] = plot_scenarios1
-    future_content['plot_scenarios2'] = plot_scenarios2
-    future_content['plot_scenarios3'] = plot_scenarios3
-
-    return future_content
+    return content_future
 
 
 def format_comma(num):

@@ -1,0 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    {% load django_simple_bulma %}
+    {% bulma %}
+    {% font_awesome %}
+    <link rel="icon"
+      type="image/x-icon"
+      href="{% static "favicon.ico" %}">
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    {% block head %}
+
+    {% endblock %}
+
+    {% load tags %}
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={% analytics_id %}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '{% analytics_id %}');
+    </script>
+  </head>
+
+  <body>
+
+    <div class="container">
+
+        <section class="section">
+          <div class="columns is-mobile has-text-centered">
+            <div class="column">
+              <div class="box">
+                <p class="heading">South African Covid-19 Summary</p>
+              </div>
+            </div>
+          </div>
+      
+          <div class="columns is-mobile has-text-centered">
+            <div class="column">
+              <div class="box">
+                <p class="heading">Total Cases</p>
+                <p class="title">{{ content_trend.cases }}</p>
+              </div>
+            </div>
+            <div class="column">
+              <div class="box">
+                <p class="heading">Total Recovered</p>
+                <p class="title">{{ content_trend.recovered }}</p> 
+              </div>
+            </div>
+            <div class="column">
+              <div class="box">
+                <p class="heading">Total Deaths</p>
+                <p class="title">{{ content_trend.deaths }}</p> 
+              </div>
+            </div>
+            <div class="column">
+              <div class="box">
+                <p class="heading">Total Active</p>
+                <p class="title">{{ content_trend.active }}</p> 
+              </div>
+            </div>
+            <div class="column">
+              <div class="box">
+                <p class="heading">Reproduction No.</p>
+                <p class="title">{{ content_trend.latestrt}}</p> 
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="hero is-warning is-bold">
+            <div class="hero-body">
+                <h2 class="subtitle">Reproduction Number over Time</h2>
+            </div>
+          </section>
+
+        <section class="section">
+            <div class="content">{{ content_trend.plot_rt_country|safe }}</div>
+        </section>
+
+        <section class="hero is-warning is-bold">
+            <div class="hero-body">
+                <h2 class="subtitle">Analysis of South African Case Data</h2>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="content">{{ content_trend.plot_combined_cases|safe }}</div>
+            <div class="content">{{ content_trend.plot_stats|safe }}</div>
+            <div class="content">{{ content_trend.plot_daily_cases|safe }}</div>
+        </section>
+
+        <section class="hero is-warning is-bold">
+            <div class="hero-body">
+                <h2 class="subtitle">Forecast Scenarion</h2>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="content">{{ content_future.plot_forecast|safe }}</div>
+        </section>
+
+        <section class="hero is-warning is-bold">
+            <div class="hero-body">
+                <h2 class="subtitle">More forecasts at covid19trends.co.za</h2>
+            </div>
+        </section>
+
+    </div>
+  </body>
+</html>

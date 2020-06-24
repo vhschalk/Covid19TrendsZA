@@ -9,6 +9,7 @@ def home(request):
 
     return render(request, 'home.html', {'content':content})
 
+
 def export(request):
 
     return render(request, 'export.html')
@@ -19,6 +20,14 @@ def forecast(request):
     content = future_plots()
 
     return render(request, 'forecast.html', {'content':content})
+
+
+def snapshot(request):
+
+    content_trend  = trend_plots()
+    content_future = future_plots()
+
+    return render(request, 'snapshot.html', {'content_trend':content_trend, 'content_future':content_future})
 
 
 def matplot(request):
