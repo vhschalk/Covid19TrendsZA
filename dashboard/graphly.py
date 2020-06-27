@@ -13,7 +13,7 @@ from plotly.offline import plot
 from plotly.subplots import make_subplots
 
 # Change to avoid temporary delays
-repo = 'heerden' #dsfsi 
+repo = 'dsfsi' #dsfsi 
 
 def trend_plots():
 
