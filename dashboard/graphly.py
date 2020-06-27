@@ -12,6 +12,8 @@ import plotly.graph_objs as go
 from plotly.offline import plot
 from plotly.subplots import make_subplots
 
+# Change to avoid temporary delays
+repo = 'heerden' #dsfsi 
 
 def trend_plots():
 
@@ -24,7 +26,7 @@ def trend_plots():
 
     # Data
 
-    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
+    url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
     states_all_rt = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
     states_all_rt = states_all_rt.rename(columns={'date':'Date'})
     states_all_rt = states_all_rt.rename(columns={'ML':'Rt'})
@@ -97,7 +99,7 @@ def trend_plots():
 
     # Main data
 
-    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
+    url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
     states_all_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=0)
     states_all_i.tail()
 
@@ -145,12 +147,12 @@ def trend_plots():
 
     # Graph 5
 
-    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_deaths.csv'
+    url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/covid19za_provincial_cumulative_timeline_deaths.csv'
     states_all_deaths = pd.read_csv(url,
                         parse_dates=['date'], dayfirst=True,
                         squeeze=True,index_col=0).sort_index()
 
-    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_recoveries.csv'
+    url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/covid19za_provincial_cumulative_timeline_recoveries.csv'
     states_all_recover = pd.read_csv(url,
                      parse_dates=['date'], dayfirst=True,
                      squeeze=True,index_col=0).sort_index()
@@ -222,13 +224,13 @@ def future_plots():
 
     # TODO Get data from other method
 
-    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
+    url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
     states_all_rt = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
 
     state_single = states_all_rt.query("state == 'Total RSA'")
     
 
-    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
+    url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
     states_all_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=0)
     states_all_i.tail()
 
@@ -239,7 +241,7 @@ def future_plots():
     cases_series = pd.Series(states_all_i['total'].values, index=states_all_i.index.values, name='Cases')
 
 
-    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/district_data/za_province_pop.csv'
+    url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/district_data/za_province_pop.csv'
     province_pops = pd.read_csv(url, header=None, names=['Province','Pop'])
     country_pop = province_pops['Pop'].sum()
 
