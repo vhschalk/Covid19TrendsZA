@@ -50,9 +50,21 @@
       <div class="column">
         <div class="box">
           <p class="heading">Reproduction No.</p>
-          <p class="title">{{ content.latestrt}}</p> 
+          <p class="title">{{ content.latest_rt}}</p> 
         </div>
       </div>
+    </div>
+
+    <div class="content">
+      Case data last updated on: {{ content.latest_date }}
+    </div>
+  </section>
+
+  <section class="hero is-success is-bold">
+    <div class="hero-body">
+        <h2 class="subtitle">Please complete this quick survey to help me improve the website: 
+          <a class="button is-light" href="https://docs.google.com/forms/d/e/1FAIpQLSeOQO1JCP9YZndO03D5O4o8bowdQCbEG-lwRmvDEjPLLdHDKw/viewform" target="_blank">Survey</a>
+        </h2>
     </div>
   </section>
 
@@ -78,10 +90,14 @@
 <div class="container">
 
   <section class="section">
+    <div class="getsocial gs-inline-group"></div>
+  </section>
+
+  <section class="section">
     <div class="content">
-      The latest Rt value for the country is <strong>{{ content.latestrt }}</strong>,
-      last calculated on {{ content.latestd }}. This means that each newly infected
-      person is likely to infect {{ content.latestrt }} more people.
+      The latest Rt value for the country is <strong>{{ content.latest_rt }}</strong>,
+      last calculated on {{ content.latest_rtdate }}. This means that each newly infected
+      person is likely to infect {{ content.latest_rt }} more people.
     </div>
   </section>
 

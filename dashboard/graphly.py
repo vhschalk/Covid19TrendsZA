@@ -39,10 +39,10 @@ def trend_plots():
 
     latestresult = state_single.iloc[-1,:]
     rt = round(latestresult['Rt'], 2)
-    latestrt = '%.2f'%rt
+    latest_rt = '%.2f'%rt
 
     d = latestresult['Date']
-    latestd = d.strftime("%d %B %Y")
+    latest_rtdate = d.strftime("%d %B %Y")
 
 
     # Graph 1
@@ -198,12 +198,15 @@ def trend_plots():
 
     d = latestcases['Active']
     d = format_comma(d)
+
+    latest = latestresult['Date']
+    latest_date = latest.strftime("%d %B %Y")
     
 
     content_trend['plot_rt_country'] = plot_rt_country
     content_trend['plot_rt_states'] = plot_rt_states
-    content_trend['latestrt'] = latestrt
-    content_trend['latestd'] = latestd
+    content_trend['latest_rt'] = latest_rt
+    content_trend['latest_rtdate'] = latest_rtdate
     content_trend['plot_combined_cases'] = plot_combined_cases
     content_trend['plot_daily_cases'] = plot_daily_cases
     content_trend['plot_stats'] = plot_stats
@@ -211,6 +214,7 @@ def trend_plots():
     content_trend['recovered'] = b
     content_trend['deaths'] = c
     content_trend['active'] = d
+    content_trend['latest_date'] = latest_date
 
     return content_trend
 
@@ -250,7 +254,7 @@ def future_plots():
 
     latestresult = state_single.iloc[-1,:]
     rt = round(latestresult['ML'], 2)
-    latestrt = '%.2f'%rt
+    latest_rt = '%.2f'%rt
 
 
     # Forecast Calc
@@ -413,7 +417,7 @@ def future_plots():
     plot_scenarios3 = plot(fig9, output_type='div', include_plotlyjs=False, auto_play=False)
 
 
-    content_future['latestrt'] = latestrt
+    content_future['latest_rt'] = latest_rt
     content_future['future'] = future
     content_future['future_perc'] = future_perc
     content_future['plot_forecast'] = plot_forecast
