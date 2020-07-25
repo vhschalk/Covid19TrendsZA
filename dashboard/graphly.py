@@ -157,13 +157,23 @@ def trend_plots():
                      parse_dates=['date'], dayfirst=True,
                      squeeze=True,index_col=0).sort_index()
 
+    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_timeline_testing.csv'
+    states_all_tests = pd.read_csv(url, parse_dates=['date'], dayfirst=True, index_col=0)
+    states_all_tests.tail()
+
+    casezero = states_all_i.index[0]
+    caselast = states_all_i.index[-1]
+
+    tests_series = states_all_tests.loc[casezero:caselast]['cumulative_tests']
+
     cases_series = pd.Series(states_all_i['total'].values, index=states_all_i.index.values, name='Cases')
 
     deaths_series = pd.Series(states_all_deaths['total'].values, index=states_all_deaths.index, name='Deaths')
     recover_series = pd.Series(states_all_recover['total'].values, index=states_all_recover.index, name='Recovered')
 
-    states_combine = pd.concat([cases_series, recover_series, deaths_series], axis=1)
-
+    states_combine = pd.concat([cases_series, recover_series, deaths_series, tests_series], axis=1)
+    states_combine = states_combine.rename(columns={'cumulative_tests':'Tests'})
+    states_combine.loc[casezero,'Tests'] = 163
     states_master = states_combine.ffill(axis=0)
 
     states_changed = states_master[['Recovered','Deaths']].sum(axis=1)
@@ -177,11 +187,23 @@ def trend_plots():
 
     state_wide_plotly = states_wide.melt(id_vars='Date', var_name='Data', value_name='Count')
 
-    fig3 = px.line(state_wide_plotly, x='Date', y='Count', color='Data',
-              title='Covid-19 Data for South Africa', line_shape='spline')
-    fig3.update_traces(hovertemplate=None)
-    fig3.update_layout(hovermode="x")
-    plot_stats = plot(fig3, output_type='div', include_plotlyjs=False)
+    px_data_sa = px.line(state_wide_plotly, x='Date', y='Count', color='Data', line_shape='spline')
+    fig_data_sa = make_subplots(specs=[[{"secondary_y": True}]])
+
+    fig_data_sa.add_trace(px_data_sa['data'][0], secondary_y=True)
+    fig_data_sa.add_trace(px_data_sa['data'][1], secondary_y=True)
+    fig_data_sa.add_trace(px_data_sa['data'][2], secondary_y=True)
+    fig_data_sa.add_trace(px_data_sa['data'][4], secondary_y=True)
+    fig_data_sa.add_trace(px_data_sa['data'][3], secondary_y=False)
+
+    fig_data_sa.update_yaxes(title_text="Rest of Data", secondary_y=True)
+    fig_data_sa.update_yaxes(title_text="Tests", secondary_y=False)
+    fig_data_sa.update_layout(title="Covid-19 Data for South Africa")
+
+    fig_data_sa.update_traces(hovertemplate=None)
+    fig_data_sa.update_layout(hovermode="x")
+
+    plot_stats = plot(fig_data_sa, output_type='div', include_plotlyjs=False)
 
 
     # Stats
