@@ -25,9 +25,11 @@ def trend_plots():
 
 
     # Data
+    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
+    states_all_rt_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=[0,1])
 
-    url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
-    states_all_rt = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
+    states_all_rt = states_all_rt_i.copy()
+    states_all_rt = states_all_rt.reset_index()
     states_all_rt = states_all_rt.rename(columns={'date':'Date'})
     states_all_rt = states_all_rt.rename(columns={'ML':'Rt'})
     states_all_rt = states_all_rt.rename(columns={'state':'Province'})
@@ -35,39 +37,56 @@ def trend_plots():
     state_single = states_all_rt.query("Province == 'Total RSA'")
 
 
-    # Stats
+    # Latest Rt1 summary
+    X0rt1 = state_single.iloc[0]['Date']
 
-    latestresult = state_single.iloc[-1,:]
-    rt = round(latestresult['Rt'], 2)
-    latest_rt = '%.2f'%rt
+    latest_result_rt = state_single.iloc[-1]
+    X2rt1 = latest_result_rt['Date']
+    latest_d_rt1 = X2rt1.strftime("%d %B %Y")
 
-    d = latestresult['Date']
-    latest_rtdate = d.strftime("%d %B %Y")
+    rt_last_df = states_all_rt_i.groupby(level=0)[['ML']].last()
+    rt_states = rt_last_df['ML'].to_dict()
+    rt1 = rt_states['Total RSA']
 
 
-    # Graph 1
+    # Plot: Model 1: Rt for Covid-19 in South Africa
 
     state_single["e_plus"] = state_single['High_90'].sub(state_single['Rt'])
     state_single["e_minus"] = state_single['Rt'].sub(state_single['Low_90'])
 
-    fig1 = px.line(state_single, x='Date', y='Rt', color='Province',
-              error_y='e_plus', error_y_minus='e_minus',
-              title='Rt for Covid-19 in South Africa', line_shape='spline')
-    fig1.update_traces(hovertemplate=None)
-    fig1.update_layout(hovermode="x")
-    fig1['data'][0]['error_y']['color'] = 'lightblue'
+    fig_rt1 = px.line(state_single, x='Date', y='Rt',
+                error_y='e_plus', error_y_minus='e_minus',
+                title='Model 1: Rt for Covid-19 in South Africa', line_shape='spline')
+    fig_rt1.update_traces(hovertemplate=None)
+    fig_rt1.update_layout(hovermode="x")
+    fig_rt1['data'][0]['error_y']['color'] = 'lightblue'
 
-    plot_rt_country = plot(fig1, output_type='div', include_plotlyjs=False)
+    fig_rt1.add_shape(
+        type="line",
+        xref="x",
+        yref="y",
+        x0=X0rt1,
+        y0=1,
+        x1=X2rt1,
+        y1=1,
+        opacity=0.6,
+        line=dict(
+            color="Crimson",
+            width=2,
+            dash='dash'
+    ))
+
+    plot_rt_country = plot(fig_rt1, output_type='div', include_plotlyjs=False)
 
 
-    # Graph 2
+    # Plot: Model 1: Rt for Covid-19 in South African provinces
 
     states_rt = states_all_rt.query("Province != 'Total RSA'")
 
     fig_px = px.line(states_rt, x='Date', y='Rt', color='Province')
     fig_len = len(fig_px['data'])
 
-    fig2 = make_subplots(rows=3, cols=3,
+    fig_rt_province = make_subplots(rows=3, cols=3,
                     subplot_titles=state_labels,
                     shared_xaxes=True, shared_yaxes=True)
 
@@ -76,13 +95,28 @@ def trend_plots():
         c = (p % 3) + 1
         if (c == 1):
             r+=1
-        fig2.add_trace(fig_px['data'][p], row=r, col=c)
+        fig_rt_province.add_trace(fig_px['data'][p], row=r, col=c)
+        
+        fig_rt_province.add_shape(
+        type="line",
+        xref="x{0}".format(p+1),
+        yref="y{0}".format(p+1),
+        x0=X0rt1,
+        y0=1,
+        x1=X2rt1,
+        y1=1,
+        opacity=0.6,
+        line=dict(
+            color="Crimson",
+            width=2,
+            dash='dash'
+        ))
 
-    fig2.update_layout(title_text="Rt for Covid-19 in South African Provinces", height=700)
-    fig2.update_traces(hovertemplate=None)
-    fig2.update_layout(hovermode="x")
+    fig_rt_province.update_layout(title_text="Rt for Covid-19 in South African Provinces", height=700)
+    fig_rt_province.update_traces(hovertemplate=None)
+    fig_rt_province.update_layout(hovermode="x")
 
-    plot_rt_states = plot(fig2, output_type='div', include_plotlyjs=False)
+    plot_rt_states = plot(fig_rt_province, output_type='div', include_plotlyjs=False)
 
 
 
@@ -208,7 +242,7 @@ def trend_plots():
 
     # Stats
 
-    latestcases = states_wide.iloc[-1,:]
+    latestcases = states_wide.iloc[-1]
     a = latestcases['Cases']
     a = format_comma(a)
 
@@ -221,14 +255,26 @@ def trend_plots():
     d = latestcases['Active']
     d = format_comma(d)
 
-    latest = latestresult['Date']
+    e = latestcases['Tests']
+    e = format_comma(e)
+
+    latest = latestcases['Date']
     latest_date = latest.strftime("%d %B %Y")
     
 
     content_trend['plot_rt_country'] = plot_rt_country
     content_trend['plot_rt_states'] = plot_rt_states
-    content_trend['latest_rt'] = latest_rt
-    content_trend['latest_rtdate'] = latest_rtdate
+    content_trend['latest_rt'] = rt1
+    content_trend['latest_rtdate'] = latest_d_rt1
+    content_trend['rt_ec'] = rt_states['EC']
+    content_trend['rt_fs'] = rt_states['FS']
+    content_trend['rt_gp'] = rt_states['GP']
+    content_trend['rt_kzn'] = rt_states['KZN']
+    content_trend['rt_lp'] = rt_states['LP']
+    content_trend['rt_mp'] = rt_states['MP']
+    content_trend['rt_nc'] = rt_states['NC']
+    content_trend['rt_nw'] = rt_states['NW']
+    content_trend['rt_wc'] = rt_states['WC']
     content_trend['plot_combined_cases'] = plot_combined_cases
     content_trend['plot_daily_cases'] = plot_daily_cases
     content_trend['plot_stats'] = plot_stats
@@ -236,6 +282,7 @@ def trend_plots():
     content_trend['recovered'] = b
     content_trend['deaths'] = c
     content_trend['active'] = d
+    content_trend['tests'] = e
     content_trend['latest_date'] = latest_date
 
     return content_trend
@@ -463,7 +510,7 @@ state_key = {
     'LP':'Limpopo',
     'MP':'Mpumalanga',
     'NC':'Northern Cape',
-    'NW':'North-West',
+    'NW':'North West',
     'WC':'Western Cape'
 }
 
