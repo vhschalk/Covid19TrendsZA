@@ -102,6 +102,9 @@
       last calculated on {{ content.latest_rt2date }}. This means that each newly infected
       person is likely to infect {{ content.latest_rt }} more people.
     </div>
+    <div class="content">
+      The country Rt is calculated with the new version 2 of the Rt model!
+    </div>
   </section>
 
   <section class="section">
@@ -204,19 +207,28 @@
     <div class="hero-body">
       <div class="content">
         <h3 class="subtitle">The following assumptions were applied to calculate the trends</h3>
+        <h4 class="subtitle">Model V1</h4>
         <ol>
+          <li>Applies to provincial Rt plots.</li>
           <li>Smoothed average data is used.</li>
           <li>The error bands indicate the 90% credibility interval.</li>
           <li>For regions with low case rates, only the date ranges with the most significant change is shown.</li>
-          <li>The lag time between testing and positive case identification is not taken into account yet, due to the difficulty to obtain access to testing data.</li>
-          <li>Any other disturbances on the calculation is not known.</li>
-          <li>Forecasted plots will use the latest calculated Rt for the region.</li>
+          <li>The lag time between testing and positive case identification is not taken into account, due to the difficulty to obtain access to testing data for regions.</li>
+        </ol>
+        <h4 class="subtitle">Model V2</h4>
+        <ol>
+          <li>Where testing data is available, an advanced multi-variable model can be used.</li>
+          <li>Applies to South Africa country Rt plot.</li>
+          <li>Testing and case data are the two input dimensions for the model.</li>
+          <li>Considering 10 days for the virus to incubate, all case data are back-dated.</li>
+          <li>Forecasted plots will use the latest calculated Rt from this model.</li>
         </ol>
       </div>
     </div>
   </section>
 
   <section class="section">
+      <div class="content"><a href="rtmodel1">Get</a> the first version of the Rt model for South Africa.</div>
       <div class="content"><a href="export">Download</a> a png version of the Rt plots for publication.</div>
   </section>
 

@@ -7,5 +7,6 @@ urlpatterns = [
     path('forecast/', views.forecast, name='forecast'),
     path('export/', views.export, name='export'),
     path('matplot/', views.matplot, name='matplot'),
+    path('rtmodel1/', views.rtmodel1, name='rtmodel1'),
     path('snapshot/', views.snapshot, name='snapshot')
 ]

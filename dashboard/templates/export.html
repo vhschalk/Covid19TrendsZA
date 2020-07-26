@@ -11,21 +11,25 @@
 
 {% block content %}
 
-<div id="output_box">
-  <section class="hero is-info is-bold">
-    <div class="hero-body">
-      <div class="container">
-        <h2 class="subtitle">Please wait while the latest Rt data is fetched.</h2>
-        <progress class="progress is-large is-info" max="100"></progress>
+<div class="container">
+  
+  <div id="output_box">
+    <section class="hero is-info is-bold">
+      <div class="hero-body">
+        <div class="container">
+          <h2 class="subtitle">Please wait while the latest Rt data is fetched.</h2>
+          <progress class="progress is-large is-info" max="100"></progress>
+        </div>
       </div>
-    </div>
-  </section>
-</div>
+    </section>
+  </div>
 
-<script>
-  $(document).ready(function() {
-    $('#output_box').load('/matplot/')
-  });
-</script>
+  <script>
+    $(document).ready(function() {
+      $('#output_box').load('/matplot/')
+    });
+  </script>
+
+</div>
 
 {% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+  <title>Covid-19 Trends in South Africa</title>
+{% endblock %}
+
+{% block suntitle %}
+<h2 class="subtitle">Effective Reproduction Number: Model V1</h2>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <section class="section">
+        <div class="content">Latest Rt (first model version) for South Africa is {{ content.latest_rt }}, last calculated on {{ content.latest_rtdate }}.</div>
+        <div class="content">{{ content.plot_rt1|safe }}</div>
+    </section>
+</div>
+
+{% endblock %}

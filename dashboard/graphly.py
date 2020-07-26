@@ -35,8 +35,16 @@ def trend_plots():
     states_all_rt = states_all_rt.rename(columns={'state':'Province'})
 
 
+    # Rt model 2
+    
+    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
+    state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
+    state_rt_mcmc = state_rt_mcmc.rename(columns={'date':'Date'})
+    state_rt_mcmc = state_rt_mcmc.rename(columns={'Median':'Rt'})
+
+
     # Rt model 1 summary
-    X0rt1 = states_all_rt.iloc[0]['Date']
+    X0rt1 = state_rt_mcmc.iloc[0]['Date'] # for improved start range
 
     latest_result_rt = states_all_rt.iloc[-1]
     X2rt1 = latest_result_rt['Date']
@@ -44,14 +52,6 @@ def trend_plots():
 
     rt1_last_df = states_all_rt_i.groupby(level=0)[['ML']].last()
     rt1_states = rt1_last_df['ML'].to_dict()
-
-
-    # Rt model 2
-    
-    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
-    state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
-    state_rt_mcmc = state_rt_mcmc.rename(columns={'date':'Date'})
-    state_rt_mcmc = state_rt_mcmc.rename(columns={'Median':'Rt'})
 
 
     # Rt modcel 2 summary
@@ -72,7 +72,7 @@ def trend_plots():
 
     fig_rt2 = px.line(state_rt_mcmc, x='Date', y='Rt',
                 error_y='e_plus', error_y_minus='e_minus',
-                title='Model 2: Rt for Covid-19 in South Africa', line_shape='spline')
+                title='Model V2: Rt for Covid-19 in South Africa', line_shape='spline')
     fig_rt2.update_traces(hovertemplate=None)
     fig_rt2.update_layout(hovermode="x")
     fig_rt2['data'][0]['error_y']['color'] = 'lightblue'
@@ -128,7 +128,7 @@ def trend_plots():
             dash='dash'
         ))
 
-    fig_rt_province.update_layout(title_text="Model 1: Rt for Covid-19 in South African Provinces", height=700)
+    fig_rt_province.update_layout(title_text="Model V1: Rt for Covid-19 in South African Provinces", height=700)
     fig_rt_province.update_traces(hovertemplate=None)
     fig_rt_province.update_layout(hovermode="x")
 
@@ -318,7 +318,7 @@ def future_plots():
     state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
 
     latest_rt2 = state_rt_mcmc.iloc[-1]
-    rt2 = latest_rt2['Median']
+    rt2 = round(latest_rt2['Median'], 2)
     
 
     # Herd immunity
@@ -544,7 +544,7 @@ def format_comma(num):
     return f'{num:,.0f}'
 
 
-def model1_rt():
+def rt_model1():
 
     # Rt mode 1
     url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
@@ -565,6 +565,8 @@ def model1_rt():
     latest_result_rt = state_single.iloc[-1]
     X2rt1 = latest_result_rt['Date']
     rt1 = latest_result_rt['Rt']
+
+    latest_d_rt1 = X2rt1.strftime("%d %B %Y")
 
     fig_rt1 = px.line(state_single, x='Date', y='Rt',
                 error_y='e_plus', error_y_minus='e_minus',
@@ -594,7 +596,7 @@ def model1_rt():
     content_trend = {}
 
     content_trend['plot_rt1'] = plot_rt1
-    content_trend['latest_rtdate'] = X2rt1
+    content_trend['latest_rtdate'] = latest_d_rt1
     content_trend['latest_rt'] = rt1
 
     return content_trend
