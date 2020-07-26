@@ -28,6 +28,8 @@
       gtag('config', '{% analytics_id %}');
     </script>
 
+    <script type="text/javascript" src="{% script_id %}" async="async"></script>
+
     <script>(function() {var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true; 
     po.src = '{% script_id %}'; var s = document.getElementsByTagName('script')[0]; 
     s.parentNode.insertBefore(po, s); })();</script>
@@ -90,9 +92,12 @@
           <div class="column is-three-fifths">
             <div class="content">
               <h4>References:</h4>
-              <p><strong>DSFSI:</strong> Data Science for Social Impact Research Group @ University of
+              <p id="ref1"><strong>DSFSI:</strong> Data Science for Social Impact Research Group @ University of
                 Pretoria, COVID-19 Data Repository for South Africa. Available
                 <a href="https://github.com/dsfsi/covid19za" target="_blank">here.</a></p>
+              <p id="ref2"><strong>Journal of Infection:</strong> Herd immunity – estimating the level required to halt the
+                COVID-19 epidemics in affected countries. Available
+                <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7151357/" target="_blank">here.</a></p>
             </div>
     
             <div class="content">
