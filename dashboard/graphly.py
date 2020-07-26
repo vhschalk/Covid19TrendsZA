@@ -24,7 +24,7 @@ def trend_plots():
     state_labels = list(state_key.values())
 
 
-    # Data
+    # Rt mode 1
     url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
     states_all_rt_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=[0,1])
 
@@ -34,40 +34,56 @@ def trend_plots():
     states_all_rt = states_all_rt.rename(columns={'ML':'Rt'})
     states_all_rt = states_all_rt.rename(columns={'state':'Province'})
 
-    state_single = states_all_rt.query("Province == 'Total RSA'")
 
+    # Rt model 1 summary
+    X0rt1 = states_all_rt.iloc[0]['Date']
 
-    # Latest Rt1 summary
-    X0rt1 = state_single.iloc[0]['Date']
-
-    latest_result_rt = state_single.iloc[-1]
+    latest_result_rt = states_all_rt.iloc[-1]
     X2rt1 = latest_result_rt['Date']
     latest_d_rt1 = X2rt1.strftime("%d %B %Y")
 
-    rt_last_df = states_all_rt_i.groupby(level=0)[['ML']].last()
-    rt_states = rt_last_df['ML'].to_dict()
-    rt1 = rt_states['Total RSA']
+    rt1_last_df = states_all_rt_i.groupby(level=0)[['ML']].last()
+    rt1_states = rt1_last_df['ML'].to_dict()
+
+
+    # Rt model 2
+    
+    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
+    state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
+    state_rt_mcmc = state_rt_mcmc.rename(columns={'date':'Date'})
+    state_rt_mcmc = state_rt_mcmc.rename(columns={'Median':'Rt'})
+
+
+    # Rt modcel 2 summary
+
+    X0rt2 = state_rt_mcmc.iloc[0,:]['Date']
+
+    latest_rt2 = state_rt_mcmc.iloc[-1]
+    rt2 = round(latest_rt2['Rt'], 2)
+
+    X2rt2 = latest_rt2['Date']
+    latest_d_rt2 = X2rt2.strftime("%d %B %Y")
 
 
     # Plot: Model 1: Rt for Covid-19 in South Africa
 
-    state_single["e_plus"] = state_single['High_90'].sub(state_single['Rt'])
-    state_single["e_minus"] = state_single['Rt'].sub(state_single['Low_90'])
+    state_rt_mcmc["e_plus"] = state_rt_mcmc['High_80'].sub(state_rt_mcmc['Rt'])
+    state_rt_mcmc["e_minus"] = state_rt_mcmc['Rt'].sub(state_rt_mcmc['Low_80'])
 
-    fig_rt1 = px.line(state_single, x='Date', y='Rt',
+    fig_rt2 = px.line(state_rt_mcmc, x='Date', y='Rt',
                 error_y='e_plus', error_y_minus='e_minus',
-                title='Model 1: Rt for Covid-19 in South Africa', line_shape='spline')
-    fig_rt1.update_traces(hovertemplate=None)
-    fig_rt1.update_layout(hovermode="x")
-    fig_rt1['data'][0]['error_y']['color'] = 'lightblue'
+                title='Model 2: Rt for Covid-19 in South Africa', line_shape='spline')
+    fig_rt2.update_traces(hovertemplate=None)
+    fig_rt2.update_layout(hovermode="x")
+    fig_rt2['data'][0]['error_y']['color'] = 'lightblue'
 
-    fig_rt1.add_shape(
+    fig_rt2.add_shape(
         type="line",
         xref="x",
         yref="y",
-        x0=X0rt1,
+        x0=X0rt2,
         y0=1,
-        x1=X2rt1,
+        x1=X2rt2,
         y1=1,
         opacity=0.6,
         line=dict(
@@ -76,7 +92,7 @@ def trend_plots():
             dash='dash'
     ))
 
-    plot_rt_country = plot(fig_rt1, output_type='div', include_plotlyjs=False)
+    plot_rt_country = plot(fig_rt2, output_type='div', include_plotlyjs=False)
 
 
     # Plot: Model 1: Rt for Covid-19 in South African provinces
@@ -112,7 +128,7 @@ def trend_plots():
             dash='dash'
         ))
 
-    fig_rt_province.update_layout(title_text="Rt for Covid-19 in South African Provinces", height=700)
+    fig_rt_province.update_layout(title_text="Model 1: Rt for Covid-19 in South African Provinces", height=700)
     fig_rt_province.update_traces(hovertemplate=None)
     fig_rt_province.update_layout(hovermode="x")
 
@@ -264,17 +280,18 @@ def trend_plots():
 
     content_trend['plot_rt_country'] = plot_rt_country
     content_trend['plot_rt_states'] = plot_rt_states
-    content_trend['latest_rt'] = rt1
-    content_trend['latest_rtdate'] = latest_d_rt1
-    content_trend['rt_ec'] = rt_states['EC']
-    content_trend['rt_fs'] = rt_states['FS']
-    content_trend['rt_gp'] = rt_states['GP']
-    content_trend['rt_kzn'] = rt_states['KZN']
-    content_trend['rt_lp'] = rt_states['LP']
-    content_trend['rt_mp'] = rt_states['MP']
-    content_trend['rt_nc'] = rt_states['NC']
-    content_trend['rt_nw'] = rt_states['NW']
-    content_trend['rt_wc'] = rt_states['WC']
+    content_trend['latest_rt'] = rt2
+    content_trend['latest_rt2date'] = latest_d_rt2
+    content_trend['rt_ec'] = rt1_states['EC']
+    content_trend['rt_fs'] = rt1_states['FS']
+    content_trend['rt_gp'] = rt1_states['GP']
+    content_trend['rt_kzn'] = rt1_states['KZN']
+    content_trend['rt_lp'] = rt1_states['LP']
+    content_trend['rt_mp'] = rt1_states['MP']
+    content_trend['rt_nc'] = rt1_states['NC']
+    content_trend['rt_nw'] = rt1_states['NW']
+    content_trend['rt_wc'] = rt1_states['WC']
+    content_trend['latest_rt1date'] = latest_d_rt1
     content_trend['plot_combined_cases'] = plot_combined_cases
     content_trend['plot_daily_cases'] = plot_daily_cases
     content_trend['plot_stats'] = plot_stats
@@ -295,12 +312,25 @@ def future_plots():
     content_future = {}
 
 
-    # TODO Get data from other method
+    # Rt model 2
 
-    url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
-    states_all_rt = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
+    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
+    state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
 
-    state_single = states_all_rt.query("state == 'Total RSA'")
+    latest_rt2 = state_rt_mcmc.iloc[-1]
+    rt2 = latest_rt2['Median']
+    
+
+    # Herd immunity
+
+    #url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/district_data/za_province_pop.csv'
+    #province_pops = pd.read_csv(url, header=None, names=['Province','Pop'])
+    #country_pop = province_pops['Pop'].sum()
+    country_pop = 58775020
+
+    Pc = 1-(1/rt2)
+    immune = country_pop * Pc
+    future_immune = format_comma(immune)
     
 
     url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
@@ -314,18 +344,6 @@ def future_plots():
     cases_series = pd.Series(states_all_i['total'].values, index=states_all_i.index.values, name='Cases')
 
 
-    url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/district_data/za_province_pop.csv'
-    province_pops = pd.read_csv(url, header=None, names=['Province','Pop'])
-    country_pop = province_pops['Pop'].sum()
-
-
-    # Simple Stats
-
-    latestresult = state_single.iloc[-1,:]
-    rt = round(latestresult['ML'], 2)
-    latest_rt = '%.2f'%rt
-
-
     # Forecast Calc
 
     cases_df = cases_series.to_frame()
@@ -333,15 +351,16 @@ def future_plots():
     cases_df = cases_df.rename(columns={'index':'Date'})
     cases_df
 
-    f = 30
+    f = 60
+    f2 = 30
 
     diff = cases_df['Cases'].diff()
 
     d = diff.values[-1]
 
     r_scenarios = [1.5, 1.4, 1.3, 1.25, 1.2, 1.15, 1.1, 1.075, 1.05, 1.025, 1.0, 0.975, 0.95, 0.925, 0.9, 0.85, 0.8, 0.7, 0.6, 0.5, 0.25, 0.1]
-    if (rt not in r_scenarios):
-        r_scenarios.append(rt)
+    if (rt2 not in r_scenarios):
+        r_scenarios.append(rt2)
         r_scenarios.sort(reverse=True)
 
     future_projections = None
@@ -372,7 +391,7 @@ def future_plots():
 
     # Simple Stats
 
-    current_forecast = future_projections.query(f"R == {rt}")
+    current_forecast = future_projections.query(f"R == {rt2}")
     last_forecast = current_forecast.iloc[-1]
     future_f = math.trunc(last_forecast['Cases'])
     future = format_comma(future_f)
@@ -381,9 +400,10 @@ def future_plots():
     future_perc = f'{infected:.1f}%'
 
 
-    #X0 = current_forecast.iloc[0]['Date']
-    #X1 = last_forecast['Date']
-    X2 = date.today()
+    Xdt = date.today()
+    X0f = current_forecast.iloc[0]['Date']
+    X1f = Xdt + timedelta(days=f2)
+    X2f = last_forecast['Date']
 
     max_forecast = max(current_forecast['Cases']) * 1.05
     max_country = country_pop * 1.1
@@ -393,8 +413,8 @@ def future_plots():
     # Graph 1
 
     fig6 = px.line(current_forecast, x='Date', y='Cases',
-                   range_y=[0, max_future],
-                   title='Covid-19 Cases Forecast for Current Rt')
+                range_y=[0, max_future],
+                title='Covid-19 Cases Forecast for Current Rt')
     fig6.update_traces(hovertemplate=None)
     fig6.update_layout(hovermode="x")
 
@@ -402,9 +422,9 @@ def future_plots():
         type="line",
         xref="x",
         yref="y",
-        x0=X2,
+        x0=Xdt,
         y0=0,
-        x1=X2,
+        x1=Xdt,
         y1=max_future,
         opacity=0.6,
         line=dict(
@@ -412,6 +432,28 @@ def future_plots():
             width=2,
             dash='dashdot'
     ))
+
+    fig6.add_shape(
+        type="line",
+        xref="x",
+        yref="y",
+        x0=X0f,
+        y0=immune,
+        x1=X2f,
+        y1=immune,
+        opacity=0.6,
+        line=dict(
+            color="Crimson",
+            width=2,
+            dash='dash'
+    ))
+
+    fig6.add_annotation(
+                x=X1f,
+                y=immune * 1.05,
+                text="Herd Immunity",
+                showarrow=False
+    )
 
     plot_forecast = plot(fig6, output_type='div', include_plotlyjs=False)
 
@@ -443,9 +485,9 @@ def future_plots():
         type="line",
         xref="x",
         yref="y",
-        x0=X2,
+        x0=Xdt,
         y0=0,
-        x1=X2,
+        x1=Xdt,
         y1=max_linear,
         opacity=0.6,
         line=dict(
@@ -472,9 +514,9 @@ def future_plots():
         type="line",
         xref="x",
         yref="y",
-        x0=X2,
+        x0=Xdt,
         y0=0,
-        x1=X2,
+        x1=Xdt,
         y1=max_decline,
         opacity=0.6,
         line=dict(
@@ -486,9 +528,10 @@ def future_plots():
     plot_scenarios3 = plot(fig9, output_type='div', include_plotlyjs=False, auto_play=False)
 
 
-    content_future['latest_rt'] = latest_rt
-    content_future['future'] = future
+    content_future['latest_rt'] = rt2
+    content_future['future_cases'] = future
     content_future['future_perc'] = future_perc
+    content_future['future_immune'] = future_immune
     content_future['plot_forecast'] = plot_forecast
     content_future['plot_scenarios1'] = plot_scenarios1
     content_future['plot_scenarios2'] = plot_scenarios2
@@ -499,6 +542,63 @@ def future_plots():
 
 def format_comma(num):
     return f'{num:,.0f}'
+
+
+def model1_rt():
+
+    # Rt mode 1
+    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
+    states_all_rt_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=[0,1])
+
+    states_all_rt = states_all_rt_i.copy()
+    states_all_rt = states_all_rt.reset_index()
+    states_all_rt = states_all_rt.rename(columns={'date':'Date'})
+    states_all_rt = states_all_rt.rename(columns={'ML':'Rt'})
+    states_all_rt = states_all_rt.rename(columns={'state':'Province'})
+
+    state_single = states_all_rt.query("Province == 'Total RSA'")
+
+    state_single["e_plus"] = state_single['High_90'].sub(state_single['Rt'])
+    state_single["e_minus"] = state_single['Rt'].sub(state_single['Low_90'])
+
+    X0rt1 = state_single.iloc[0]['Date']
+    latest_result_rt = state_single.iloc[-1]
+    X2rt1 = latest_result_rt['Date']
+    rt1 = latest_result_rt['Rt']
+
+    fig_rt1 = px.line(state_single, x='Date', y='Rt',
+                error_y='e_plus', error_y_minus='e_minus',
+                title='Model 1: Rt for Covid-19 in South Africa', line_shape='spline')
+    fig_rt1.update_traces(hovertemplate=None)
+    fig_rt1.update_layout(hovermode="x")
+    fig_rt1['data'][0]['error_y']['color'] = 'lightblue'
+
+    fig_rt1.add_shape(
+        type="line",
+        xref="x",
+        yref="y",
+        x0=X0rt1,
+        y0=1,
+        x1=X2rt1,
+        y1=1,
+        opacity=0.6,
+        line=dict(
+            color="Crimson",
+            width=2,
+            dash='dash'
+    ))
+
+    plot_rt1 = plot(fig_rt1, output_type='div', include_plotlyjs=False, auto_play=False)
+
+
+    content_trend = {}
+
+    content_trend['plot_rt1'] = plot_rt1
+    content_trend['latest_rtdate'] = X2rt1
+    content_trend['latest_rt'] = rt1
+
+    return content_trend
+
 
 # Global keys
 

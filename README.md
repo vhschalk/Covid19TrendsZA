@@ -17,8 +17,6 @@ The dashboard is build with Django. The analytics engine currently runs on the [
 
 ### TODOs
 
-1. Improve front-end layout
-1. Change all plots to Plotly
 1. Consider using a cron job to store the latest Rt data with PostgreSQL DB
 1. Consider running the analytics engine directly in this project (low priority)
 
@@ -43,5 +41,5 @@ After adding new images:
 Local run:
 1. `python manage.py runserver`
 
-After session changes (due to WSGI config): 
+After local session changes (due to WSGI config): 
 1. `touch Covid19TrendsZA/wsgi.py`

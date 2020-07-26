@@ -97,7 +97,7 @@
   <section class="section">
     <div class="content">
       The latest Rt value for the country is <strong>{{ content.latest_rt }}</strong>,
-      last calculated on {{ content.latest_rtdate }}. This means that each newly infected
+      last calculated on {{ content.latest_rt2date }}. This means that each newly infected
       person is likely to infect {{ content.latest_rt }} more people.
     </div>
   </section>
@@ -119,80 +119,82 @@
   </section>
 
   <section class="section">
-      <div class="content">{{ content.plot_rt_states|safe }}</div>
-
-      <div class="columns is-mobile has-text-centered">
-        <div class="column">
-          <div class="box">
-            <p class="heading">Latest Provincial Reproduction Numbers</p>
-          </div>
+    <div class="columns is-mobile has-text-centered">
+      <div class="column">
+        <div class="box">
+          <p class="heading">Latest Provincial Reproduction Numbers</p>
         </div>
       </div>
+    </div>
 
-      <div class="columns is-mobile has-text-centered">
-        <div class="column is-one-third">
-          <div class="box">
-            <p class="heading">Eastern Cape</p>
-            <p class="title">{{ content.rt_ec }}</p>
-          </div>
-        </div>
-        <div class="column is-one-third">
-          <div class="box">
-            <p class="heading">Free State</p>
-            <p class="title">{{ content.rt_fs }}</p>
-          </div>
-        </div>
-        <div class="column is-one-third">
-          <div class="box">
-            <p class="heading">Guateng</p>
-            <p class="title">{{ content.rt_gp }}</p>
-          </div>
+    <div class="columns is-mobile has-text-centered">
+      <div class="column is-one-third">
+        <div class="box">
+          <p class="heading">Eastern Cape</p>
+          <p class="title">{{ content.rt_ec }}</p>
         </div>
       </div>
-
-      <div class="columns is-mobile has-text-centered">
-        <div class="column is-one-third">
-          <div class="box">
-            <p class="heading">Kwazulu Natal</p>
-            <p class="title">{{ content.rt_kzn }}</p>
-          </div>
-        </div>
-        <div class="column is-one-third">
-          <div class="box">
-            <p class="heading">Limpopo</p>
-            <p class="title">{{ content.rt_lp }}</p>
-          </div>
-        </div>
-        <div class="column is-one-third">
-          <div class="box">
-            <p class="heading">Mpumalanga</p>
-            <p class="title">{{ content.rt_mp }}</p>
-          </div>
+      <div class="column is-one-third">
+        <div class="box">
+          <p class="heading">Free State</p>
+          <p class="title">{{ content.rt_fs }}</p>
         </div>
       </div>
-
-      <div class="columns is-mobile has-text-centered">
-        <div class="column is-one-third">
-          <div class="box">
-            <p class="heading">northen Cape</p>
-            <p class="title">{{ content.rt_nc }}</p>
-          </div>
-        </div>
-        <div class="column is-one-third">
-          <div class="box">
-            <p class="heading">North West</p>
-            <p class="title">{{ content.rt_nw }}</p>
-          </div>
-        </div>
-        <div class="column is-one-third">
-          <div class="box">
-            <p class="heading">Western Cape</p>
-            <p class="title">{{ content.rt_wc }}</p>
-          </div>
+      <div class="column is-one-third">
+        <div class="box">
+          <p class="heading">Guateng</p>
+          <p class="title">{{ content.rt_gp }}</p>
         </div>
       </div>
+    </div>
 
+    <div class="columns is-mobile has-text-centered">
+      <div class="column is-one-third">
+        <div class="box">
+          <p class="heading">Kwazulu Natal</p>
+          <p class="title">{{ content.rt_kzn }}</p>
+        </div>
+      </div>
+      <div class="column is-one-third">
+        <div class="box">
+          <p class="heading">Limpopo</p>
+          <p class="title">{{ content.rt_lp }}</p>
+        </div>
+      </div>
+      <div class="column is-one-third">
+        <div class="box">
+          <p class="heading">Mpumalanga</p>
+          <p class="title">{{ content.rt_mp }}</p>
+        </div>
+      </div>
+    </div>
 
+    <div class="columns is-mobile has-text-centered">
+      <div class="column is-one-third">
+        <div class="box">
+          <p class="heading">northen Cape</p>
+          <p class="title">{{ content.rt_nc }}</p>
+        </div>
+      </div>
+      <div class="column is-one-third">
+        <div class="box">
+          <p class="heading">North West</p>
+          <p class="title">{{ content.rt_nw }}</p>
+        </div>
+      </div>
+      <div class="column is-one-third">
+        <div class="box">
+          <p class="heading">Western Cape</p>
+          <p class="title">{{ content.rt_wc }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      Last calculated on: <strong>{{ content.latest_rt1date }}</strong>.
+    </div>
+
+    <div class="content">{{ content.plot_rt_states|safe }}</div>
 
   </section>
 
