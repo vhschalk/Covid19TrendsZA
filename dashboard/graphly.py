@@ -433,28 +433,6 @@ def future_plots():
             dash='dashdot'
     ))
 
-    fig6.add_shape(
-        type="line",
-        xref="x",
-        yref="y",
-        x0=X0f,
-        y0=immune,
-        x1=X2f,
-        y1=immune,
-        opacity=0.6,
-        line=dict(
-            color="Crimson",
-            width=2,
-            dash='dash'
-    ))
-
-    fig6.add_annotation(
-                x=X1f,
-                y=immune * 1.05,
-                text="Herd Immunity",
-                showarrow=False
-    )
-
     plot_forecast = plot(fig6, output_type='div', include_plotlyjs=False)
 
     
