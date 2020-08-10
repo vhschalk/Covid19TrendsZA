@@ -21,8 +21,331 @@ def trend_plots():
 
     content_trend = {}
 
+    state_filter = list(state_key.keys())
+
     state_labels = list(state_key.values())
 
+    state_filter_t = copy.deepcopy(state_filter)
+    state_filter_t.insert(0,'Total RSA')
+
+    state_filter_all = copy.deepcopy(state_filter)
+    state_filter_all.insert(0,'Total RSA')
+    state_filter_all.append('Date')
+
+    # SA Population
+
+
+    # Download and fill stats
+
+    ## Cases
+    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
+    states_cases_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=0)
+
+    casezero = states_cases_i.index[0]
+    caselast = states_cases_i.index[-1]
+
+    idx = pd.date_range(casezero, caselast)
+
+    states_cases_i = states_cases_i.reindex(idx, method='ffill')
+    states_cases_i = states_cases_i.rename(columns={'total':'Total RSA'})
+
+    states_cases = states_cases_i.copy()
+    states_cases = states_cases.reset_index()
+    states_cases = states_cases.rename(columns={'index':'Date'})
+
+    ## Deaths
+    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_deaths.csv'
+    states_deaths_i = pd.read_csv(url,
+                        parse_dates=['date'], dayfirst=True,
+                        squeeze=True,index_col=0).sort_index()
+
+    states_deaths_i = states_deaths_i.reindex(idx, method='ffill')
+
+    states_deaths_i.iloc[0, :] = states_deaths_i.iloc[0, :].replace({np.nan:0})
+    states_deaths_i = states_deaths_i.ffill(axis=0)
+    states_deaths_i = states_deaths_i.rename(columns={'total':'Total RSA'})
+
+    states_deaths = states_deaths_i.copy()
+    states_deaths = states_deaths.reset_index()
+    states_deaths = states_deaths.rename(columns={'index':'Date'})
+
+    ## Recovery
+    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_recoveries.csv'
+    states_recovery_i = pd.read_csv(url,
+                        parse_dates=['date'], dayfirst=True,
+                        squeeze=True,index_col=0).sort_index()
+
+    states_recovery_i = states_recovery_i.reindex(idx, method='ffill')
+
+    states_recovery_i.iloc[0, :] = states_recovery_i.iloc[0, :].replace({np.nan:0})
+    states_recovery_i = states_recovery_i.ffill(axis=0)
+    states_recovery_i = states_recovery_i.rename(columns={'total':'Total RSA'})
+
+    states_recovery = states_recovery_i.copy()
+    states_recovery = states_recovery.reset_index()
+    states_recovery = states_recovery.rename(columns={'index':'Date'})
+
+    ## Tests
+    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_timeline_testing.csv'
+    states_tests_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, index_col=0)
+    states_tests_i = states_tests_i['cumulative_tests']
+
+    states_tests_i = states_tests_i.reindex(idx, method='ffill')
+
+    states_tests_i = states_tests_i.ffill(axis=0)
+    states_tests_i = states_tests_i.rename('Total RSA')
+
+    states_tests = states_tests_i.copy()
+    states_tests = states_tests.reset_index()
+    states_tests = states_tests.rename(columns={'index':'Date'})
+
+
+    # Analysis per province
+
+    colour_series = px.colors.qualitative.Vivid
+
+
+    filter_cases = states_cases[state_filter_all]
+    analysis_cases = filter_cases.melt(id_vars='Date', var_name='Province', value_name='Value')
+    analysis_cases['Data'] = 'Cases'
+
+    filter_recovery = states_recovery[state_filter_all]
+    analysis_recovery = filter_recovery.melt(id_vars='Date', var_name='Province', value_name='Value')
+    analysis_recovery['Data'] = 'Recovered'
+
+    filter_deaths = states_deaths[state_filter_all]
+    analysis_deaths = filter_deaths.melt(id_vars='Date', var_name='Province', value_name='Value')
+    analysis_deaths['Data'] = 'Deaths'
+
+
+    filter_add = pd.concat([filter_deaths, filter_recovery])
+    filter_add = filter_add.groupby('Date').sum()
+
+    filter_sub = filter_add.rmul(-1).reset_index()
+
+    filter_active_i = pd.concat([filter_cases, filter_sub])
+    filter_active_i = filter_active_i.groupby('Date').sum()
+    filter_active = filter_active_i.reset_index()
+    filter_active = filter_active.rename(columns={'index':'Date'})
+
+    analysis_active = filter_active.melt(id_vars='Date', var_name='Province', value_name='Value')
+    analysis_active['Data'] = 'Active'
+
+    analysis_all = pd.concat([analysis_cases, analysis_active, analysis_recovery, analysis_deaths])
+
+    analysis_states = analysis_all.query(f"Province != 'Total RSA'")
+    analysis_country = analysis_all.query(f"Province == 'Total RSA'")
+
+
+    ## Plot analysis for provinces
+
+    template_h = '%{y}'
+
+    fig_analysis_prov = px.bar(analysis_states, title='Analysis For Provinces',
+                x='Date', y='Value', color='Province', animation_frame='Data',
+                barmode='relative', color_discrete_sequence=colour_series)
+
+    fig_analysis_prov.update_layout(plot_bgcolor="#FFF",hovermode="x")
+    fig_analysis_prov.update_xaxes(linecolor="#BCCCDC")
+    fig_analysis_prov.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
+
+    fig_analysis_prov.update_traces(hovertemplate=template_h)
+    fig_analysis_prov["layout"].pop("updatemenus") # remove play controls
+
+    plot_analsysis_prov = plot(fig_analysis_prov, output_type='div', include_plotlyjs=False, auto_play=False)
+
+
+    ## Plot analysis for deaths
+
+    analysis_states_deaths = analysis_deaths.query(f"Province != 'Total RSA'")
+
+
+    fig_analysis_death = px.bar(analysis_states_deaths, title='Analysis For Deaths',
+                x='Date', y='Value', color='Province',
+                barmode='relative', color_discrete_sequence=colour_series)
+
+    fig_analysis_death.update_layout(plot_bgcolor="#FFF")
+    fig_analysis_death.update_xaxes(linecolor="#BCCCDC")
+    fig_analysis_death.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
+
+    fig_analysis_death.update_traces(hovertemplate=None)
+    fig_analysis_death.update_layout(hovermode="x")
+
+    plot_analsysis_deaths = plot(fig_analysis_death, output_type='div', include_plotlyjs=False)
+
+
+    ## Plot analysis for South Africa
+
+    states_tests['Province'] = 'Total RSA'
+    states_tests['Data'] = 'Tests'
+    states_tests = states_tests.rename(columns={'Total RSA':'Value'})
+
+    analysis_country = pd.concat([analysis_country, states_tests])
+
+
+    px_data_sa = px.line(analysis_country, x='Date', y='Value', color='Data', line_shape='spline')
+    fig_analysis_sa = make_subplots(specs=[[{"secondary_y": True}]])
+
+
+    fig_analysis_sa.add_trace(px_data_sa['data'][0], secondary_y=True)
+    fig_analysis_sa.add_trace(px_data_sa['data'][1], secondary_y=True)
+    fig_analysis_sa.add_trace(px_data_sa['data'][2], secondary_y=True)
+    fig_analysis_sa.add_trace(px_data_sa['data'][3], secondary_y=True)
+    fig_analysis_sa.add_trace(px_data_sa['data'][4], secondary_y=False)
+
+    fig_analysis_sa.update_yaxes(title_text="Rest of Data", secondary_y=True)
+    fig_analysis_sa.update_yaxes(title_text="Tests", secondary_y=False)
+    fig_analysis_sa.update_layout(title="Analysis for South Africa")
+
+    fig_analysis_sa.update_layout(plot_bgcolor="#FFF",hovermode="x")
+
+    fig_analysis_sa.update_xaxes(showspikes=True, spikesnap="cursor", spikemode="across", spikethickness=1, linecolor="#BCCCDC")
+    fig_analysis_sa.update_yaxes(showspikes=True, spikethickness=1, linecolor="#BCCCDC", gridcolor='#D3D3D3')
+    fig_analysis_sa.update_layout(spikedistance=1000, hoverdistance=100)
+
+    fig_analysis_sa.update_traces(hovertemplate=None)
+
+    plot_analysis_sa = plot(fig_analysis_sa, output_type='div', include_plotlyjs=False)
+
+
+    ## Summary
+
+    latest_date = caselast.strftime("%d %B %Y")
+    f_date = caselast.strftime("%Y-%m-%d")
+
+    analysis_latest = analysis_country.query(f"Date == '{f_date}'")
+
+    latest_cases = format_comma(analysis_latest.iloc[0]['Value'])
+    latest_active = format_comma(analysis_latest.iloc[1]['Value'])
+    latest_recovery = format_comma(analysis_latest.iloc[2]['Value'])
+    latest_deaths = format_comma(analysis_latest.iloc[3]['Value'])
+    latest_tests = format_comma(analysis_latest.iloc[4]['Value'])
+
+
+    ## Plot analysis per province
+
+    max_states = max(analysis_states['Value']) * 1.05
+
+
+    fig_analaysis_prov2 = px.line(analysis_states, title='Analysis Per Provinces',
+                x='Date', y='Value', color='Data', animation_frame='Province',
+                line_shape='spline', range_y=[0, max_states],
+                color_discrete_sequence=colour_series)
+
+    fig_analaysis_prov2.update_layout(plot_bgcolor="#FFF")
+    fig_analaysis_prov2.update_xaxes(linecolor="#BCCCDC")
+    fig_analaysis_prov2.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
+
+    fig_analaysis_prov2.update_xaxes(showspikes=True, spikesnap="cursor", spikemode="across", spikethickness=1)
+    fig_analaysis_prov2.update_yaxes(showspikes=True, spikethickness=1)
+    fig_analaysis_prov2.update_layout(spikedistance=1000, hoverdistance=100)
+
+    fig_analaysis_prov2.update_traces(hovertemplate=template_h)
+    fig_analaysis_prov2.update_layout(hovermode="x")
+    fig_analaysis_prov2["layout"].pop("updatemenus") # remove play controls
+
+    plot_analsysis_prov2 = plot(fig_analaysis_prov2, output_type='div', include_plotlyjs=False, auto_play=False)
+
+
+    # Daily analaysis
+
+    def shape_daily(states_df_i, label, fil=True):
+        if fil:
+            all_df = states_df_i[state_filter_t]
+        else:
+            all_df = states_df_i
+        daily_df_i = all_df.diff()
+        daily_df_i = daily_df_i[1:]
+        daily_df = daily_df_i.reset_index()
+        daily_df = daily_df.rename(columns={'index':'Date'})
+        daily_melt_df = daily_df.melt(id_vars='Date', var_name='Province', value_name='Value')
+        daily_melt_df['Data'] = label
+        return daily_melt_df, daily_df_i
+
+    daily_melt_cases, daily_cases = shape_daily(states_cases_i, 'Cases')
+    daily_melt_active, x = shape_daily(filter_active_i, 'Active')
+    daily_melt_recovery, x = shape_daily(states_recovery_i, 'Recovery')
+    daily_melt_deaths, x = shape_daily(states_deaths_i, 'Deaths')
+
+    states_cases_smoothed = daily_cases.rolling(7,
+        win_type='gaussian',
+        min_periods=1,
+        center=True).mean(std=2).round()
+
+    daily_smoothed = states_cases_smoothed.reset_index()
+    daily_smoothed = daily_smoothed.rename(columns={'index':'Date'})
+    daily_melt_smoothed = daily_smoothed.melt(id_vars='Date', var_name='Province', value_name='Value')
+    daily_melt_smoothed['Data'] = 'Cases Smoothed'
+
+    daily_all = pd.concat([daily_melt_cases, daily_melt_smoothed, daily_melt_active, daily_melt_recovery, daily_melt_deaths])
+
+    daily_country = daily_all.query(f"Province == 'Total RSA'")
+    daily_states = daily_all.query(f"Province != 'Total RSA'")
+
+    daily_melt_tests, x = shape_daily(states_tests_i, 'Tests', False)
+
+    daily_country = pd.concat([daily_country, daily_melt_tests])
+
+
+    ## Plot daily change for South Africa
+
+    px_daily_sa = px.line(daily_country, x='Date', y='Value', color='Data', line_shape='spline')
+    fig_daily_sa = make_subplots(rows=1, cols=2, specs=[[{},{"secondary_y": True}]], y_title="Value")
+
+
+    #visible="legendonly"
+    fig_daily_sa.add_trace(px_daily_sa['data'][0], row=1, col=1)
+    fig_daily_sa.add_trace(px_daily_sa['data'][1], row=1, col=1)
+    fig_daily_sa.add_trace(px_daily_sa['data'][2], secondary_y=False, row=1, col=2)
+    fig_daily_sa.add_trace(px_daily_sa['data'][3], secondary_y=False, row=1, col=2)
+    fig_daily_sa.add_trace(px_daily_sa['data'][4], secondary_y=False, row=1, col=2)
+    fig_daily_sa.add_trace(px_daily_sa['data'][5], secondary_y=True, row=1, col=2)
+
+    fig_daily_sa.update_layout(plot_bgcolor="#FFF")
+    fig_daily_sa.update_xaxes(linecolor="#BCCCDC")
+    fig_daily_sa.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
+
+    fig_daily_sa.update_yaxes(title_text="Tests", secondary_y=True)
+    #fig_daily_sa.update_yaxes(title_text="Tests", secondary_y=False)
+    fig_daily_sa.update_layout(title="Daily Change for South Africa")
+
+    fig_daily_sa.update_xaxes(showspikes=True, spikesnap="cursor", spikemode="across", spikethickness=1)
+    fig_daily_sa.update_yaxes(showspikes=True, spikethickness=1, spikemode="across")
+    fig_daily_sa.update_layout(spikedistance=1000, hoverdistance=100)
+
+    fig_daily_sa.update_traces(hovertemplate=None)
+    fig_daily_sa.update_layout(hovermode="x")
+
+    plot_daily_sa = plot(fig_daily_sa, output_type='div', include_plotlyjs=False)
+
+
+    # Plot daily change for provinces
+
+    max_daily = max(daily_states['Value']) * 1.05
+    min_daily = min(daily_states['Value']) * 1.05
+
+
+    fig_daily_prov = px.line(daily_states, title='Daily Change For Provinces',
+                x='Date', y='Value', color='Data', animation_frame='Province',
+                range_y=[min_daily, max_daily], line_shape='spline',
+                color_discrete_sequence=colour_series)
+
+    fig_daily_prov.update_layout(plot_bgcolor="#FFF")
+    fig_daily_prov.update_xaxes(linecolor="#BCCCDC")
+    fig_daily_prov.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
+
+    fig_daily_prov.update_traces(hovertemplate=template_h)
+    fig_daily_prov.update_layout(hovermode="x")
+    fig_daily_prov["layout"].pop("updatemenus") # remove play controls
+
+    fig_daily_prov.update_xaxes(showspikes=True, spikesnap="cursor", spikemode="across", spikethickness=1)
+    fig_daily_prov.update_yaxes(showspikes=True, spikethickness=1)
+    fig_daily_prov.update_layout(spikedistance=1000, hoverdistance=100)
+
+    plot_daily_prov = plot(fig_daily_prov, output_type='div', include_plotlyjs=False, auto_play=False)
+
+
+    # Rt analysis
 
     # Rt mode 1
     url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
@@ -135,148 +458,7 @@ def trend_plots():
     plot_rt_states = plot(fig_rt_province, output_type='div', include_plotlyjs=False)
 
 
-
-
-    # Setup common variables
-
-    state_filter = list(state_key.keys())
-
-    state_filter_i = copy.deepcopy(state_filter)
-    state_filter_i.append('Date')
-
-    colour_series = px.colors.qualitative.Vivid
-
-
-    # Main data
-
-    url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
-    states_all_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=0)
-    states_all_i.tail()
-
-    states_all = states_all_i.copy()
-    states_all = states_all.reset_index()
-    states_all = states_all.rename(columns={'date':'Date'})
-
-
-    # Graph 3
-
-    state_plot = states_all[state_filter_i]
-    state_plotly = state_plot.melt(id_vars='Date', var_name='Province', value_name='Cases')
-
-    fig1 = px.bar(state_plotly, title='Total Cases Per Province', x='Date', y='Cases', color='Province',
-                barmode='relative', color_discrete_sequence=colour_series)
-    fig1.update_traces(hovertemplate=None)
-    fig1.update_layout(hovermode="x")
-    plot_combined_cases = plot(fig1, output_type='div', include_plotlyjs=False)
-
-
-    # Graph 4
-
-    states_all['Actual Data'] = states_all['total'].diff()
-
-    smoothed = states_all['Actual Data'].rolling(7,
-    win_type='gaussian',
-    min_periods=1,
-    center=True).mean(std=2).round()
-
-    idx_start = np.searchsorted(smoothed, 25)
-
-    smoothed = smoothed.iloc[idx_start:]
-    states_all['Smoothed Data'] = smoothed
-
-    daily = states_all[['Date','Actual Data','Smoothed Data']]
-
-    daily_plotly = daily.melt(id_vars='Date', var_name='Range', value_name='Daily Cases')
-
-    fig2 = px.line(daily_plotly, title='Daily Case Increase for South Africa',
-                  x='Date', y='Daily Cases', color='Range', line_shape='spline')
-    fig2.update_traces(hovertemplate=None)
-    fig2.update_layout(hovermode="x")
-    plot_daily_cases = plot(fig2, output_type='div', include_plotlyjs=False)
-
-
-    # Graph 5
-
-    url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/covid19za_provincial_cumulative_timeline_deaths.csv'
-    states_all_deaths = pd.read_csv(url,
-                        parse_dates=['date'], dayfirst=True,
-                        squeeze=True,index_col=0).sort_index()
-
-    url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/covid19za_provincial_cumulative_timeline_recoveries.csv'
-    states_all_recover = pd.read_csv(url,
-                     parse_dates=['date'], dayfirst=True,
-                     squeeze=True,index_col=0).sort_index()
-
-    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_timeline_testing.csv'
-    states_all_tests = pd.read_csv(url, parse_dates=['date'], dayfirst=True, index_col=0)
-    states_all_tests.tail()
-
-    casezero = states_all_i.index[0]
-    caselast = states_all_i.index[-1]
-
-    tests_series = states_all_tests.loc[casezero:caselast]['cumulative_tests']
-
-    cases_series = pd.Series(states_all_i['total'].values, index=states_all_i.index.values, name='Cases')
-
-    deaths_series = pd.Series(states_all_deaths['total'].values, index=states_all_deaths.index, name='Deaths')
-    recover_series = pd.Series(states_all_recover['total'].values, index=states_all_recover.index, name='Recovered')
-
-    states_combine = pd.concat([cases_series, recover_series, deaths_series, tests_series], axis=1)
-    states_combine = states_combine.rename(columns={'cumulative_tests':'Tests'})
-    states_combine.loc[casezero,'Tests'] = 163
-    states_master = states_combine.ffill(axis=0)
-
-    states_changed = states_master[['Recovered','Deaths']].sum(axis=1)
-
-    active_all = states_master['Cases'].sub(states_changed)
-
-    states_master['Active'] = active_all
-
-    states_wide = states_master.reset_index(col_fill='Date')
-    states_wide = states_wide.rename(columns={'index':'Date'})
-
-    state_wide_plotly = states_wide.melt(id_vars='Date', var_name='Data', value_name='Count')
-
-    px_data_sa = px.line(state_wide_plotly, x='Date', y='Count', color='Data', line_shape='spline')
-    fig_data_sa = make_subplots(specs=[[{"secondary_y": True}]])
-
-    fig_data_sa.add_trace(px_data_sa['data'][0], secondary_y=True)
-    fig_data_sa.add_trace(px_data_sa['data'][1], secondary_y=True)
-    fig_data_sa.add_trace(px_data_sa['data'][2], secondary_y=True)
-    fig_data_sa.add_trace(px_data_sa['data'][4], secondary_y=True)
-    fig_data_sa.add_trace(px_data_sa['data'][3], secondary_y=False)
-
-    fig_data_sa.update_yaxes(title_text="Rest of Data", secondary_y=True)
-    fig_data_sa.update_yaxes(title_text="Tests", secondary_y=False)
-    fig_data_sa.update_layout(title="Covid-19 Data for South Africa")
-
-    fig_data_sa.update_traces(hovertemplate=None)
-    fig_data_sa.update_layout(hovermode="x")
-
-    plot_stats = plot(fig_data_sa, output_type='div', include_plotlyjs=False)
-
-
-    # Stats
-
-    latestcases = states_wide.iloc[-1]
-    a = latestcases['Cases']
-    a = format_comma(a)
-
-    b = latestcases['Recovered']
-    b = format_comma(b)
-
-    c = latestcases['Deaths']
-    c = format_comma(c)
-
-    d = latestcases['Active']
-    d = format_comma(d)
-
-    e = latestcases['Tests']
-    e = format_comma(e)
-
-    latest = latestcases['Date']
-    latest_date = latest.strftime("%d %B %Y")
-    
+    ## Complete content dict
 
     content_trend['plot_rt_country'] = plot_rt_country
     content_trend['plot_rt_states'] = plot_rt_states
@@ -292,14 +474,17 @@ def trend_plots():
     content_trend['rt_nw'] = rt1_states['NW']
     content_trend['rt_wc'] = rt1_states['WC']
     content_trend['latest_rt1date'] = latest_d_rt1
-    content_trend['plot_combined_cases'] = plot_combined_cases
-    content_trend['plot_daily_cases'] = plot_daily_cases
-    content_trend['plot_stats'] = plot_stats
-    content_trend['cases'] = a
-    content_trend['recovered'] = b
-    content_trend['deaths'] = c
-    content_trend['active'] = d
-    content_trend['tests'] = e
+    content_trend['plot_analsysis_prov'] = plot_analsysis_prov
+    content_trend['plot_analsysis_deaths'] = plot_analsysis_deaths
+    content_trend['plot_analysis_sa'] = plot_analysis_sa
+    content_trend['plot_analsysis_prov2'] = plot_analsysis_prov2
+    content_trend['plot_daily_sa'] = plot_daily_sa
+    content_trend['plot_daily_prov'] = plot_daily_prov
+    content_trend['cases'] = latest_cases
+    content_trend['recovered'] = latest_recovery
+    content_trend['deaths'] = latest_deaths
+    content_trend['active'] = latest_active
+    content_trend['tests'] = latest_tests
     content_trend['latest_date'] = latest_date
 
     return content_trend
@@ -592,51 +777,4 @@ state_key = {
     'NC':'Northern Cape',
     'NW':'North West',
     'WC':'Western Cape'
-}
-
-district_gp_key = {
-'ekurhuleni':'Ekurhuleni',
-'johannesburg':'Johannesburg',
-'tshwane':'Tshwane'
-}
-
-district_wc_key = {
-'CT':'City of Cape Town (D)',
-'CT-WE':'Western',
-'CT-SO':'Southern Suburbs',
-'CT-NO':'Northern Suburbs',
-'CT-TB':'Tygerberg',
-'CT-EA':'Eastern',
-'CT-KF':'Klipfontein',
-'CT-MP':'Mitchells Plain',
-'CT-KL':'Khayelitsha',
-'CW':'Cape Winelands (D)',
-'CW-BV':'Breede Valley',
-'CW-DS':'Drakenstein',
-'CW-LB':'Langeberg',
-'CW-SB':'Stellenbosch',
-'CW-WB':'Witzenberg',
-'CK':'Central Karoo (D)',
-'CK-BW':'Beaufort West',
-'CK-LB':'Laingsburg',
-'CK-PA':'Prince Albert',
-'GR':'Eden (D)',
-'GR-BT':'Bitou',
-'GR-GE':'George',
-'GR-HQ':'Hessequa',
-'GR-KL':'Kannaland',
-'GR-KN':'Knysna',
-'GR-MB':'Mossel Bay',
-'GR-OS':'Oudtshoorn',
-'OB':'Overberg (D)',
-'OB-CA':'Cape Agulhas',
-'OB-OS':'Overstrand',
-'OB-SD':'Swellendam',
-'OB-TK':'Theewaterskloof',
-'WC':'West Coast (D)',
-'WC-BR':'Bergrivier',
-'WC-CB':'Cederberg',
-'WC-MZ':'Matzikama',
-'WC-SB':'Saldanha Bay',
-'WC-SL':'Swartland'
 }

@@ -211,7 +211,6 @@
         <ol>
           <li>Applies to provincial Rt plots.</li>
           <li>Smoothed average data is used.</li>
-          <li>The error bands indicate the 90% credibility interval.</li>
           <li>For regions with low case rates, only the date ranges with the most significant change is shown.</li>
           <li>The lag time between testing and positive case identification is not taken into account, due to the difficulty to obtain access to testing data for regions.</li>
         </ol>
@@ -221,6 +220,7 @@
           <li>Applies to South Africa country Rt plot.</li>
           <li>Testing and case data are the two input dimensions for the model.</li>
           <li>Considering 10 days for the virus to incubate, all case data are back-dated.</li>
+          <li>The error bands indicate the 80% credibility interval.</li>
           <li>Forecasted plots will use the latest calculated Rt from this model.</li>
         </ol>
       </div>
@@ -236,16 +236,48 @@
 
 <section class="hero is-dark is-bold">
   <div class="hero-body">
-      <h2 class="subtitle">Covid-19 Case Data</h2>
+      <h2 class="subtitle">Breakdown of Covid-19 Data</h2>
   </div>
 </section>
 
 <div class="container">
 
+
   <section class="section">
-      <div class="content">{{ content.plot_combined_cases|safe }}</div>
-      <div class="content">{{ content.plot_stats|safe }}</div>
-      <div class="content">{{ content.plot_daily_cases|safe }}</div>
+    <div class="content">{{ content.plot_analsysis_prov|safe }}</div>
+  </section>
+
+  <section class="hero is-info is-bold">
+    <div class="hero-body">
+        <h2 class="subtitle">Tips</h2>
+        <div class="content">
+          <ul>
+            <li>Move the slider to see the effect of different types of data.</li>
+            <li>Use the arrows icon (<span class="icon"><i class="fas fa-expand-arrows-alt"></i></span>) to auto zoom if changes on the plot seem to small.</li>
+          </ul>
+        </div>
+    </div>
+  </section>
+
+  <section class="section">
+      <div class="content">{{ content.plot_analsysis_deaths|safe }}</div>
+      <div class="content">{{ content.plot_analysis_sa|safe }}</div>
+      <div class="content">{{ content.plot_analsysis_prov2|safe }}</div>
+      <div class="content">{{ content.plot_daily_sa|safe }}</div>
+  </section>
+
+  <section class="hero is-info is-bold">
+    <div class="hero-body">
+      <h2 class="subtitle">Tip</h2>
+      <div class="content">
+        <ul>
+          <li>Hide the data line in the legend if the plot looks to busy.</li>
+        </ul>
+      </div>
+
+  </section>
+  <section class="section">
+      <div class="content">{{ content.plot_daily_prov|safe }}</div>
   </section>
 
 </div>
