@@ -145,7 +145,7 @@ def trend_plots():
                 x='Date', y='Value', color='Province', animation_frame='Data',
                 barmode='relative', color_discrete_sequence=colour_series)
 
-    fig_analysis_prov.update_layout(plot_bgcolor="#FFF",hovermode="x")
+    fig_analysis_prov.update_layout(plot_bgcolor="#FFF",hovermode="x", height=650)
     fig_analysis_prov.update_xaxes(linecolor="#BCCCDC")
     fig_analysis_prov.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
 
@@ -197,7 +197,7 @@ def trend_plots():
     fig_analysis_sa.update_yaxes(title_text="Tests", secondary_y=False)
     fig_analysis_sa.update_layout(title="Analysis for South Africa")
 
-    fig_analysis_sa.update_layout(plot_bgcolor="#FFF",hovermode="x")
+    fig_analysis_sa.update_layout(plot_bgcolor="#FFF", hovermode="x")
 
     fig_analysis_sa.update_xaxes(showspikes=True, spikesnap="cursor", spikemode="across", spikethickness=1, linecolor="#BCCCDC")
     fig_analysis_sa.update_yaxes(showspikes=True, spikethickness=1, linecolor="#BCCCDC", gridcolor='#D3D3D3')
@@ -232,7 +232,7 @@ def trend_plots():
                 line_shape='spline', range_y=[0, max_states],
                 color_discrete_sequence=colour_series)
 
-    fig_analaysis_prov2.update_layout(plot_bgcolor="#FFF")
+    fig_analaysis_prov2.update_layout(plot_bgcolor="#FFF", height=550)
     fig_analaysis_prov2.update_xaxes(linecolor="#BCCCDC")
     fig_analaysis_prov2.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
 
@@ -330,7 +330,7 @@ def trend_plots():
                 range_y=[min_daily, max_daily], line_shape='spline',
                 color_discrete_sequence=colour_series)
 
-    fig_daily_prov.update_layout(plot_bgcolor="#FFF")
+    fig_daily_prov.update_layout(plot_bgcolor="#FFF", height=550)
     fig_daily_prov.update_xaxes(linecolor="#BCCCDC")
     fig_daily_prov.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
 
@@ -415,6 +415,10 @@ def trend_plots():
             dash='dash'
     ))
 
+    fig_rt2.update_layout(plot_bgcolor="#FFF")
+    fig_rt2.update_xaxes(linecolor="#BCCCDC")
+    fig_rt2.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
+
     plot_rt_country = plot(fig_rt2, output_type='div', include_plotlyjs=False)
 
 
@@ -454,6 +458,10 @@ def trend_plots():
     fig_rt_province.update_layout(title_text="Model V1: Rt for Covid-19 in South African Provinces", height=700)
     fig_rt_province.update_traces(hovertemplate=None)
     fig_rt_province.update_layout(hovermode="x")
+
+    fig_rt_province.update_layout(plot_bgcolor="#FFF")
+    fig_rt_province.update_xaxes(linecolor="#BCCCDC")
+    fig_rt_province.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
 
     plot_rt_states = plot(fig_rt_province, output_type='div', include_plotlyjs=False)
 
@@ -618,6 +626,10 @@ def future_plots():
             dash='dashdot'
     ))
 
+    fig6.update_layout(plot_bgcolor="#FFF")
+    fig6.update_xaxes(linecolor="#BCCCDC")
+    fig6.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
+
     plot_forecast = plot(fig6, output_type='div', include_plotlyjs=False)
 
     
@@ -629,6 +641,10 @@ def future_plots():
                animation_frame='R', height=600, range_y=[0, max_country],
                title='Covid-19 Cases Forecast for Increasing Cases (Rt is bigger than 1)')
     fig7.update_layout(hovermode="x")
+
+    fig7.update_layout(plot_bgcolor="#FFF")
+    fig7.update_xaxes(linecolor="#BCCCDC")
+    fig7.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
 
     plot_scenarios1 = plot(fig7, output_type='div', include_plotlyjs=False, auto_play=False)
 
@@ -659,6 +675,10 @@ def future_plots():
             dash='dashdot'
     ))
 
+    fig8.update_layout(plot_bgcolor="#FFF")
+    fig8.update_xaxes(linecolor="#BCCCDC")
+    fig8.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
+
     plot_scenarios2 = plot(fig8, output_type='div', include_plotlyjs=False, auto_play=False)
 
 
@@ -687,6 +707,10 @@ def future_plots():
             width=2,
             dash='dashdot'
     ))
+
+    fig9.update_layout(plot_bgcolor="#FFF")
+    fig9.update_xaxes(linecolor="#BCCCDC")
+    fig9.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
 
     plot_scenarios3 = plot(fig9, output_type='div', include_plotlyjs=False, auto_play=False)
 
@@ -752,6 +776,10 @@ def rt_model1():
             width=2,
             dash='dash'
     ))
+
+    fig_rt1.update_layout(plot_bgcolor="#FFF")
+    fig_rt1.update_xaxes(linecolor="#BCCCDC")
+    fig_rt1.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
 
     plot_rt1 = plot(fig_rt1, output_type='div', include_plotlyjs=False, auto_play=False)
 
