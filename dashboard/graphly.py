@@ -290,23 +290,21 @@ def trend_plots():
     ## Plot daily change for South Africa
 
     px_daily_sa = px.line(daily_country, x='Date', y='Value', color='Data', line_shape='spline')
-    fig_daily_sa = make_subplots(rows=1, cols=2, specs=[[{},{"secondary_y": True}]], y_title="Value")
+    fig_daily_sa = make_subplots(rows=1, cols=2)
 
 
     #visible="legendonly"
     fig_daily_sa.add_trace(px_daily_sa['data'][0], row=1, col=1)
     fig_daily_sa.add_trace(px_daily_sa['data'][1], row=1, col=1)
-    fig_daily_sa.add_trace(px_daily_sa['data'][2], secondary_y=False, row=1, col=2)
-    fig_daily_sa.add_trace(px_daily_sa['data'][3], secondary_y=False, row=1, col=2)
-    fig_daily_sa.add_trace(px_daily_sa['data'][4], secondary_y=False, row=1, col=2)
-    fig_daily_sa.add_trace(px_daily_sa['data'][5], secondary_y=True, row=1, col=2)
+    fig_daily_sa.add_trace(px_daily_sa['data'][2], row=1, col=2)
+    fig_daily_sa.add_trace(px_daily_sa['data'][3], row=1, col=2)
+    fig_daily_sa.add_trace(px_daily_sa['data'][4], row=1, col=2)
+    fig_daily_sa.add_trace(px_daily_sa['data'][5], row=1, col=1)
 
     fig_daily_sa.update_layout(plot_bgcolor="#FFF")
     fig_daily_sa.update_xaxes(linecolor="#BCCCDC")
     fig_daily_sa.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
 
-    fig_daily_sa.update_yaxes(title_text="Tests", secondary_y=True)
-    #fig_daily_sa.update_yaxes(title_text="Tests", secondary_y=False)
     fig_daily_sa.update_layout(title="Daily Change for South Africa")
 
     fig_daily_sa.update_xaxes(showspikes=True, spikesnap="cursor", spikemode="across", spikethickness=1)
