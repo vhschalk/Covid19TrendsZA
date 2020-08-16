@@ -393,7 +393,7 @@ def trend_plots():
 
     fig_rt2 = px.line(state_rt_mcmc, x='Date', y='Rt',
                 error_y='e_plus', error_y_minus='e_minus',
-                title='Model V2: Rt for Covid-19 in South Africa', line_shape='spline')
+                title='Rt for Covid-19 in South Africa', line_shape='spline')
     fig_rt2.update_traces(hovertemplate=None)
     fig_rt2.update_layout(hovermode="x")
     fig_rt2['data'][0]['error_y']['color'] = 'lightblue'
@@ -755,7 +755,7 @@ def rt_model1():
 
     fig_rt1 = px.line(state_single, x='Date', y='Rt',
                 error_y='e_plus', error_y_minus='e_minus',
-                title='Model 1: Rt for Covid-19 in South Africa', line_shape='spline')
+                title='Rt for Covid-19 in South Africa (first model)', line_shape='spline')
     fig_rt1.update_traces(hovertemplate=None)
     fig_rt1.update_layout(hovermode="x")
     fig_rt1['data'][0]['error_y']['color'] = 'lightblue'
