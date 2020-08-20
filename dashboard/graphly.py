@@ -289,7 +289,7 @@ def trend_plots():
 
     ## Plot daily change for South Africa
 
-    px_daily_sa = px.line(daily_country, x='Date', y='Value', color='Data', line_shape='spline')
+    px_daily_sa = px.line(daily_country, x='Date', y='Value', color='Data') # temporary remove line_shape='spline'
     fig_daily_sa = make_subplots(rows=1, cols=2)
 
 
