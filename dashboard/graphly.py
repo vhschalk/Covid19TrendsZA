@@ -23,8 +23,6 @@ def trend_plots():
 
     state_filter = list(state_key.keys())
 
-    state_labels = list(state_key.values())
-
     state_filter_t = copy.deepcopy(state_filter)
     state_filter_t.insert(0,'Total RSA')
 
@@ -345,17 +343,6 @@ def trend_plots():
 
     # Rt analysis
 
-    # Rt mode 1
-    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
-    states_all_rt_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=[0,1])
-
-    states_all_rt = states_all_rt_i.copy()
-    states_all_rt = states_all_rt.reset_index()
-    states_all_rt = states_all_rt.rename(columns={'date':'Date'})
-    states_all_rt = states_all_rt.rename(columns={'ML':'Rt'})
-    states_all_rt = states_all_rt.rename(columns={'state':'Province'})
-
-
     # Rt model 2
     
     url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
@@ -364,18 +351,7 @@ def trend_plots():
     state_rt_mcmc = state_rt_mcmc.rename(columns={'Median':'Rt'})
 
 
-    # Rt model 1 summary
-    X0rt1 = state_rt_mcmc.iloc[0]['Date'] # for improved start range
-
-    latest_result_rt = states_all_rt.iloc[-1]
-    X2rt1 = latest_result_rt['Date']
-    latest_d_rt1 = X2rt1.strftime("%d %B %Y")
-
-    rt1_last_df = states_all_rt_i.groupby(level=0)[['ML']].last()
-    rt1_states = rt1_last_df['ML'].to_dict()
-
-
-    # Rt modcel 2 summary
+    # Rt model 2 summary
 
     X0rt2 = state_rt_mcmc.iloc[0,:]['Date']
 
@@ -420,66 +396,11 @@ def trend_plots():
     plot_rt_country = plot(fig_rt2, output_type='div', include_plotlyjs=False)
 
 
-    # Plot: Model 1: Rt for Covid-19 in South African provinces
-
-    states_rt = states_all_rt.query("Province != 'Total RSA'")
-
-    fig_px = px.line(states_rt, x='Date', y='Rt', color='Province')
-    fig_len = len(fig_px['data'])
-
-    fig_rt_province = make_subplots(rows=3, cols=3,
-                    subplot_titles=state_labels,
-                    shared_xaxes=True, shared_yaxes=True)
-
-    r = 0
-    for p in range(fig_len):
-        c = (p % 3) + 1
-        if (c == 1):
-            r+=1
-        fig_rt_province.add_trace(fig_px['data'][p], row=r, col=c)
-        
-        fig_rt_province.add_shape(
-        type="line",
-        xref="x{0}".format(p+1),
-        yref="y{0}".format(p+1),
-        x0=X0rt1,
-        y0=1,
-        x1=X2rt1,
-        y1=1,
-        opacity=0.6,
-        line=dict(
-            color="Crimson",
-            width=2,
-            dash='dash'
-        ))
-
-    fig_rt_province.update_layout(title_text="Model V1: Rt for Covid-19 in South African Provinces", height=700)
-    fig_rt_province.update_traces(hovertemplate=None)
-    fig_rt_province.update_layout(hovermode="x")
-
-    fig_rt_province.update_layout(plot_bgcolor="#FFF")
-    fig_rt_province.update_xaxes(linecolor="#BCCCDC")
-    fig_rt_province.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
-
-    plot_rt_states = plot(fig_rt_province, output_type='div', include_plotlyjs=False)
-
-
     ## Complete content dict
 
     content_trend['plot_rt_country'] = plot_rt_country
-    content_trend['plot_rt_states'] = plot_rt_states
     content_trend['latest_rt'] = rt2
     content_trend['latest_rt2date'] = latest_d_rt2
-    content_trend['rt_ec'] = rt1_states['EC']
-    content_trend['rt_fs'] = rt1_states['FS']
-    content_trend['rt_gp'] = rt1_states['GP']
-    content_trend['rt_kzn'] = rt1_states['KZN']
-    content_trend['rt_lp'] = rt1_states['LP']
-    content_trend['rt_mp'] = rt1_states['MP']
-    content_trend['rt_nc'] = rt1_states['NC']
-    content_trend['rt_nw'] = rt1_states['NW']
-    content_trend['rt_wc'] = rt1_states['WC']
-    content_trend['latest_rt1date'] = latest_d_rt1
     content_trend['plot_analsysis_prov'] = plot_analsysis_prov
     content_trend['plot_analsysis_deaths'] = plot_analsysis_deaths
     content_trend['plot_analysis_sa'] = plot_analysis_sa
@@ -731,6 +652,13 @@ def format_comma(num):
 
 def rt_model1():
 
+    # Setup common variables
+
+    content_trend = {}
+
+    state_labels = list(state_key.values())
+
+
     # Rt mode 1
     url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
     states_all_rt_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=[0,1])
@@ -740,6 +668,12 @@ def rt_model1():
     states_all_rt = states_all_rt.rename(columns={'date':'Date'})
     states_all_rt = states_all_rt.rename(columns={'ML':'Rt'})
     states_all_rt = states_all_rt.rename(columns={'state':'Province'})
+
+
+    # Summary
+
+    rt1_last_df = states_all_rt_i.groupby(level=0)[['ML']].last()
+    rt1_states = rt1_last_df['ML'].to_dict()
 
     state_single = states_all_rt.query("Province == 'Total RSA'")
 
@@ -753,9 +687,12 @@ def rt_model1():
 
     latest_d_rt1 = X2rt1.strftime("%d %B %Y")
 
+
+    # Plot Rt country
+
     fig_rt1 = px.line(state_single, x='Date', y='Rt',
                 error_y='e_plus', error_y_minus='e_minus',
-                title='Rt for Covid-19 in South Africa (first model)', line_shape='spline')
+                title='Rt for Covid-19 in South Africa (First model)', line_shape='spline')
     fig_rt1.update_traces(hovertemplate=None)
     fig_rt1.update_layout(hovermode="x")
     fig_rt1['data'][0]['error_y']['color'] = 'lightblue'
@@ -782,11 +719,63 @@ def rt_model1():
     plot_rt1 = plot(fig_rt1, output_type='div', include_plotlyjs=False, auto_play=False)
 
 
-    content_trend = {}
+    # Plot Rt for Covid-19 in South African provinces
+
+    states_rt = states_all_rt.query("Province != 'Total RSA'")
+
+    fig_px = px.line(states_rt, x='Date', y='Rt', color='Province')
+    fig_len = len(fig_px['data'])
+
+    fig_rt_province = make_subplots(rows=3, cols=3,
+                    subplot_titles=state_labels,
+                    shared_xaxes=True, shared_yaxes=True)
+
+    r = 0
+    for p in range(fig_len):
+        c = (p % 3) + 1
+        if (c == 1):
+            r+=1
+        fig_rt_province.add_trace(fig_px['data'][p], row=r, col=c)
+        
+        fig_rt_province.add_shape(
+        type="line",
+        xref="x{0}".format(p+1),
+        yref="y{0}".format(p+1),
+        x0=X0rt1,
+        y0=1,
+        x1=X2rt1,
+        y1=1,
+        opacity=0.6,
+        line=dict(
+            color="Crimson",
+            width=2,
+            dash='dash'
+        ))
+
+    fig_rt_province.update_layout(title_text="Rt for Covid-19 in South African Provinces (First model)", height=700)
+    fig_rt_province.update_traces(hovertemplate=None)
+    fig_rt_province.update_layout(hovermode="x")
+
+    fig_rt_province.update_layout(plot_bgcolor="#FFF")
+    fig_rt_province.update_xaxes(linecolor="#BCCCDC")
+    fig_rt_province.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
+
+    plot_rt_states = plot(fig_rt_province, output_type='div', include_plotlyjs=False)
+
 
     content_trend['plot_rt1'] = plot_rt1
     content_trend['latest_rtdate'] = latest_d_rt1
     content_trend['latest_rt'] = rt1
+    content_trend['plot_rt_states'] = plot_rt_states
+    content_trend['rt_ec'] = rt1_states['EC']
+    content_trend['rt_fs'] = rt1_states['FS']
+    content_trend['rt_gp'] = rt1_states['GP']
+    content_trend['rt_kzn'] = rt1_states['KZN']
+    content_trend['rt_lp'] = rt1_states['LP']
+    content_trend['rt_mp'] = rt1_states['MP']
+    content_trend['rt_nc'] = rt1_states['NC']
+    content_trend['rt_nw'] = rt1_states['NW']
+    content_trend['rt_wc'] = rt1_states['WC']
 
     return content_trend
 

@@ -16,6 +16,101 @@
         <div class="content">Latest Rt (first model version) for South Africa is {{ content.latest_rt }}, last calculated on {{ content.latest_rtdate }}. No testing data and back dating of cases was applied.</div>
         <div class="content">{{ content.plot_rt1|safe }}</div>
     </section>
+
+    <section class="section">
+      <div class="columns is-mobile has-text-centered">
+        <div class="column">
+          <div class="box">
+            <p class="heading">Latest Provincial Reproduction Numbers</p>
+          </div>
+        </div>
+      </div>
+  
+      <div class="columns is-mobile has-text-centered">
+        <div class="column is-one-third">
+          <div class="box">
+            <p class="heading">Eastern Cape</p>
+            <p class="title">{{ content.rt_ec }}</p>
+          </div>
+        </div>
+        <div class="column is-one-third">
+          <div class="box">
+            <p class="heading">Free State</p>
+            <p class="title">{{ content.rt_fs }}</p>
+          </div>
+        </div>
+        <div class="column is-one-third">
+          <div class="box">
+            <p class="heading">Guateng</p>
+            <p class="title">{{ content.rt_gp }}</p>
+          </div>
+        </div>
+      </div>
+  
+      <div class="columns is-mobile has-text-centered">
+        <div class="column is-one-third">
+          <div class="box">
+            <p class="heading">Kwazulu Natal</p>
+            <p class="title">{{ content.rt_kzn }}</p>
+          </div>
+        </div>
+        <div class="column is-one-third">
+          <div class="box">
+            <p class="heading">Limpopo</p>
+            <p class="title">{{ content.rt_lp }}</p>
+          </div>
+        </div>
+        <div class="column is-one-third">
+          <div class="box">
+            <p class="heading">Mpumalanga</p>
+            <p class="title">{{ content.rt_mp }}</p>
+          </div>
+        </div>
+      </div>
+  
+      <div class="columns is-mobile has-text-centered">
+        <div class="column is-one-third">
+          <div class="box">
+            <p class="heading">Northen Cape</p>
+            <p class="title">{{ content.rt_nc }}</p>
+          </div>
+        </div>
+        <div class="column is-one-third">
+          <div class="box">
+            <p class="heading">North West</p>
+            <p class="title">{{ content.rt_nw }}</p>
+          </div>
+        </div>
+        <div class="column is-one-third">
+          <div class="box">
+            <p class="heading">Western Cape</p>
+            <p class="title">{{ content.rt_wc }}</p>
+          </div>
+        </div>
+      </div>
+  
+      <div class="content">
+        Last calculated on {{ content.latest_rtdate }}.
+      </div>
+  
+      <div class="content">{{ content.plot_rt_states|safe }}</div>
+  
+    </section>
+  
+    <section class="hero is-danger is-bold">
+      <div class="hero-body">
+        <div class="content">
+          <h3 class="subtitle">The following assumptions were applied to calculate the trends for this model</h3>
+          <ol>
+            <li>Applies to provincial Rt plots.</li>
+            <li>Smoothed average data is used.</li>
+            <li>The error bands indicate the 90% credibility interval.</li>
+            <li>For regions with low case rates, only the date ranges with the most significant change is shown.</li>
+            <li>The lag time between testing and positive case identification is not taken into account, due to the difficulty to obtain access to testing data for regions.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
 </div>
 
 {% endblock %}
