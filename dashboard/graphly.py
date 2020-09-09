@@ -430,7 +430,10 @@ def future_plots():
     state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
 
     latest_rt2 = state_rt_mcmc.iloc[-1]
-    rt2 = round(latest_rt2['Median'], 2)
+    rt2 = latest_rt2['Rt']
+    rt2h = latest_rt2['High_80']
+    rt2l = latest_rt2['Low_80']
+    rt2f = round(rt2, 2)
     
 
     # Herd immunity
@@ -473,7 +476,10 @@ def future_plots():
     r_scenarios = [1.5, 1.4, 1.3, 1.25, 1.2, 1.15, 1.1, 1.075, 1.05, 1.025, 1.0, 0.975, 0.95, 0.925, 0.9, 0.85, 0.8, 0.7, 0.6, 0.5, 0.25, 0.1]
     if (rt2 not in r_scenarios):
         r_scenarios.append(rt2)
-        r_scenarios.sort(reverse=True)
+    if (rt2h not in r_scenarios):
+        r_scenarios.append(rt2h)
+    if (rt2l not in r_scenarios):
+        r_scenarios.append(rt2l)
 
     future_projections = None
 
