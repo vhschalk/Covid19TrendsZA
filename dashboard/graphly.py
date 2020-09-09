@@ -423,30 +423,22 @@ def future_plots():
 
     content_future = {}
 
+    country_pop = 58775020
 
-    # Rt model 2
+
+    # Downloads Rt model 2 calc data
 
     url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
     state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
 
     latest_rt2 = state_rt_mcmc.iloc[-1]
-    rt2 = latest_rt2['Rt']
+    rt2 = latest_rt2['Median']
     rt2h = latest_rt2['High_80']
     rt2l = latest_rt2['Low_80']
     rt2f = round(rt2, 2)
-    
 
-    # Herd immunity
 
-    #url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/district_data/za_province_pop.csv'
-    #province_pops = pd.read_csv(url, header=None, names=['Province','Pop'])
-    #country_pop = province_pops['Pop'].sum()
-    country_pop = 58775020
-
-    Pc = 1-(1/rt2)
-    immune = country_pop * Pc
-    future_immune = format_comma(immune)
-    
+    # Download latest stats
 
     url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
     states_all_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=0)
@@ -480,6 +472,7 @@ def future_plots():
         r_scenarios.append(rt2h)
     if (rt2l not in r_scenarios):
         r_scenarios.append(rt2l)
+    r_scenarios.sort(reverse=True)
 
     future_projections = None
 
@@ -643,7 +636,6 @@ def future_plots():
     content_future['latest_rt'] = rt2f
     content_future['future_cases'] = future
     content_future['future_perc'] = future_perc
-    content_future['future_immune'] = future_immune
     content_future['plot_forecast'] = plot_forecast
     content_future['plot_scenarios1'] = plot_scenarios1
     content_future['plot_scenarios2'] = plot_scenarios2
