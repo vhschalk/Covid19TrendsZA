@@ -640,7 +640,7 @@ def future_plots():
     plot_scenarios3 = plot(fig9, output_type='div', include_plotlyjs=False, auto_play=False)
 
 
-    content_future['latest_rt'] = rt2
+    content_future['latest_rt'] = rt2f
     content_future['future_cases'] = future
     content_future['future_perc'] = future_perc
     content_future['future_immune'] = future_immune
