@@ -675,8 +675,8 @@ def rt_model1():
 
     state_single = states_all_rt.query("Province == 'Total RSA'")
 
-    state_single["e_plus"] = state_single['High_90'].sub(state_single['Rt'])
-    state_single["e_minus"] = state_single['Rt'].sub(state_single['Low_90'])
+    #state_single["e_plus"] = state_single['High_90'].sub(state_single['Rt'])
+    #state_single["e_minus"] = state_single['Rt'].sub(state_single['Low_90'])
 
     X0rt1 = state_single.iloc[0]['Date']
     latest_result_rt = state_single.iloc[-1]
@@ -689,11 +689,11 @@ def rt_model1():
     # Plot Rt country
 
     fig_rt1 = px.line(state_single, x='Date', y='Rt',
-                error_y='e_plus', error_y_minus='e_minus',
                 title='Rt for Covid-19 in South Africa (First model)', line_shape='spline')
+                #error_y='e_plus', error_y_minus='e_minus',
     fig_rt1.update_traces(hovertemplate=None)
     fig_rt1.update_layout(hovermode="x")
-    fig_rt1['data'][0]['error_y']['color'] = 'lightblue'
+    #fig_rt1['data'][0]['error_y']['color'] = 'lightblue'
 
     fig_rt1.add_shape(
         type="line",
