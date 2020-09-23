@@ -181,7 +181,7 @@ def trend_plots():
     analysis_country = pd.concat([analysis_country, states_tests])
 
 
-    px_data_sa = px.line(analysis_country, x='Date', y='Value', color='Data', line_shape='spline')
+    px_data_sa = px.line(analysis_country, x='Date', y='Value', color='Data') #, line_shape='spline' -- "hv" | "vh" | "hvh" | "vhv"
     fig_analysis_sa = make_subplots(specs=[[{"secondary_y": True}]])
 
 
