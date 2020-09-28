@@ -686,6 +686,17 @@ def rt_model1():
     latest_d_rt1 = X2rt1.strftime("%d %B %Y")
 
 
+    # Find errors in data
+
+    ss = 0
+    pp = 0
+    state_label_err = []
+
+    for key in state_key:
+        if key in rt1_states:
+            state_label_err.append(state_key.get(key))
+
+
     # Plot Rt country
 
     fig_rt1 = px.line(state_single, x='Date', y='Rt',
@@ -725,7 +736,7 @@ def rt_model1():
     fig_len = len(fig_px['data'])
 
     fig_rt_province = make_subplots(rows=3, cols=3,
-                    subplot_titles=state_labels,
+                    subplot_titles=state_label_err,
                     shared_xaxes=True, shared_yaxes=True)
 
     r = 0
@@ -761,19 +772,22 @@ def rt_model1():
     plot_rt_states = plot(fig_rt_province, output_type='div', include_plotlyjs=False)
 
 
+    # Format content 2
+
     content_trend['plot_rt1'] = plot_rt1
     content_trend['latest_rtdate'] = latest_d_rt1
     content_trend['latest_rt'] = rt1
     content_trend['plot_rt_states'] = plot_rt_states
-    content_trend['rt_ec'] = rt1_states['EC']
-    content_trend['rt_fs'] = rt1_states['FS']
-    content_trend['rt_gp'] = rt1_states['GP']
-    content_trend['rt_kzn'] = rt1_states['KZN']
-    content_trend['rt_lp'] = rt1_states['LP']
-    content_trend['rt_mp'] = rt1_states['MP']
-    content_trend['rt_nc'] = rt1_states['NC']
-    content_trend['rt_nw'] = rt1_states['NW']
-    content_trend['rt_wc'] = rt1_states['WC']
+
+    content_trend['rt_ec'] = rt1_states.get('EC')
+    content_trend['rt_fs'] = rt1_states.get('FS')
+    content_trend['rt_gp'] = rt1_states.get('GP')
+    content_trend['rt_kzn'] = rt1_states.get('KZN')
+    content_trend['rt_lp'] = rt1_states.get('LP')
+    content_trend['rt_mp'] = rt1_states.get('MP')
+    content_trend['rt_nc'] = rt1_states.get('NC')
+    content_trend['rt_nw'] = rt1_states.get('NW')
+    content_trend['rt_wc'] = rt1_states.get('WC')
 
     return content_trend
 
