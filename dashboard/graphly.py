@@ -129,7 +129,7 @@ def trend_plots():
     analysis_active = filter_active.melt(id_vars='Date', var_name='Province', value_name='Value')
     analysis_active['Data'] = 'Active'
 
-    analysis_all = pd.concat([analysis_cases, analysis_active, analysis_recovery, analysis_deaths])
+    analysis_all = pd.concat([analysis_cases, analysis_recovery, analysis_active, analysis_deaths])
 
     analysis_states = analysis_all.query(f"Province != 'Total RSA'")
     analysis_country = analysis_all.query(f"Province == 'Total RSA'")
@@ -265,17 +265,17 @@ def trend_plots():
     daily_melt_recovery, x = shape_daily(states_recovery_i, 'Recovery')
     daily_melt_deaths, x = shape_daily(states_deaths_i, 'Deaths')
 
-    states_cases_smoothed = daily_cases.rolling(7,
-        win_type='gaussian',
-        min_periods=1,
-        center=True).mean(std=2).round()
+    #states_cases_smoothed = daily_cases.rolling(7,
+    #    win_type='gaussian',
+    #    min_periods=1,
+    #    center=True).mean(std=2).round()
 
-    daily_smoothed = states_cases_smoothed.reset_index()
-    daily_smoothed = daily_smoothed.rename(columns={'index':'Date'})
-    daily_melt_smoothed = daily_smoothed.melt(id_vars='Date', var_name='Province', value_name='Value')
-    daily_melt_smoothed['Data'] = 'Cases Smoothed'
+    #daily_smoothed = states_cases_smoothed.reset_index()
+    #daily_smoothed = daily_smoothed.rename(columns={'index':'Date'})
+    #daily_melt_smoothed = daily_smoothed.melt(id_vars='Date', var_name='Province', value_name='Value')
+    #daily_melt_smoothed['Data'] = 'Cases Smoothed'
 
-    daily_all = pd.concat([daily_melt_cases, daily_melt_smoothed, daily_melt_active, daily_melt_recovery, daily_melt_deaths])
+    daily_all = pd.concat([daily_melt_cases, daily_melt_active, daily_melt_recovery, daily_melt_deaths]) #daily_melt_smoothed
 
     daily_country = daily_all.query(f"Province == 'Total RSA'")
     daily_states = daily_all.query(f"Province != 'Total RSA'")
@@ -293,11 +293,10 @@ def trend_plots():
 
     #visible="legendonly"
     fig_daily_sa.add_trace(px_daily_sa['data'][0], row=1, col=1)
-    fig_daily_sa.add_trace(px_daily_sa['data'][1], row=1, col=1)
+    fig_daily_sa.add_trace(px_daily_sa['data'][1], row=1, col=2)
     fig_daily_sa.add_trace(px_daily_sa['data'][2], row=1, col=2)
     fig_daily_sa.add_trace(px_daily_sa['data'][3], row=1, col=2)
-    fig_daily_sa.add_trace(px_daily_sa['data'][4], row=1, col=2)
-    fig_daily_sa.add_trace(px_daily_sa['data'][5], row=1, col=1)
+    fig_daily_sa.add_trace(px_daily_sa['data'][4], row=1, col=1)
 
     fig_daily_sa.update_layout(plot_bgcolor="#FFF")
     fig_daily_sa.update_xaxes(linecolor="#BCCCDC")
@@ -654,7 +653,7 @@ def rt_model1():
 
     content_trend = {}
 
-    state_labels = list(state_key.values())
+    #state_labels = list(state_key.values())
 
 
     # Rt mode 1
