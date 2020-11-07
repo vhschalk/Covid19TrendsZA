@@ -214,8 +214,8 @@ def trend_plots():
     analysis_latest = analysis_country.query(f"Date == '{f_date}'")
 
     latest_cases = format_comma(analysis_latest.iloc[0]['Value'])
-    latest_active = format_comma(analysis_latest.iloc[1]['Value'])
-    latest_recovery = format_comma(analysis_latest.iloc[2]['Value'])
+    latest_recovery = format_comma(analysis_latest.iloc[1]['Value'])
+    latest_active = format_comma(analysis_latest.iloc[2]['Value'])
     latest_deaths = format_comma(analysis_latest.iloc[3]['Value'])
     latest_tests = format_comma(analysis_latest.iloc[4]['Value'])
 
