@@ -92,7 +92,7 @@ def trend_plots():
     states_tests_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, index_col=0)
     states_tests_i = states_tests_i['cumulative_tests']
 
-    states_tests_i = states_tests_i.reindex(idx, method='ffill') #TODO temp remove -> , method='ffill'
+    states_tests_i = states_tests_i.reindex(idx) #TODO temp remove -> , method='ffill'
 
     states_tests_i = states_tests_i.ffill(axis=0)
     states_tests_i = states_tests_i.rename('Total RSA')
