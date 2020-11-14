@@ -15,6 +15,10 @@ from plotly.subplots import make_subplots
 # Change to avoid temporary delays
 repo = 'dsfsi' #dsfsi 
 
+# TODO move to own class
+#def data_provider():
+
+
 def trend_plots():
 
     # Setup common variables
@@ -88,7 +92,7 @@ def trend_plots():
     states_tests_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, index_col=0)
     states_tests_i = states_tests_i['cumulative_tests']
 
-    states_tests_i = states_tests_i.reindex(idx, method='ffill')
+    states_tests_i = states_tests_i.reindex(idx, method='ffill') #TODO temp remove -> , method='ffill'
 
     states_tests_i = states_tests_i.ffill(axis=0)
     states_tests_i = states_tests_i.rename('Total RSA')
