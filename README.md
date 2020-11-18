@@ -36,10 +36,13 @@ The dashboard is build with Django. The analytics engine currently runs on the [
 ### Run
 
 After adding new images:
-1. `python manage.py collectstatic --noinput`
+`python manage.py collectstatic --noinput`
 
 Local run:
-1. `python manage.py runserver`
+`python manage.py runserver`
 
 After local session changes (due to WSGI config): 
-1. `touch Covid19TrendsZA/wsgi.py`
+`touch Covid19TrendsZA/wsgi.py`
+
+Other commands
+`heroku run bash -a APP`

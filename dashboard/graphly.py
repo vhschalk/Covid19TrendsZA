@@ -941,20 +941,22 @@ def rt_model1():
 
 
     # Rt mode 1
-    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
-    states_all_rt_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=[0,1])
+    #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
+    #states_all_rt_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=[0,1])
+    db_rep1 = ReproductionNum.objects.filter(var = 2, index_col=['date','state'])
+    states_all_rt_i = read_frame(db_rep1)
 
     states_all_rt = states_all_rt_i.copy()
     states_all_rt = states_all_rt.reset_index()
     states_all_rt = states_all_rt.rename(columns={'date':'Date'})
-    states_all_rt = states_all_rt.rename(columns={'ML':'Rt'})
+    states_all_rt = states_all_rt.rename(columns={'rt':'Rt'})
     states_all_rt = states_all_rt.rename(columns={'state':'Province'})
 
 
     # Summary
 
-    rt1_last_df = states_all_rt_i.groupby(level=0)[['ML']].last()
-    rt1_states = rt1_last_df['ML'].to_dict()
+    rt1_last_df = states_all_rt_i.groupby(level=0)[['rt']].last()
+    rt1_states = rt1_last_df['rt'].to_dict()
 
     state_single = states_all_rt.query("Province == 'total'")
 
