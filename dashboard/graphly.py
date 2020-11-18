@@ -1,8 +1,17 @@
+import copy, math
 import datetime
 import glob
+import sys
 import os
-import copy, math
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
+
+from django_pandas.io import read_frame
+
+from decimal import Decimal
+import csv
+import requests
+
+from .models import CovidData, LatestUpdate, ReproductionNum
 
 import numpy as np
 import pandas as pd
@@ -13,11 +22,270 @@ from plotly.offline import plot
 from plotly.subplots import make_subplots
 
 # Change to avoid temporary delays
-repo = 'dsfsi' #dsfsi 
+repo = 'dsfsi' #dsfsi
 
-# TODO move to own class
-#def data_provider():
 
+
+### TODO move to own class
+
+def sync_all_data_providers():
+    data_gen_provider('C', 'confirmed')
+    #data_gen_provider('A', '')
+    data_gen_provider('R', 'recoveries')
+    data_gen_provider('D', 'deaths')
+    data_test_provider()
+
+    data_rep1_provider()
+    data_rep2_provider()
+
+
+def data_gen_provider(data_var, filepart):
+
+    urlC = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_' + filepart + '.csv'
+    with requests.Session() as s:
+        download = s.get(urlC)
+        decode_content = download.content.decode('utf-8').splitlines()
+
+        covid_reader = csv.reader(decode_content, delimiter=',')
+        try:
+            updated = LatestUpdate.objects.get(var = data_var).date
+        except LatestUpdate.DoesNotExist:
+            updated = date(2000,1,1)
+        except:
+            print('No updated record ERROR for ' + data_var + ':', sys.exc_info()[0])
+        
+        
+        try:
+            covid_data_list = list(covid_reader)
+            last_date = datetime.strptime(covid_data_list[-1][0], '%d-%m-%Y').date()
+
+            ## Already up to date, DB save is not required
+            if updated == last_date:
+                print('Not saving ' + data_var)
+                return None
+
+            
+            covid_reader = csv.reader(decode_content, delimiter=',')
+            next(covid_reader, None) #skip the header
+            print('Recording: ' + data_var)
+
+            for record in covid_reader:
+
+                record_date = datetime.strptime(record[0], '%d-%m-%Y')
+
+                CovidData.objects.update_or_create(
+                    date = record_date, var = data_var,
+                    defaults = {
+                        'EC' : parse_int(record[2]),
+                        'FS' : parse_int(record[3]),
+                        'GP' : parse_int(record[4]),
+                        'KZN' : parse_int(record[5]),
+                        'LP' : parse_int(record[6]),
+                        'MP' : parse_int(record[7]),
+                        'NC' : parse_int(record[8]),
+                        'NW' : parse_int(record[9]),
+                        'WC' : parse_int(record[10]),
+                        'unknown' : parse_int(record[11]),
+                        'total' : parse_int(record[12]),
+                        'source' : record[13]
+                    },
+                )
+
+            LatestUpdate.objects.update_or_create(
+                var = data_var,
+                defaults = {'date' : last_date}
+            )
+
+        except:
+            print('Recording ERROR for ' + data_var + ':', sys.exc_info()[0])
+
+
+def data_test_provider():
+    data_var = 'T'
+
+    urlC = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_timeline_testing.csv'
+    with requests.Session() as s:
+        download = s.get(urlC)
+
+        decode_content = download.content.decode('utf-8').splitlines()
+
+        covid_reader = csv.reader(decode_content, delimiter=',')
+        try:
+            updated = LatestUpdate.objects.get(var = data_var).date
+        except LatestUpdate.DoesNotExist:
+            updated = date(2000,1,1)
+        except:
+            print('No updated record ERROR for ' + data_var + ':', sys.exc_info()[0])
+        
+
+        try:
+            covid_data_list = list(covid_reader)
+            last_date = datetime.strptime(covid_data_list[-1][0], '%d-%m-%Y').date()
+
+            ## Already up to date, DB save is not required
+            if updated == last_date:
+                print('Not saving ' + data_var)
+                return None
+
+            
+            covid_reader = csv.reader(decode_content, delimiter=',')
+            next(covid_reader, None) #skip the header
+            print('Recording: ' + data_var)
+
+            for record in covid_reader:
+
+                record_date = datetime.strptime(record[0], '%d-%m-%Y')
+
+                CovidData.objects.update_or_create(
+                    date = record_date, var = data_var,
+                    defaults = {
+                        'total' : parse_int(record[2]),
+                        'source' : record[13]
+                    }
+                )
+            
+            LatestUpdate.objects.update_or_create(
+                var = data_var,
+                defaults = {'date' : last_date}
+            )
+
+        except:
+            print('Recording ERROR for ' + data_var + ':', sys.exc_info()[0])
+
+
+def data_rep1_provider():
+    data_var = '1'
+    
+    urlC = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
+    with requests.Session() as s:
+        download = s.get(urlC)
+
+        decode_content = download.content.decode('utf-8').splitlines()
+
+        covid_reader = csv.reader(decode_content, delimiter=',')
+        try:
+            updated = LatestUpdate.objects.get(var = data_var).date
+        except LatestUpdate.DoesNotExist:
+            updated = date(2000,1,1)
+        except:
+            print('No updated record ERROR for ' + data_var + ':', sys.exc_info()[0])
+        
+
+        try:
+            covid_data_list = list(covid_reader)
+            last_date = datetime.strptime(covid_data_list[-1][1], '%Y-%m-%d').date()
+
+            ## Already up to date, DB save is not required
+            if updated == last_date:
+                print('Not saving ' + data_var)
+                return None
+
+            
+            covid_reader = csv.reader(decode_content, delimiter=',')
+            next(covid_reader, None) #skip the header
+            print('Recording: ' + data_var)
+            
+            for record in covid_reader:
+
+                state = record[0]
+                if state == 'Total RSA':
+                    state = 'RSA'
+                record_date = datetime.strptime(record[1], '%Y-%m-%d')
+
+                ReproductionNum.objects.update_or_create(
+                    date = record_date, var = 1,
+                    defaults = {
+                        'rt' : parse_dec(record[2]),
+                        'high' : parse_dec(record[3]),
+                        'low' : parse_dec(record[4])
+                    }
+                )
+        
+            LatestUpdate.objects.update_or_create(
+                var = data_var,
+                defaults = {'date' : last_date}
+            )
+
+        except:
+            print('Recording ERROR for ' + data_var + ':', sys.exc_info()[0])
+
+
+def data_rep2_provider():
+    data_var = '2'
+    
+    urlC = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
+    with requests.Session() as s:
+        download = s.get(urlC)
+
+        decode_content = download.content.decode('utf-8').splitlines()
+
+        covid_reader = csv.reader(decode_content, delimiter=',')
+        try:
+            updated = LatestUpdate.objects.get(var = data_var).date
+        except LatestUpdate.DoesNotExist:
+            updated = date(2000,1,1)
+        except:
+            print('No updated record ERROR for ' + data_var + ':', sys.exc_info()[0])
+        
+
+        try:
+            covid_data_list = list(covid_reader)
+            last_date = datetime.strptime(covid_data_list[-1][0], '%Y-%m-%d').date()
+
+            ## Already up to date, DB save is not required
+            if updated == last_date:
+                print('Not saving ' + data_var)
+                return None
+
+            
+            covid_reader = csv.reader(decode_content, delimiter=',')
+            next(covid_reader, None) #skip the header
+            print('Recording: ' + data_var)
+            
+            for record in covid_reader:
+
+                record_date = datetime.strptime(record[0], '%Y-%m-%d')
+
+                ReproductionNum.objects.update_or_create(
+                    date = record_date, var = 2,
+                    defaults = {
+                        'rt' : parse_dec(record[1]),
+                        'high' : parse_dec(record[2]),
+                        'low' : parse_dec(record[3]),
+                        'infect' : parse_dec(record[4]),
+                        'adj' : parse_dec(record[5])
+                    }
+                )
+            
+            LatestUpdate.objects.update_or_create(
+                var = data_var,
+                defaults = {'date' : last_date}
+            )
+
+        except:
+            print('Recording ERROR for ' + data_var + ':', sys.exc_info()[0])
+
+
+def parse_int(str):
+    if str == '':
+        return 0
+    else:
+        try:
+            return int(str)
+        except:
+            return 0
+
+def parse_dec(str):
+    if str == '':
+        return 0
+    else: 
+        try:
+            return Decimal(str)
+        except:
+            return 0
+
+
+## Graphly
 
 def trend_plots():
 
@@ -28,20 +296,26 @@ def trend_plots():
     state_filter = list(state_key.keys())
 
     state_filter_t = copy.deepcopy(state_filter)
-    state_filter_t.insert(0,'Total RSA')
+    state_filter_t.insert(0,'total')
 
     state_filter_all = copy.deepcopy(state_filter)
-    state_filter_all.insert(0,'Total RSA')
+    state_filter_all.insert(0,'total')
     state_filter_all.append('Date')
 
     # SA Population
 
 
+    # Load Data Providers
+
+    sync_all_data_providers()
+
     # Download and fill stats
 
     ## Cases
-    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
-    states_cases_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=0)
+    #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
+    #states_cases_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=0)
+    db_cases = CovidData.objects.filter(var = 'C')
+    states_cases_i = read_frame(db_cases, index_col='date')
 
     casezero = states_cases_i.index[0]
     caselast = states_cases_i.index[-1]
@@ -49,53 +323,55 @@ def trend_plots():
     idx = pd.date_range(casezero, caselast)
 
     states_cases_i = states_cases_i.reindex(idx, method='ffill')
-    states_cases_i = states_cases_i.rename(columns={'total':'Total RSA'})
+    #states_cases_i = states_cases_i.rename(columns={'total':'Total RSA'})
 
     states_cases = states_cases_i.copy()
     states_cases = states_cases.reset_index()
     states_cases = states_cases.rename(columns={'index':'Date'})
 
     ## Deaths
-    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_deaths.csv'
-    states_deaths_i = pd.read_csv(url,
-                        parse_dates=['date'], dayfirst=True,
-                        squeeze=True,index_col=0).sort_index()
+    #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_deaths.csv'
+    #states_deaths_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True,index_col=0).sort_index()
+    db_deaths = CovidData.objects.filter(var = 'D')
+    states_deaths_i = read_frame(db_deaths, index_col='date')
 
     states_deaths_i = states_deaths_i.reindex(idx, method='ffill')
 
     states_deaths_i.iloc[0, :] = states_deaths_i.iloc[0, :].replace({np.nan:0})
     states_deaths_i = states_deaths_i.ffill(axis=0)
-    states_deaths_i = states_deaths_i.rename(columns={'total':'Total RSA'})
+    #states_deaths_i = states_deaths_i.rename(columns={'total':'Total RSA'})
 
     states_deaths = states_deaths_i.copy()
     states_deaths = states_deaths.reset_index()
     states_deaths = states_deaths.rename(columns={'index':'Date'})
 
     ## Recovery
-    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_recoveries.csv'
-    states_recovery_i = pd.read_csv(url,
-                        parse_dates=['date'], dayfirst=True,
-                        squeeze=True,index_col=0).sort_index()
+    #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_recoveries.csv'
+    #states_recovery_i = pd.read_csv(url,  parse_dates=['date'], dayfirst=True, squeeze=True,index_col=0).sort_index()
+    db_recovery = CovidData.objects.filter(var = 'R')
+    states_recovery_i = read_frame(db_recovery, index_col='date')
 
     states_recovery_i = states_recovery_i.reindex(idx, method='ffill')
 
     states_recovery_i.iloc[0, :] = states_recovery_i.iloc[0, :].replace({np.nan:0})
     states_recovery_i = states_recovery_i.ffill(axis=0)
-    states_recovery_i = states_recovery_i.rename(columns={'total':'Total RSA'})
+    #states_recovery_i = states_recovery_i.rename(columns={'total':'Total RSA'})
 
     states_recovery = states_recovery_i.copy()
     states_recovery = states_recovery.reset_index()
     states_recovery = states_recovery.rename(columns={'index':'Date'})
 
     ## Tests
-    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_timeline_testing.csv'
-    states_tests_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, index_col=0)
-    states_tests_i = states_tests_i['cumulative_tests']
+    #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_timeline_testing.csv'
+    #states_tests_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, index_col=0)
+    #states_tests_i = states_tests_i['cumulative_tests']
+    db_tests = CovidData.objects.filter(var = 'T')
+    states_tests_i = read_frame(db_tests, index_col='date')
 
     states_tests_i = states_tests_i.reindex(idx) #TODO temp remove -> , method='ffill'
 
     states_tests_i = states_tests_i.ffill(axis=0)
-    states_tests_i = states_tests_i.rename('Total RSA')
+    #states_tests_i = states_tests_i.rename('Total RSA')
 
     states_tests = states_tests_i.copy()
     states_tests = states_tests.reset_index()
@@ -135,8 +411,8 @@ def trend_plots():
 
     analysis_all = pd.concat([analysis_cases, analysis_recovery, analysis_active, analysis_deaths])
 
-    analysis_states = analysis_all.query(f"Province != 'Total RSA'")
-    analysis_country = analysis_all.query(f"Province == 'Total RSA'")
+    analysis_states = analysis_all.query(f"Province != 'total'")
+    analysis_country = analysis_all.query(f"Province == 'total'")
 
 
     ## Plot analysis for provinces
@@ -159,7 +435,7 @@ def trend_plots():
 
     ## Plot analysis for deaths
 
-    analysis_states_deaths = analysis_deaths.query(f"Province != 'Total RSA'")
+    analysis_states_deaths = analysis_deaths.query(f"Province != 'total'")
 
 
     fig_analysis_death = px.bar(analysis_states_deaths, title='Analysis For Deaths',
@@ -178,9 +454,9 @@ def trend_plots():
 
     ## Plot analysis for South Africa
 
-    states_tests['Province'] = 'Total RSA'
+    states_tests['Province'] = 'total'
     states_tests['Data'] = 'Tests'
-    states_tests = states_tests.rename(columns={'Total RSA':'Value'})
+    states_tests = states_tests.rename(columns={'total':'Value'})
 
     analysis_country = pd.concat([analysis_country, states_tests])
 
@@ -255,19 +531,19 @@ def trend_plots():
         if fil:
             all_df = states_df_i[state_filter_t]
         else:
-            all_df = states_df_i
+            all_df = states_df_i['total']
         daily_df_i = all_df.diff()
         daily_df_i = daily_df_i[1:]
         daily_df = daily_df_i.reset_index()
         daily_df = daily_df.rename(columns={'index':'Date'})
         daily_melt_df = daily_df.melt(id_vars='Date', var_name='Province', value_name='Value')
         daily_melt_df['Data'] = label
-        return daily_melt_df, daily_df_i
+        return daily_melt_df #, daily_df_i
 
-    daily_melt_cases, daily_cases = shape_daily(states_cases_i, 'Cases')
-    daily_melt_active, x = shape_daily(filter_active_i, 'Active')
-    daily_melt_recovery, x = shape_daily(states_recovery_i, 'Recovery')
-    daily_melt_deaths, x = shape_daily(states_deaths_i, 'Deaths')
+    daily_melt_cases = shape_daily(states_cases_i, 'Cases') #, daily_cases
+    daily_melt_active = shape_daily(filter_active_i, 'Active')
+    daily_melt_recovery = shape_daily(states_recovery_i, 'Recovery')
+    daily_melt_deaths = shape_daily(states_deaths_i, 'Deaths')
 
     #states_cases_smoothed = daily_cases.rolling(7,
     #    win_type='gaussian',
@@ -281,10 +557,10 @@ def trend_plots():
 
     daily_all = pd.concat([daily_melt_cases, daily_melt_active, daily_melt_recovery, daily_melt_deaths]) #daily_melt_smoothed
 
-    daily_country = daily_all.query(f"Province == 'Total RSA'")
-    daily_states = daily_all.query(f"Province != 'Total RSA'")
+    daily_country = daily_all.query(f"Province == 'total'")
+    daily_states = daily_all.query(f"Province != 'total'")
 
-    daily_melt_tests, x = shape_daily(states_tests_i, 'Tests', False)
+    daily_melt_tests = shape_daily(states_tests_i, 'Tests', False)
 
     daily_country = pd.concat([daily_country, daily_melt_tests])
 
@@ -348,10 +624,13 @@ def trend_plots():
 
     # Rt model 2
     
-    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
-    state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
+    #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
+    #state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
+    db_rep2 = ReproductionNum.objects.filter(var = 2)
+    state_rt_mcmc = read_frame(db_rep2)
+
     state_rt_mcmc = state_rt_mcmc.rename(columns={'date':'Date'})
-    state_rt_mcmc = state_rt_mcmc.rename(columns={'Median':'Rt'})
+    state_rt_mcmc = state_rt_mcmc.rename(columns={'rt':'Rt'})
 
 
     # Rt model 2 summary
@@ -367,8 +646,8 @@ def trend_plots():
 
     # Plot: Model 1: Rt for Covid-19 in South Africa
 
-    state_rt_mcmc["e_plus"] = state_rt_mcmc['High_80'].sub(state_rt_mcmc['Rt'])
-    state_rt_mcmc["e_minus"] = state_rt_mcmc['Rt'].sub(state_rt_mcmc['Low_80'])
+    state_rt_mcmc["e_plus"] = state_rt_mcmc['high'].sub(state_rt_mcmc['Rt'])
+    state_rt_mcmc["e_minus"] = state_rt_mcmc['Rt'].sub(state_rt_mcmc['low'])
 
     fig_rt2 = px.line(state_rt_mcmc, x='Date', y='Rt',
                 error_y='e_plus', error_y_minus='e_minus',
@@ -431,21 +710,24 @@ def future_plots():
 
     # Downloads Rt model 2 calc data
 
-    url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
-    state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
+    #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
+    #state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
+    db_rep2 = ReproductionNum.objects.filter(var = 2)
+    state_rt_mcmc = read_frame(db_rep2)
 
     latest_rt2 = state_rt_mcmc.iloc[-1]
-    rt2 = latest_rt2['Median']
-    rt2h = latest_rt2['High_80']
-    rt2l = latest_rt2['Low_80']
+    rt2 = float(latest_rt2['rt'])
+    rt2h = float(latest_rt2['high'])
+    rt2l = float(latest_rt2['low'])
     rt2f = round(rt2, 2)
 
 
     # Download latest stats
 
-    url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
-    states_all_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=0)
-    states_all_i.tail()
+    #url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
+    #states_all_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=0)
+    db_cases = CovidData.objects.filter(var = 'C')
+    states_all_i = read_frame(db_cases, index_col='date')
 
     states_all = states_all_i.copy()
     states_all = states_all.reset_index()
@@ -461,12 +743,10 @@ def future_plots():
     cases_df = cases_df.rename(columns={'index':'Date'})
     cases_df
 
-    f = 60
-    f2 = 30
-
     diff = cases_df['Cases'].diff()
 
-    d = diff.values[-1]
+    f = 60
+    f2 = 30
 
     r_scenarios = [1.5, 1.4, 1.3, 1.25, 1.2, 1.15, 1.1, 1.075, 1.05, 1.025, 1.0, 0.975, 0.95, 0.925, 0.9, 0.85, 0.8, 0.7, 0.6, 0.5, 0.25, 0.1]
     if (rt2 not in r_scenarios):
@@ -676,7 +956,7 @@ def rt_model1():
     rt1_last_df = states_all_rt_i.groupby(level=0)[['ML']].last()
     rt1_states = rt1_last_df['ML'].to_dict()
 
-    state_single = states_all_rt.query("Province == 'Total RSA'")
+    state_single = states_all_rt.query("Province == 'total'")
 
     #state_single["e_plus"] = state_single['High_90'].sub(state_single['Rt'])
     #state_single["e_minus"] = state_single['Rt'].sub(state_single['Low_90'])
@@ -733,7 +1013,7 @@ def rt_model1():
 
     # Plot Rt for Covid-19 in South African provinces
 
-    states_rt = states_all_rt.query("Province != 'Total RSA'")
+    states_rt = states_all_rt.query("Province != 'total'")
 
     fig_px = px.line(states_rt, x='Date', y='Rt', color='Province')
     fig_len = len(fig_px['data'])

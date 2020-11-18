@@ -2,10 +2,6 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 
-
-
-## Normalised Table Examples
-
 class CovidData(models.Model):
 
     class Vars(models.TextChoices):
@@ -17,16 +13,16 @@ class CovidData(models.Model):
 
     date = models.DateField()
     var = models.CharField(max_length = 1 , choices = Vars.choices)
-    ec = models.IntegerField()
-    fs = models.IntegerField()
-    gp = models.IntegerField()
-    kzn = models.IntegerField()
-    lp = models.IntegerField()
-    mp = models.IntegerField()
-    nc = models.IntegerField()
-    nw = models.IntegerField()
-    wc = models.IntegerField()
-    unknown = models.IntegerField()
+    EC = models.IntegerField(null=True)
+    FS = models.IntegerField(null=True)
+    GP = models.IntegerField(null=True)
+    KZN = models.IntegerField(null=True)
+    LP = models.IntegerField(null=True)
+    MP = models.IntegerField(null=True)
+    NC = models.IntegerField(null=True)
+    NW = models.IntegerField(null=True)
+    WC = models.IntegerField(null=True)
+    unknown = models.IntegerField(null=True)
     total = models.IntegerField()
     source = models.CharField(max_length = 200)
 
@@ -34,12 +30,12 @@ class ReproductionNum(models.Model):
 
     date = models.DateField()
     var = models.IntegerField()
-    state = models.CharField(max_length = 20)
-    rt = models.DecimalField(decimal_places = 3, max_digits= 5)
-    high = models.IntegerField() # high confidence interval
-    low = models.IntegerField() # low confidence interval
-    infect = models.IntegerField(null=True) # infections
-    adj = models.IntegerField(null=True) # adjusted positives
+    state = models.CharField(max_length = 20, null=True)
+    rt = models.DecimalField(decimal_places = 3, max_digits = 5)
+    high = models.DecimalField(decimal_places = 3, max_digits = 5) # high confidence interval
+    low = models.DecimalField(decimal_places = 3, max_digits = 5) # low confidence interval
+    infect = models.DecimalField(decimal_places = 3, max_digits = 10, null=True) # infections
+    adj = models.DecimalField(decimal_places = 3, max_digits = 10, null=True) # adjusted positives
 
 class LatestUpdate(models.Model):
     
