@@ -10,3 +10,4 @@ whitenoise==5.0.1
 gunicorn==20.0.4
 plotly==4.7.1
 django-pandas==0.6.1
+requests
