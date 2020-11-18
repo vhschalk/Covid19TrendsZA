@@ -38,6 +38,7 @@ def sync_all_data_providers():
     #    data_gen_provider('C', 'confirmed')
 
 
+    print('START RECORDING')
     data_gen_provider('C', 'confirmed')
     #data_gen_provider('A', '')
     data_gen_provider('R', 'recoveries')
@@ -46,6 +47,7 @@ def sync_all_data_providers():
 
     data_rep1_provider()
     data_rep2_provider()
+    print('DONE RECORDING')
 
 
 def data_gen_provider(data_var, filepart):
@@ -294,16 +296,19 @@ def parse_dec(str):
             return 0
 
 
+
 ## Graphly
+
 
 def trend_plots():
 
     # Load Data Providers
-
-    t = threading.Thread(target=sync_all_data_providers())
-    t.setDaemon(True)
-    t.start()
+    thread = threading.Thread(target=sync_all_data_providers, args=())
+    thread.daemon = True  
+    thread.start()
     
+    print('Graphing')
+
 
     # Setup common variables
 
