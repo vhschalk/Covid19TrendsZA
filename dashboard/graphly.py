@@ -10,6 +10,7 @@ from django_pandas.io import read_frame
 from decimal import Decimal
 import csv
 import requests
+import threading
 
 from .models import CovidData, LatestUpdate, ReproductionNum
 
@@ -29,6 +30,14 @@ repo = 'dsfsi' #dsfsi
 ### TODO move to own class
 
 def sync_all_data_providers():
+
+    # TODO: should check for empty DB
+    #try:
+    #    recordC = CovidData.objects.filter(var = 'C')
+    #except LatestUpdate.DoesNotExist:
+    #    data_gen_provider('C', 'confirmed')
+
+
     data_gen_provider('C', 'confirmed')
     #data_gen_provider('A', '')
     data_gen_provider('R', 'recoveries')
@@ -289,6 +298,13 @@ def parse_dec(str):
 
 def trend_plots():
 
+    # Load Data Providers
+
+    t = threading.Thread(target=sync_all_data_providers())
+    t.setDaemon(True)
+    t.start()
+    
+
     # Setup common variables
 
     content_trend = {}
@@ -304,10 +320,6 @@ def trend_plots():
 
     # SA Population
 
-
-    # Load Data Providers
-
-    sync_all_data_providers()
 
     # Download and fill stats
 
