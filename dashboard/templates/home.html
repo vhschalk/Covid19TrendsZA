@@ -159,7 +159,7 @@
 <section class="hero is-dark is-bold">
   <div class="container">
     <div class="hero-body">
-        <h2 class="subtitle">Breakdown of Covid-19 Data</h2>
+        <h2 class="subtitle">Breakdown of Complete Covid-19 Data</h2>
     </div>
   </div>
 </section>
@@ -189,27 +189,32 @@
       <div class="content">{{ content.plot_analsysis_deaths|safe }}</div>
       <div class="content">{{ content.plot_analysis_sa|safe }}</div>
       <div class="content">{{ content.plot_analsysis_prov2|safe }}</div>
-      <div class="content">{{ content.plot_daily_sa|safe }}</div>
   </section>
 
-  <section class="hero is-info is-bold">
+</div>
+
+<section class="hero is-dark is-bold">
+  <div class="container">
     <div class="hero-body">
-      <h2 class="subtitle">Tip</h2>
-      <div class="content">
-        <ul>
-          <li>Hide the data line in the legend if the plot looks to busy.</li>
-        </ul>
-      </div>
+        <h2 class="subtitle">Breakdown of Daily Covid-19 Data</h2>
+    </div>
+  </div>
+</section>
 
-  </section>
+<div class="container">
+
   <section class="section">
-      <div class="content">{{ content.plot_daily_prov|safe }}</div>
+      <div class="content">{{ content.plot_daily_sa|safe }}</div>
+      <div class="content">{{ content.plot_daily_prov_cases|safe }}</div>
+      <div class="content">{{ content.plot_daily_prov_recovery|safe }}</div>
+      <div class="content">{{ content.plot_daily_prov_active|safe }}</div>
+      <div class="content">{{ content.plot_daily_prov_deaths|safe }}</div>
   </section>
 
 </div>
 
 
-<section class="hero is-warning is-bold">
+<section class="hero is-dark is-bold">
   <div class="container">
     <div class="hero-body">
         <h2 class="subtitle">Forecast</h2>

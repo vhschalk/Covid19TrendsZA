@@ -519,7 +519,7 @@ def trend_plots():
 
     ## Plot analysis per province
 
-    max_states = max(analysis_states['Value']) * 1.05
+    max_states = np.percentile(analysis_states['Value'], 99)
 
 
     fig_analaysis_prov2 = px.line(analysis_states, title='Analysis Per Provinces',
@@ -557,16 +557,17 @@ def trend_plots():
         daily_melt_df['Data'] = label
         return daily_melt_df #, daily_df_i
 
-    daily_melt_cases = shape_daily(states_cases_i, 'Cases') #, daily_cases
+    daily_melt_cases = shape_daily(states_cases_i, 'Cases') #, daily_cases -> was previously returned in daily_fd_i
     daily_melt_active = shape_daily(filter_active_i, 'Active')
     daily_melt_recovery = shape_daily(states_recovery_i, 'Recovery')
     daily_melt_deaths = shape_daily(states_deaths_i, 'Deaths')
+    daily_melt_tests = shape_daily(states_tests_i, 'Tests', False)
 
+    # Note: Makes the plot more cluttered
     #states_cases_smoothed = daily_cases.rolling(7,
     #    win_type='gaussian',
     #    min_periods=1,
     #    center=True).mean(std=2).round()
-
     #daily_smoothed = states_cases_smoothed.reset_index()
     #daily_smoothed = daily_smoothed.rename(columns={'index':'Date'})
     #daily_melt_smoothed = daily_smoothed.melt(id_vars='Date', var_name='Province', value_name='Value')
@@ -575,10 +576,6 @@ def trend_plots():
     daily_all = pd.concat([daily_melt_cases, daily_melt_active, daily_melt_recovery, daily_melt_deaths]) #daily_melt_smoothed
 
     daily_country = daily_all.query(f"Province == 'total'")
-    daily_states = daily_all.query(f"Province != 'total'")
-
-    daily_melt_tests = shape_daily(states_tests_i, 'Tests', False)
-
     daily_country = pd.concat([daily_country, daily_melt_tests])
 
 
@@ -611,30 +608,39 @@ def trend_plots():
     plot_daily_sa = plot(fig_daily_sa, output_type='div', include_plotlyjs=False)
 
 
-    # Plot daily change for provinces
+    # Plot daily change per provinces
 
-    max_daily = max(daily_states['Value']) * 1.05
-    min_daily = min(daily_states['Value']) * 1.05
+    # Note: Made into separate plot, multiple variables is to cluttere, color='Data'
+    #daily_states = daily_all.query(f"Province != 'total'")
 
+    def daily_change_per_province(daily_melt_data, title, c):
+        daily_states = daily_melt_data.query(f"Province != 'total'")
 
-    fig_daily_prov = px.line(daily_states, title='Daily Change For Provinces',
-                x='Date', y='Value', color='Data', animation_frame='Province',
-                range_y=[min_daily, max_daily], line_shape='spline',
-                color_discrete_sequence=colour_series)
+        max_daily = np.percentile(daily_states['Value'], 99)
+        min_daily = min(daily_states['Value'])
+        fig_daily_prov = px.line(daily_states, title='Daily Change For ' + title + ' Per Provinces',
+                    x='Date', y='Value', animation_frame='Province',
+                    range_y=[min_daily, max_daily],
+                    line_shape='spline', color_discrete_sequence=[colour_series[c]])
 
-    fig_daily_prov.update_layout(plot_bgcolor="#FFF", height=550)
-    fig_daily_prov.update_xaxes(linecolor="#BCCCDC")
-    fig_daily_prov.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
+        fig_daily_prov.update_layout(plot_bgcolor="#FFF", height=550)
+        fig_daily_prov.update_xaxes(linecolor="#BCCCDC")
+        fig_daily_prov.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
 
-    fig_daily_prov.update_traces(hovertemplate=template_h)
-    fig_daily_prov.update_layout(hovermode="x")
-    fig_daily_prov["layout"].pop("updatemenus") # remove play controls
+        fig_daily_prov.update_traces(hovertemplate=template_h)
+        fig_daily_prov.update_layout(hovermode="x")
+        fig_daily_prov["layout"].pop("updatemenus") # remove play controls
 
-    fig_daily_prov.update_xaxes(showspikes=True, spikesnap="cursor", spikemode="across", spikethickness=1)
-    fig_daily_prov.update_yaxes(showspikes=True, spikethickness=1)
-    fig_daily_prov.update_layout(spikedistance=1000, hoverdistance=100)
+        fig_daily_prov.update_xaxes(showspikes=True, spikesnap="cursor", spikemode="across", spikethickness=1)
+        fig_daily_prov.update_yaxes(showspikes=True, spikethickness=1)
+        fig_daily_prov.update_layout(spikedistance=1000, hoverdistance=100)
 
-    plot_daily_prov = plot(fig_daily_prov, output_type='div', include_plotlyjs=False, auto_play=False)
+        return plot(fig_daily_prov, output_type='div', include_plotlyjs=False, auto_play=False)
+
+    plot_daily_prov_cases = daily_change_per_province(daily_melt_cases, 'Cases', 0)
+    plot_daily_prov_recovery = daily_change_per_province(daily_melt_recovery, 'Recovered', 1)
+    plot_daily_prov_active = daily_change_per_province(daily_melt_active, 'Active', 2)
+    plot_daily_prov_deaths = daily_change_per_province(daily_melt_deaths, 'Deaths', 3)
 
 
     # Rt analysis
@@ -705,7 +711,11 @@ def trend_plots():
     content_trend['plot_analysis_sa'] = plot_analysis_sa
     content_trend['plot_analsysis_prov2'] = plot_analsysis_prov2
     content_trend['plot_daily_sa'] = plot_daily_sa
-    content_trend['plot_daily_prov'] = plot_daily_prov
+    #content_trend['plot_daily_prov'] = plot_daily_prov
+    content_trend['plot_daily_prov_cases'] = plot_daily_prov_cases
+    content_trend['plot_daily_prov_recovery'] = plot_daily_prov_recovery
+    content_trend['plot_daily_prov_active'] = plot_daily_prov_active
+    content_trend['plot_daily_prov_deaths'] = plot_daily_prov_deaths
     content_trend['cases'] = latest_cases
     content_trend['recovered'] = latest_recovery
     content_trend['deaths'] = latest_deaths
