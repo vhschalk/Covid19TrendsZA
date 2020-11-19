@@ -44,5 +44,6 @@ Local run:
 After local session changes (due to WSGI config): 
 `touch Covid19TrendsZA/wsgi.py`
 
-Other commands
+Other commands:
 `heroku run bash -a APP`
+`heroku dynon:restart -a APP`
