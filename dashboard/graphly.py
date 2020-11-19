@@ -33,7 +33,7 @@ def sync_all_data_providers():
 
     # TODO: should check for empty DB
     #try:
-    #    recordC = CovidData.objects.filter(var = 'C')
+    #    recordC = CovidData.objects.filter(var = 'C').order_by('date')
     #except LatestUpdate.DoesNotExist:
     #    data_gen_provider('C', 'confirmed')
 
@@ -331,7 +331,7 @@ def trend_plots():
     ## Cases
     #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
     #states_cases_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=0)
-    db_cases = CovidData.objects.filter(var = 'C')
+    db_cases = CovidData.objects.filter(var = 'C').order_by('date')
     states_cases_i = read_frame(db_cases, index_col='date')
 
     casezero = states_cases_i.index[0]
@@ -349,7 +349,7 @@ def trend_plots():
     ## Deaths
     #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_deaths.csv'
     #states_deaths_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True,index_col=0).sort_index()
-    db_deaths = CovidData.objects.filter(var = 'D')
+    db_deaths = CovidData.objects.filter(var = 'D').order_by('date')
     states_deaths_i = read_frame(db_deaths, index_col='date')
 
     states_deaths_i = states_deaths_i.reindex(idx, method='ffill')
@@ -365,7 +365,7 @@ def trend_plots():
     ## Recovery
     #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_recoveries.csv'
     #states_recovery_i = pd.read_csv(url,  parse_dates=['date'], dayfirst=True, squeeze=True,index_col=0).sort_index()
-    db_recovery = CovidData.objects.filter(var = 'R')
+    db_recovery = CovidData.objects.filter(var = 'R').order_by('date')
     states_recovery_i = read_frame(db_recovery, index_col='date')
 
     states_recovery_i = states_recovery_i.reindex(idx, method='ffill')
@@ -382,7 +382,7 @@ def trend_plots():
     #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_timeline_testing.csv'
     #states_tests_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, index_col=0)
     #states_tests_i = states_tests_i['cumulative_tests']
-    db_tests = CovidData.objects.filter(var = 'T')
+    db_tests = CovidData.objects.filter(var = 'T').order_by('date')
     states_tests_i = read_frame(db_tests, index_col='date')
 
     states_tests_i = states_tests_i.reindex(idx) #TODO temp remove -> , method='ffill'
@@ -643,7 +643,7 @@ def trend_plots():
     
     #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
     #state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
-    db_rep2 = ReproductionNum.objects.filter(var = 2)
+    db_rep2 = ReproductionNum.objects.filter(var = 2).order_by('date')
     state_rt_mcmc = read_frame(db_rep2)
 
     state_rt_mcmc = state_rt_mcmc.rename(columns={'date':'Date'})
@@ -729,7 +729,7 @@ def future_plots():
 
     #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
     #state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
-    db_rep2 = ReproductionNum.objects.filter(var = 2)
+    db_rep2 = ReproductionNum.objects.filter(var = 2).order_by('date')
     state_rt_mcmc = read_frame(db_rep2)
 
     latest_rt2 = state_rt_mcmc.iloc[-1]
@@ -743,7 +743,7 @@ def future_plots():
 
     #url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
     #states_all_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=0)
-    db_cases = CovidData.objects.filter(var = 'C')
+    db_cases = CovidData.objects.filter(var = 'C').order_by('date')
     states_all_i = read_frame(db_cases, index_col='date')
 
     states_all = states_all_i.copy()
@@ -960,7 +960,7 @@ def rt_model1():
     # Rt mode 1
     #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
     #states_all_rt_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=[0,1])
-    db_rep1 = ReproductionNum.objects.filter(var = 2, index_col=['date','state'])
+    db_rep1 = ReproductionNum.objects.filter(var = 2, index_col=['date','state']).order_by('date')
     states_all_rt_i = read_frame(db_rep1)
 
     states_all_rt = states_all_rt_i.copy()
