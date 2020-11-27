@@ -329,8 +329,6 @@ def trend_plots():
     # Download and fill stats
 
     ## Cases
-    #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
-    #states_cases_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=0)
     db_cases = CovidData.objects.filter(var = 'C').order_by('date')
     states_cases_i = read_frame(db_cases, index_col='date')
 
@@ -340,15 +338,16 @@ def trend_plots():
     idx = pd.date_range(casezero, caselast)
 
     states_cases_i = states_cases_i.reindex(idx, method='ffill')
-    #states_cases_i = states_cases_i.rename(columns={'total':'Total RSA'})
+    states_cases_i = states_cases_i.rename(columns={'total':'total2'})
+    # Validate totals
+    states_cases_i = states_cases_i[state_filter]
+    states_cases_i['total'] = states_cases_i.sum(axis=1)
 
     states_cases = states_cases_i.copy()
     states_cases = states_cases.reset_index()
     states_cases = states_cases.rename(columns={'index':'Date'})
 
     ## Deaths
-    #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_deaths.csv'
-    #states_deaths_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True,index_col=0).sort_index()
     db_deaths = CovidData.objects.filter(var = 'D').order_by('date')
     states_deaths_i = read_frame(db_deaths, index_col='date')
 
@@ -356,15 +355,16 @@ def trend_plots():
 
     states_deaths_i.iloc[0, :] = states_deaths_i.iloc[0, :].replace({np.nan:0})
     states_deaths_i = states_deaths_i.ffill(axis=0)
-    #states_deaths_i = states_deaths_i.rename(columns={'total':'Total RSA'})
+    states_deaths_i = states_deaths_i.rename(columns={'total':'total2'})
+    # Validate totals
+    states_deaths_i = states_deaths_i[state_filter]
+    states_deaths_i['total'] = states_deaths_i.sum(axis=1)
 
     states_deaths = states_deaths_i.copy()
     states_deaths = states_deaths.reset_index()
     states_deaths = states_deaths.rename(columns={'index':'Date'})
 
     ## Recovery
-    #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_recoveries.csv'
-    #states_recovery_i = pd.read_csv(url,  parse_dates=['date'], dayfirst=True, squeeze=True,index_col=0).sort_index()
     db_recovery = CovidData.objects.filter(var = 'R').order_by('date')
     states_recovery_i = read_frame(db_recovery, index_col='date')
 
@@ -372,23 +372,22 @@ def trend_plots():
 
     states_recovery_i.iloc[0, :] = states_recovery_i.iloc[0, :].replace({np.nan:0})
     states_recovery_i = states_recovery_i.ffill(axis=0)
-    #states_recovery_i = states_recovery_i.rename(columns={'total':'Total RSA'})
+    states_recovery_i = states_recovery_i.rename(columns={'total':'total2'})
+    # Validate totals
+    states_recovery_i = states_recovery_i[state_filter]
+    states_recovery_i['total'] = states_recovery_i.sum(axis=1)
 
     states_recovery = states_recovery_i.copy()
     states_recovery = states_recovery.reset_index()
     states_recovery = states_recovery.rename(columns={'index':'Date'})
 
     ## Tests
-    #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_timeline_testing.csv'
-    #states_tests_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, index_col=0)
-    #states_tests_i = states_tests_i['cumulative_tests']
     db_tests = CovidData.objects.filter(var = 'T').order_by('date')
     states_tests_i = read_frame(db_tests, index_col='date')
 
     states_tests_i = states_tests_i.reindex(idx) #TODO temp remove -> , method='ffill'
 
     states_tests_i = states_tests_i.ffill(axis=0)
-    #states_tests_i = states_tests_i.rename('Total RSA')
 
     states_tests = states_tests_i.copy()
     states_tests = states_tests.reset_index()
