@@ -45,6 +45,7 @@ def sync_all_data_providers():
     data_gen_shape('C', 'confirmed')
     data_gen_shape('R', 'recoveries')
     data_gen_shape('D', 'deaths')
+    data_active_shape()
     data_test_shape()
 
     data_rep1_provider()
@@ -185,6 +186,82 @@ def data_gen_shape(data_var, filepart):
 
     except:
         print('Recording ERROR for ' + data_var + ':', sys.exc_info())
+
+
+def data_active_shape():
+
+    data_var = 'A'
+
+    try:
+        updated = LatestUpdate.objects.get(Var = data_var).Date
+    except LatestUpdate.DoesNotExist:
+        updated = date(2000,1,1)
+    except:
+        print('No updated record ERROR for ' + data_var + ':', sys.exc_info())
+    
+    try:
+
+        ## Already up to date, DB save is not required
+        if updated == date_last:
+            print('Not saving ' + data_var)
+            return None
+
+        # Get latest data sets
+        db_cases = CovidData.objects.filter(Var = 'C').order_by('Date')
+        states_cases = read_frame(db_cases)
+        filter_cases = states_cases[state_filter_all]
+
+        db_deaths = CovidData.objects.filter(Var = 'D').order_by('Date')
+        states_deaths = read_frame(db_deaths)
+        filter_deaths = states_deaths[state_filter_all]
+        
+        db_recovery = CovidData.objects.filter(Var = 'R').order_by('Date')
+        states_recovery = read_frame(db_recovery)
+        filter_recovery = states_recovery[state_filter_all]
+
+        # Calculate active data
+
+        filter_add = pd.concat([filter_deaths, filter_recovery])
+        filter_add = filter_add.groupby('Date').sum()
+
+        filter_sub = filter_add.rmul(-1).reset_index()
+
+        filter_active_i = pd.concat([filter_cases, filter_sub])
+        filter_active_i = filter_active_i.groupby('Date').sum()
+
+        # Store data in DB table
+        
+        for index, record in filter_active_i.iterrows():
+
+            record_date = index
+
+            CovidData.objects.update_or_create(
+                Date = record_date, Var = data_var,
+                defaults = {
+                    'EC' : parse_int(record['EC']),
+                    'FS' : parse_int(record['FS']),
+                    'GP' : parse_int(record['GP']),
+                    'KZN' : parse_int(record['KZN']),
+                    'LP' : parse_int(record['LP']),
+                    'MP' : parse_int(record['MP']),
+                    'NC' : parse_int(record['NC']),
+                    'NW' : parse_int(record['NW']),
+                    'WC' : parse_int(record['WC']),
+                    'Unknown' : parse_int(record['Unknown']),
+                    'Total' : parse_int(record['Total']),
+                    'Source' : ''
+                },
+            )
+
+        LatestUpdate.objects.update_or_create(
+            Var = data_var,
+            defaults = {'Date' : date_last}
+        )
+        print('SAVED ' + data_var)
+
+    except:
+        print('Recording ERROR for ' + data_var + ':', sys.exc_info())
+
 
 def data_test_shape():
 
@@ -450,10 +527,6 @@ def trend_plots():
     state_filter_t = copy.deepcopy(state_filter)
     state_filter_t.insert(0,'Total')
 
-    state_filter_all = copy.deepcopy(state_filter)
-    state_filter_all.insert(0,'Total')
-    state_filter_all.append('Date')
-
     # SA Population
 
 
@@ -464,55 +537,33 @@ def trend_plots():
     states_cases_i = read_frame(db_cases, index_col='Date')
 
     #casezero = states_cases_i.index[0]
-    #caselast = states_cases_i.index[-1]
-
-    #idx = pd.date_range(casezero, caselast)
-
-    #states_cases_i = states_cases_i.reindex(idx, method='ffill')
-
-    #states_cases_i.iloc[0, :] = states_cases_i.iloc[0, :].replace({np.nan:0})
-    #states_cases_i = states_cases_i.ffill(axis=0)
-
-    states_cases = states_cases_i.copy()
-    states_cases = states_cases.reset_index()
-    states_cases = states_cases.rename(columns={'index':'Date'})
+    caselast = states_cases_i.index[-1]
+    states_cases = read_frame(db_cases)
 
     ## Deaths
     db_deaths = CovidData.objects.filter(Var = 'D').order_by('Date')
     states_deaths_i = read_frame(db_deaths, index_col='Date')
-
-    #states_deaths_i = states_deaths_i.reindex(idx, method='ffill')
-
-    states_deaths = states_deaths_i.copy()
-    states_deaths = states_deaths.reset_index()
-    states_deaths = states_deaths.rename(columns={'index':'Date'})
+    states_deaths = read_frame(db_deaths)
 
     ## Recovery
     db_recovery = CovidData.objects.filter(Var = 'R').order_by('Date')
     states_recovery_i = read_frame(db_recovery, index_col='Date')
+    states_recovery = read_frame(db_recovery)
 
-    #states_recovery_i = states_recovery_i.reindex(idx, method='ffill')
-
-    states_recovery = states_recovery_i.copy()
-    states_recovery = states_recovery.reset_index()
-    states_recovery = states_recovery.rename(columns={'index':'Date'})
-
+    ## Active
+    db_active = CovidData.objects.filter(Var = 'A').order_by('Date')
+    states_active_i = read_frame(db_active, index_col='Date')
+    states_active = read_frame(db_active)
 
     ## Tests
     db_tests = CovidData.objects.filter(Var = 'T').order_by('Date')
     states_tests_i = read_frame(db_tests, index_col='Date')
-
-    #states_tests_i = states_tests_i.reindex(idx, method='ffill')
-
-    states_tests = states_tests_i.copy()
-    states_tests = states_tests.reset_index()
-    states_tests = states_tests.rename(columns={'index':'Date'})
+    states_tests = read_frame(db_tests)
 
 
     # Analysis per province
 
     colour_series = px.colors.qualitative.Vivid
-
 
     filter_cases = states_cases[state_filter_all]
     analysis_cases = filter_cases.melt(id_vars='Date', var_name='Province', value_name='Value')
@@ -526,22 +577,11 @@ def trend_plots():
     analysis_deaths = filter_deaths.melt(id_vars='Date', var_name='Province', value_name='Value')
     analysis_deaths['Data'] = 'Deaths'
 
-
-    filter_add = pd.concat([filter_deaths, filter_recovery])
-    filter_add = filter_add.groupby('Date').sum()
-
-    filter_sub = filter_add.rmul(-1).reset_index()
-
-    filter_active_i = pd.concat([filter_cases, filter_sub])
-    filter_active_i = filter_active_i.groupby('Date').sum()
-    filter_active = filter_active_i.reset_index()
-    filter_active = filter_active.rename(columns={'index':'Date'})
-
+    filter_active = states_active[state_filter_all]
     analysis_active = filter_active.melt(id_vars='Date', var_name='Province', value_name='Value')
     analysis_active['Data'] = 'Active'
 
     analysis_all = pd.concat([analysis_cases, analysis_recovery, analysis_active, analysis_deaths])
-
 
     analysis_states = analysis_all.query(f"Province != 'Total'")
     analysis_country = analysis_all.query(f"Province == 'Total'")
@@ -589,6 +629,7 @@ def trend_plots():
     states_tests['Province'] = 'Total'
     states_tests['Data'] = 'Tests'
     states_tests = states_tests.rename(columns={'Total':'Value'})
+    states_tests = states_tests[['Date','Province','Value','Data']]
 
     analysis_country = pd.concat([analysis_country, states_tests])
 
@@ -621,12 +662,9 @@ def trend_plots():
 
     latest_date = date_last.strftime("%d %B %Y")
 
-    #analysis_latest = analysis_country.query(f"Date == '{f_date}'")
-    #latest_cases = format_comma(analysis_latest.iloc[0]['Value'])
-
     latest_cases = format_comma(states_cases_i.iloc[-1]['Total'])
     latest_recovery = format_comma(states_recovery_i.iloc[-1]['Total'])
-    latest_active = ''#format_comma(states_cases_i.iloc[-1]['Total'])
+    latest_active = format_comma(states_active_i.iloc[-1]['Total'])
     latest_deaths = format_comma(states_deaths_i.iloc[-1]['Total'])
     latest_tests = format_comma(states_tests_i.iloc[-1]['Total'])
 
@@ -672,7 +710,7 @@ def trend_plots():
         return daily_melt_df #, daily_df_i
 
     daily_melt_cases = shape_daily(states_cases_i, 'Cases') #, daily_cases -> was previously returned in daily_fd_i
-    daily_melt_active = shape_daily(filter_active_i, 'Active')
+    daily_melt_active = shape_daily(states_active_i, 'Active')
     daily_melt_recovery = shape_daily(states_recovery_i, 'Recovery')
     daily_melt_deaths = shape_daily(states_deaths_i, 'Deaths')
     daily_melt_tests = shape_daily(states_tests_i, 'Tests', False)
@@ -1224,4 +1262,10 @@ state_key = {
     'NW':'North West',
     'WC':'Western Cape'
 }
+
 state_filter = list(state_key.keys())
+
+state_filter_all = copy.deepcopy(state_filter)
+state_filter_all.insert(0,'Total')
+state_filter_all.append('Unknown')
+state_filter_all.append('Date')
