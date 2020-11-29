@@ -470,8 +470,8 @@ def trend_plots():
 
     states_cases_i = states_cases_i.reindex(idx, method='ffill')
 
-    states_cases_i.iloc[0, :] = states_cases_i.iloc[0, :].replace({np.nan:0})
-    states_cases_i = states_cases_i.ffill(axis=0)
+    #states_cases_i.iloc[0, :] = states_cases_i.iloc[0, :].replace({np.nan:0})
+    #states_cases_i = states_cases_i.ffill(axis=0)
 
     states_cases = states_cases_i.copy()
     states_cases = states_cases.reset_index()
@@ -483,9 +483,6 @@ def trend_plots():
 
     states_deaths_i = states_deaths_i.reindex(idx, method='ffill')
 
-    states_deaths_i.iloc[0, :] = states_deaths_i.iloc[0, :].replace({np.nan:0})
-    states_deaths_i = states_deaths_i.ffill(axis=0)
-
     states_deaths = states_deaths_i.copy()
     states_deaths = states_deaths.reset_index()
     states_deaths = states_deaths.rename(columns={'index':'Date'})
@@ -496,13 +493,6 @@ def trend_plots():
 
     states_recovery_i = states_recovery_i.reindex(idx, method='ffill')
 
-    states_recovery_i.iloc[0, :] = states_recovery_i.iloc[0, :].replace({np.nan:0})
-    states_recovery_i = states_recovery_i.ffill(axis=0)
-    # Validate totals
-    states_recovery_i = states_recovery_i.rename(columns={'total':'total2'})
-    states_recovery_i = states_recovery_i[state_filter]
-    states_recovery_i['Total'] = states_recovery_i.sum(axis=1)
-
     states_recovery = states_recovery_i.copy()
     states_recovery = states_recovery.reset_index()
     states_recovery = states_recovery.rename(columns={'index':'Date'})
@@ -512,12 +502,7 @@ def trend_plots():
     db_tests = CovidData.objects.filter(Var = 'T').order_by('Date')
     states_tests_i = read_frame(db_tests, index_col='Date')
 
-    #try:
-    #    states_tests_i = states_tests_i.reindex(idx)
-    #except:
     states_tests_i = states_tests_i.reindex(idx, method='ffill')
-
-    states_tests_i = states_tests_i.ffill(axis=0)
 
     states_tests = states_tests_i.copy()
     states_tests = states_tests.reset_index()
