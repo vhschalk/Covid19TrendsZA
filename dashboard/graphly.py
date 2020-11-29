@@ -535,10 +535,10 @@ def trend_plots():
     ## Cases
     db_cases = CovidData.objects.filter(Var = 'C').order_by('Date')
     states_cases_i = read_frame(db_cases, index_col='Date')
+    states_cases = read_frame(db_cases)
 
     #casezero = states_cases_i.index[0]
-    caselast = states_cases_i.index[-1]
-    states_cases = read_frame(db_cases)
+    #caselast = states_cases_i.index[-1]
 
     ## Deaths
     db_deaths = CovidData.objects.filter(Var = 'D').order_by('Date')
@@ -666,7 +666,7 @@ def trend_plots():
     latest_recovery = format_comma(states_recovery_i.iloc[-1]['Total'])
     latest_active = format_comma(states_active_i.iloc[-1]['Total'])
     latest_deaths = format_comma(states_deaths_i.iloc[-1]['Total'])
-    latest_tests = format_comma(states_tests_i.iloc[-1]['Total'])
+    latest_tests = ''#format_comma(states_tests_i.iloc[-1]['Total'])
 
 
     ## Plot analysis per province
