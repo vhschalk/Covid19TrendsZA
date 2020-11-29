@@ -463,12 +463,12 @@ def trend_plots():
     db_cases = CovidData.objects.filter(Var = 'C').order_by('Date')
     states_cases_i = read_frame(db_cases, index_col='Date')
 
-    casezero = states_cases_i.index[0]
-    caselast = states_cases_i.index[-1]
+    #casezero = states_cases_i.index[0]
+    #caselast = states_cases_i.index[-1]
 
-    idx = pd.date_range(casezero, caselast)
+    #idx = pd.date_range(casezero, caselast)
 
-    states_cases_i = states_cases_i.reindex(idx, method='ffill')
+    #states_cases_i = states_cases_i.reindex(idx, method='ffill')
 
     #states_cases_i.iloc[0, :] = states_cases_i.iloc[0, :].replace({np.nan:0})
     #states_cases_i = states_cases_i.ffill(axis=0)
@@ -481,7 +481,7 @@ def trend_plots():
     db_deaths = CovidData.objects.filter(Var = 'D').order_by('Date')
     states_deaths_i = read_frame(db_deaths, index_col='Date')
 
-    states_deaths_i = states_deaths_i.reindex(idx, method='ffill')
+    #states_deaths_i = states_deaths_i.reindex(idx, method='ffill')
 
     states_deaths = states_deaths_i.copy()
     states_deaths = states_deaths.reset_index()
@@ -491,7 +491,7 @@ def trend_plots():
     db_recovery = CovidData.objects.filter(Var = 'R').order_by('Date')
     states_recovery_i = read_frame(db_recovery, index_col='Date')
 
-    states_recovery_i = states_recovery_i.reindex(idx, method='ffill')
+    #states_recovery_i = states_recovery_i.reindex(idx, method='ffill')
 
     states_recovery = states_recovery_i.copy()
     states_recovery = states_recovery.reset_index()
@@ -502,7 +502,7 @@ def trend_plots():
     db_tests = CovidData.objects.filter(Var = 'T').order_by('Date')
     states_tests_i = read_frame(db_tests, index_col='Date')
 
-    states_tests_i = states_tests_i.reindex(idx, method='ffill')
+    #states_tests_i = states_tests_i.reindex(idx, method='ffill')
 
     states_tests = states_tests_i.copy()
     states_tests = states_tests.reset_index()
@@ -541,9 +541,6 @@ def trend_plots():
     analysis_active['Data'] = 'Active'
 
     analysis_all = pd.concat([analysis_cases, analysis_recovery, analysis_active, analysis_deaths])
-
-
-
 
 
     analysis_states = analysis_all.query(f"Province != 'Total'")
@@ -620,19 +617,18 @@ def trend_plots():
 
     plot_analysis_sa = plot(fig_analysis_sa, output_type='div', include_plotlyjs=False)
 
-
     ## Summary
 
-    latest_date = caselast.strftime("%d %B %Y")
-    f_date = caselast.strftime("%Y-%m-%d")
+    latest_date = date_last.strftime("%d %B %Y")
 
-    analysis_latest = analysis_country.query(f"Date == '{f_date}'")
+    #analysis_latest = analysis_country.query(f"Date == '{f_date}'")
+    #latest_cases = format_comma(analysis_latest.iloc[0]['Value'])
 
-    latest_cases = format_comma(analysis_latest.iloc[0]['Value'])
-    latest_recovery = format_comma(analysis_latest.iloc[1]['Value'])
-    latest_active = format_comma(analysis_latest.iloc[2]['Value'])
-    latest_deaths = format_comma(analysis_latest.iloc[3]['Value'])
-    latest_tests = format_comma(analysis_latest.iloc[4]['Value'])
+    latest_cases = format_comma(states_cases_i.iloc[-1]['Total'])
+    latest_recovery = format_comma(states_recovery_i.iloc[-1]['Total'])
+    latest_active = ''#format_comma(states_cases_i.iloc[-1]['Total'])
+    latest_deaths = format_comma(states_deaths_i.iloc[-1]['Total'])
+    latest_tests = format_comma(states_tests_i.iloc[-1]['Total'])
 
 
     ## Plot analysis per province
