@@ -58,12 +58,13 @@ def data_gen_provider(data_var, filepart):
         decode_content = download.content.decode('utf-8').splitlines()
 
         covid_reader = csv.reader(decode_content, delimiter=',')
+
         try:
-            updated = LatestUpdate.objects.get(Var = data_var).date
+            updated = LatestUpdate.objects.get(Var = data_var).Date
         except LatestUpdate.DoesNotExist:
             updated = date(2000,1,1)
         except:
-            print('No updated record ERROR for ' + data_var + ':', sys.exc_info()[0])
+            print('No updated record ERROR for ' + data_var + ':', sys.exc_info())
         
         
         try:
@@ -85,7 +86,7 @@ def data_gen_provider(data_var, filepart):
                 record_date = datetime.strptime(record[0], '%d-%m-%Y')
 
                 CovidData.objects.update_or_create(
-                    date = record_date, Var = data_var,
+                    Date = record_date, Var = data_var,
                     defaults = {
                         'EC' : parse_int(record[2]),
                         'FS' : parse_int(record[3]),
@@ -108,7 +109,81 @@ def data_gen_provider(data_var, filepart):
             )
 
         except:
-            print('Recording ERROR for ' + data_var + ':', sys.exc_info()[0])
+            print('Recording ERROR for ' + data_var + ':', sys.exc_info())
+
+
+def data_gen_shape(data_var, filepart):
+
+    urlC = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_' + filepart + '.csv'
+
+    states_data_i = pd.read_csv(urlC, parse_dates=['date'], dayfirst=True, index_col=0)
+
+    try:
+        updated = LatestUpdate.objects.get(Var = data_var)
+        print(updated)
+        updated = LatestUpdate.objects.get(Var = data_var).Date
+    except LatestUpdate.DoesNotExist:
+        updated = date(2000,1,1)
+    except:
+        print('No updated record ERROR for ' + data_var + ':', sys.exc_info())
+    
+    
+    try:
+        # Shape data
+        casezero = states_data_i.index[0]
+        caselast = states_data_i.index[-1]
+
+        idx = pd.date_range(casezero, caselast)
+
+        states_data_i.iloc[0, :] = states_data_i.iloc[0, :].replace({np.nan:0})
+        states_data_i = states_data_i.reindex(idx, method='ffill')
+        # Validate totals
+        #states_data_i = states_data_i.rename(columns={'total':'total2'})
+        #states_data_i = states_data_i[state_filter]
+        #states_data_i['Total'] = states_data_i.sum(axis=1)
+
+        states_data_i = states_data_i.copy()
+        states_data_i = states_data_i.reset_index()
+        states_data_i = states_data_i.rename(columns={'index':'Date'})
+
+        last_date = datetime.strptime(caselast, '%d-%m-%Y').date()
+
+        ## Already up to date, DB save is not required
+        if updated == last_date:
+            print('Not saving ' + data_var)
+            return None
+
+        # Store data in DB table
+        
+        for index, record in states_data_i.iterrows():
+
+            record_date = datetime.strptime(record['date'], '%d-%m-%Y')
+
+            CovidData.objects.update_or_create(
+                Date = record_date, Var = data_var,
+                defaults = {
+                    'EC' : parse_int(record['EC']),
+                    'FS' : parse_int(record['FS']),
+                    'GP' : parse_int(record['GP']),
+                    'KZN' : parse_int(record['KZN']),
+                    'LP' : parse_int(record['LP']),
+                    'MP' : parse_int(record['MP']),
+                    'NC' : parse_int(record['NC']),
+                    'NW' : parse_int(record['NW']),
+                    'WC' : parse_int(record['WC']),
+                    'Unknown' : parse_int(record['unknown']),
+                    'Total' : parse_int(record['total']),
+                    'Source' : record['source']
+                },
+            )
+
+        LatestUpdate.objects.update_or_create(
+            Var = data_var,
+            defaults = {'Date' : last_date}
+        )
+
+    except:
+        print('Recording ERROR for ' + data_var + ':', sys.exc_info())
 
 
 def data_test_provider():
@@ -122,11 +197,11 @@ def data_test_provider():
 
         covid_reader = csv.reader(decode_content, delimiter=',')
         try:
-            updated = LatestUpdate.objects.get(Var = data_var).date
+            updated = LatestUpdate.objects.get(Var = data_var).Date
         except LatestUpdate.DoesNotExist:
             updated = date(2000,1,1)
         except:
-            print('No updated record ERROR for ' + data_var + ':', sys.exc_info()[0])
+            print('No updated record ERROR for ' + data_var + ':', sys.exc_info())
         
 
         try:
@@ -148,7 +223,7 @@ def data_test_provider():
                 record_date = datetime.strptime(record[0], '%d-%m-%Y')
 
                 CovidData.objects.update_or_create(
-                    date = record_date, Var = data_var,
+                    Date = record_date, Var = data_var,
                     defaults = {
                         'Total' : parse_int(record[2]),
                         'Source' : record[13]
@@ -161,7 +236,7 @@ def data_test_provider():
             )
 
         except:
-            print('Recording ERROR for ' + data_var + ':', sys.exc_info()[0])
+            print('Recording ERROR for ' + data_var + ':', sys.exc_info())
 
 
 def data_rep1_provider():
@@ -175,11 +250,11 @@ def data_rep1_provider():
 
         covid_reader = csv.reader(decode_content, delimiter=',')
         try:
-            updated = LatestUpdate.objects.get(Var = data_var).date
+            updated = LatestUpdate.objects.get(Var = data_var).Date
         except LatestUpdate.DoesNotExist:
             updated = date(2000,1,1)
         except:
-            print('No updated record ERROR for ' + data_var + ':', sys.exc_info()[0])
+            print('No updated record ERROR for ' + data_var + ':', sys.exc_info())
         
 
         try:
@@ -204,7 +279,7 @@ def data_rep1_provider():
                 record_date = datetime.strptime(record[1], '%Y-%m-%d')
 
                 ReproductionNum.objects.update_or_create(
-                    date = record_date, Var = 1,
+                    Date = record_date, Var = 1,
                     defaults = {
                         'Rt' : parse_dec(record[2]),
                         'High' : parse_dec(record[3]),
@@ -218,7 +293,7 @@ def data_rep1_provider():
             )
 
         except:
-            print('Recording ERROR for ' + data_var + ':', sys.exc_info()[0])
+            print('Recording ERROR for ' + data_var + ':', sys.exc_info())
 
 
 def data_rep2_provider():
@@ -232,11 +307,11 @@ def data_rep2_provider():
 
         covid_reader = csv.reader(decode_content, delimiter=',')
         try:
-            updated = LatestUpdate.objects.get(Var = data_var).date
+            updated = LatestUpdate.objects.get(Var = data_var).Date
         except LatestUpdate.DoesNotExist:
             updated = date(2000,1,1)
         except:
-            print('No updated record ERROR for ' + data_var + ':', sys.exc_info()[0])
+            print('No updated record ERROR for ' + data_var + ':', sys.exc_info())
         
 
         try:
@@ -258,7 +333,7 @@ def data_rep2_provider():
                 record_date = datetime.strptime(record[0], '%Y-%m-%d')
 
                 ReproductionNum.objects.update_or_create(
-                    date = record_date, Var = 2,
+                    Date = record_date, Var = 2,
                     defaults = {
                         'Rt' : parse_dec(record[1]),
                         'High' : parse_dec(record[2]),
@@ -274,7 +349,7 @@ def data_rep2_provider():
             )
 
         except:
-            print('Recording ERROR for ' + data_var + ':', sys.exc_info()[0])
+            print('Recording ERROR for ' + data_var + ':', sys.exc_info())
 
 
 def parse_int(str):
@@ -318,8 +393,6 @@ def trend_plots():
 
     content_trend = {}
 
-    state_filter = list(state_key.keys())
-
     state_filter_t = copy.deepcopy(state_filter)
     state_filter_t.insert(0,'Total')
 
@@ -342,10 +415,9 @@ def trend_plots():
     idx = pd.date_range(casezero, caselast)
 
     states_cases_i = states_cases_i.reindex(idx, method='ffill')
-    states_cases_i = states_cases_i.rename(columns={'Total':'Total2'})
-    # Validate totals
-    states_cases_i = states_cases_i[state_filter]
-    states_cases_i['Total'] = states_cases_i.sum(axis=1)
+
+    states_cases_i.iloc[0, :] = states_cases_i.iloc[0, :].replace({np.nan:0})
+    states_cases_i = states_cases_i.ffill(axis=0)
 
     states_cases = states_cases_i.copy()
     states_cases = states_cases.reset_index()
@@ -359,10 +431,6 @@ def trend_plots():
 
     states_deaths_i.iloc[0, :] = states_deaths_i.iloc[0, :].replace({np.nan:0})
     states_deaths_i = states_deaths_i.ffill(axis=0)
-    states_deaths_i = states_deaths_i.rename(columns={'Total':'Total2'})
-    # Validate totals
-    states_deaths_i = states_deaths_i[state_filter]
-    states_deaths_i['Total'] = states_deaths_i.sum(axis=1)
 
     states_deaths = states_deaths_i.copy()
     states_deaths = states_deaths.reset_index()
@@ -376,8 +444,8 @@ def trend_plots():
 
     states_recovery_i.iloc[0, :] = states_recovery_i.iloc[0, :].replace({np.nan:0})
     states_recovery_i = states_recovery_i.ffill(axis=0)
-    states_recovery_i = states_recovery_i.rename(columns={'Total':'Total2'})
     # Validate totals
+    states_recovery_i = states_recovery_i.rename(columns={'total':'total2'})
     states_recovery_i = states_recovery_i[state_filter]
     states_recovery_i['Total'] = states_recovery_i.sum(axis=1)
 
@@ -1121,3 +1189,4 @@ state_key = {
     'NW':'North West',
     'WC':'Western Cape'
 }
+state_filter = list(state_key.keys())

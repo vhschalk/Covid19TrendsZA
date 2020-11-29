@@ -48,9 +48,9 @@ class LatestUpdate(models.Model):
         RT1 = '1'
         RT2 = '2'
 
-    var = models.CharField(
+    Var = models.CharField(
         max_length = 1,
         choices = Vars.choices,
         primary_key = True
     )
-    date = models.DateField()
+    Date = models.DateField()
