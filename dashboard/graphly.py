@@ -29,6 +29,9 @@ repo = 'dsfsi' #dsfsi
 
 ### TODO move to own class
 
+date_zero = None
+date_last = None
+
 def sync_all_data_providers():
 
     # TODO: should check for empty DB
@@ -39,11 +42,10 @@ def sync_all_data_providers():
 
 
     print('START RECORDING')
-    data_gen_provider('C', 'confirmed')
-    #data_gen_provider('A', '')
-    data_gen_provider('R', 'recoveries')
-    data_gen_provider('D', 'deaths')
-    data_test_provider()
+    data_gen_shape('C', 'confirmed')
+    data_gen_shape('R', 'recoveries')
+    data_gen_shape('D', 'deaths')
+    data_test_shape()
 
     data_rep1_provider()
     data_rep2_provider()
@@ -119,45 +121,43 @@ def data_gen_shape(data_var, filepart):
     states_data_i = pd.read_csv(urlC, parse_dates=['date'], dayfirst=True, index_col=0)
 
     try:
-        updated = LatestUpdate.objects.get(Var = data_var)
-        print(updated)
         updated = LatestUpdate.objects.get(Var = data_var).Date
     except LatestUpdate.DoesNotExist:
         updated = date(2000,1,1)
     except:
         print('No updated record ERROR for ' + data_var + ':', sys.exc_info())
     
-    
     try:
-        # Shape data
-        casezero = states_data_i.index[0]
-        caselast = states_data_i.index[-1]
+        if data_var == 'C':
+            global date_zero 
+            date_zero = states_data_i.index[0]
+            global date_last 
+            date_last = states_data_i.index[-1]
 
-        idx = pd.date_range(casezero, caselast)
+        ## Already up to date, DB save is not required
+        if updated == date_last:
+            print('Not saving ' + data_var)
+            return None
+
+        # Shape data
+
+        idx = pd.date_range(date_zero, date_last)
+
+        states_data_i = states_data_i.reindex(idx, method='ffill')
 
         states_data_i.iloc[0, :] = states_data_i.iloc[0, :].replace({np.nan:0})
-        states_data_i = states_data_i.reindex(idx, method='ffill')
-        # Validate totals
+        states_data_i = states_data_i.ffill(axis=0)
+
+        # TODO: Validate totals
         #states_data_i = states_data_i.rename(columns={'total':'total2'})
         #states_data_i = states_data_i[state_filter]
         #states_data_i['Total'] = states_data_i.sum(axis=1)
-
-        states_data_i = states_data_i.copy()
-        states_data_i = states_data_i.reset_index()
-        states_data_i = states_data_i.rename(columns={'index':'Date'})
-
-        last_date = datetime.strptime(caselast, '%d-%m-%Y').date()
-
-        ## Already up to date, DB save is not required
-        if updated == last_date:
-            print('Not saving ' + data_var)
-            return None
 
         # Store data in DB table
         
         for index, record in states_data_i.iterrows():
 
-            record_date = datetime.strptime(record['date'], '%d-%m-%Y')
+            record_date = index
 
             CovidData.objects.update_or_create(
                 Date = record_date, Var = data_var,
@@ -171,7 +171,7 @@ def data_gen_shape(data_var, filepart):
                     'NC' : parse_int(record['NC']),
                     'NW' : parse_int(record['NW']),
                     'WC' : parse_int(record['WC']),
-                    'Unknown' : parse_int(record['unknown']),
+                    'Unknown' : parse_int(record['UNKNOWN']),
                     'Total' : parse_int(record['total']),
                     'Source' : record['source']
                 },
@@ -179,8 +179,62 @@ def data_gen_shape(data_var, filepart):
 
         LatestUpdate.objects.update_or_create(
             Var = data_var,
-            defaults = {'Date' : last_date}
+            defaults = {'Date' : date_last}
         )
+        print('SAVED ' + data_var)
+
+    except:
+        print('Recording ERROR for ' + data_var + ':', sys.exc_info())
+
+def data_test_shape():
+
+    data_var = 'T'
+    urlC = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_timeline_testing.csv'
+
+    states_data_i = pd.read_csv(urlC, parse_dates=['date'], dayfirst=True, index_col=0)
+
+    try:
+        updated = LatestUpdate.objects.get(Var = data_var).Date
+    except LatestUpdate.DoesNotExist:
+        updated = date(2000,1,1)
+    except:
+        print('No updated record ERROR for ' + data_var + ':', sys.exc_info())
+    
+    try:
+        ## Already up to date, DB save is not required
+        if updated == date_last:
+            print('Not saving ' + data_var)
+            return None
+
+        # Shape data
+
+        idx = pd.date_range(date_zero, date_last)
+
+        states_data_i = states_data_i[['cumulative_tests','source']]
+        states_data_i = states_data_i.reindex(idx, method='ffill')
+
+        states_data_i.iloc[0, :] = states_data_i.iloc[0, :].replace({np.nan:0})
+        states_data_i = states_data_i.ffill(axis=0)
+
+        # Store data in DB table
+        
+        for index, record in states_data_i.iterrows():
+
+            record_date = index
+
+            CovidData.objects.update_or_create(
+                Date = record_date, Var = data_var,
+                defaults = {
+                    'Total' : parse_int(record['cumulative_tests']),
+                    'Source' : record['source']
+                },
+            )
+
+        LatestUpdate.objects.update_or_create(
+            Var = data_var,
+            defaults = {'Date' : date_last}
+        )
+        print('SAVED ' + data_var)
 
     except:
         print('Recording ERROR for ' + data_var + ':', sys.exc_info())
