@@ -33,7 +33,7 @@ def sync_all_data_providers():
 
     # TODO: should check for empty DB
     #try:
-    #    recordC = CovidData.objects.filter(var = 'C').order_by('date')
+    #    recordC = CovidData.objects.filter(Var = 'C').order_by('date')
     #except LatestUpdate.DoesNotExist:
     #    data_gen_provider('C', 'confirmed')
 
@@ -59,7 +59,7 @@ def data_gen_provider(data_var, filepart):
 
         covid_reader = csv.reader(decode_content, delimiter=',')
         try:
-            updated = LatestUpdate.objects.get(var = data_var).date
+            updated = LatestUpdate.objects.get(Var = data_var).date
         except LatestUpdate.DoesNotExist:
             updated = date(2000,1,1)
         except:
@@ -85,7 +85,7 @@ def data_gen_provider(data_var, filepart):
                 record_date = datetime.strptime(record[0], '%d-%m-%Y')
 
                 CovidData.objects.update_or_create(
-                    date = record_date, var = data_var,
+                    date = record_date, Var = data_var,
                     defaults = {
                         'EC' : parse_int(record[2]),
                         'FS' : parse_int(record[3]),
@@ -96,15 +96,15 @@ def data_gen_provider(data_var, filepart):
                         'NC' : parse_int(record[8]),
                         'NW' : parse_int(record[9]),
                         'WC' : parse_int(record[10]),
-                        'unknown' : parse_int(record[11]),
-                        'total' : parse_int(record[12]),
-                        'source' : record[13]
+                        'Unknown' : parse_int(record[11]),
+                        'Total' : parse_int(record[12]),
+                        'Source' : record[13]
                     },
                 )
 
             LatestUpdate.objects.update_or_create(
-                var = data_var,
-                defaults = {'date' : last_date}
+                Var = data_var,
+                defaults = {'Date' : last_date}
             )
 
         except:
@@ -122,7 +122,7 @@ def data_test_provider():
 
         covid_reader = csv.reader(decode_content, delimiter=',')
         try:
-            updated = LatestUpdate.objects.get(var = data_var).date
+            updated = LatestUpdate.objects.get(Var = data_var).date
         except LatestUpdate.DoesNotExist:
             updated = date(2000,1,1)
         except:
@@ -148,16 +148,16 @@ def data_test_provider():
                 record_date = datetime.strptime(record[0], '%d-%m-%Y')
 
                 CovidData.objects.update_or_create(
-                    date = record_date, var = data_var,
+                    date = record_date, Var = data_var,
                     defaults = {
-                        'total' : parse_int(record[2]),
-                        'source' : record[13]
+                        'Total' : parse_int(record[2]),
+                        'Source' : record[13]
                     }
                 )
             
             LatestUpdate.objects.update_or_create(
-                var = data_var,
-                defaults = {'date' : last_date}
+                Var = data_var,
+                defaults = {'Date' : last_date}
             )
 
         except:
@@ -175,7 +175,7 @@ def data_rep1_provider():
 
         covid_reader = csv.reader(decode_content, delimiter=',')
         try:
-            updated = LatestUpdate.objects.get(var = data_var).date
+            updated = LatestUpdate.objects.get(Var = data_var).date
         except LatestUpdate.DoesNotExist:
             updated = date(2000,1,1)
         except:
@@ -204,17 +204,17 @@ def data_rep1_provider():
                 record_date = datetime.strptime(record[1], '%Y-%m-%d')
 
                 ReproductionNum.objects.update_or_create(
-                    date = record_date, var = 1,
+                    date = record_date, Var = 1,
                     defaults = {
-                        'rt' : parse_dec(record[2]),
-                        'high' : parse_dec(record[3]),
-                        'low' : parse_dec(record[4])
+                        'Rt' : parse_dec(record[2]),
+                        'High' : parse_dec(record[3]),
+                        'Low' : parse_dec(record[4])
                     }
                 )
         
             LatestUpdate.objects.update_or_create(
-                var = data_var,
-                defaults = {'date' : last_date}
+                Var = data_var,
+                defaults = {'Date' : last_date}
             )
 
         except:
@@ -232,7 +232,7 @@ def data_rep2_provider():
 
         covid_reader = csv.reader(decode_content, delimiter=',')
         try:
-            updated = LatestUpdate.objects.get(var = data_var).date
+            updated = LatestUpdate.objects.get(Var = data_var).date
         except LatestUpdate.DoesNotExist:
             updated = date(2000,1,1)
         except:
@@ -258,19 +258,19 @@ def data_rep2_provider():
                 record_date = datetime.strptime(record[0], '%Y-%m-%d')
 
                 ReproductionNum.objects.update_or_create(
-                    date = record_date, var = 2,
+                    date = record_date, Var = 2,
                     defaults = {
-                        'rt' : parse_dec(record[1]),
-                        'high' : parse_dec(record[2]),
-                        'low' : parse_dec(record[3]),
-                        'infect' : parse_dec(record[4]),
-                        'adj' : parse_dec(record[5])
+                        'Rt' : parse_dec(record[1]),
+                        'High' : parse_dec(record[2]),
+                        'Low' : parse_dec(record[3]),
+                        'Infect' : parse_dec(record[4]),
+                        'Adj' : parse_dec(record[5])
                     }
                 )
             
             LatestUpdate.objects.update_or_create(
-                var = data_var,
-                defaults = {'date' : last_date}
+                Var = data_var,
+                defaults = {'Date' : last_date}
             )
 
         except:
@@ -296,6 +296,10 @@ def parse_dec(str):
             return 0
 
 
+def trend_shape():
+
+    return 0
+
 
 ## Graphly
 
@@ -317,10 +321,10 @@ def trend_plots():
     state_filter = list(state_key.keys())
 
     state_filter_t = copy.deepcopy(state_filter)
-    state_filter_t.insert(0,'total')
+    state_filter_t.insert(0,'Total')
 
     state_filter_all = copy.deepcopy(state_filter)
-    state_filter_all.insert(0,'total')
+    state_filter_all.insert(0,'Total')
     state_filter_all.append('Date')
 
     # SA Population
@@ -329,8 +333,8 @@ def trend_plots():
     # Download and fill stats
 
     ## Cases
-    db_cases = CovidData.objects.filter(var = 'C').order_by('date')
-    states_cases_i = read_frame(db_cases, index_col='date')
+    db_cases = CovidData.objects.filter(Var = 'C').order_by('Date')
+    states_cases_i = read_frame(db_cases, index_col='Date')
 
     casezero = states_cases_i.index[0]
     caselast = states_cases_i.index[-1]
@@ -338,54 +342,58 @@ def trend_plots():
     idx = pd.date_range(casezero, caselast)
 
     states_cases_i = states_cases_i.reindex(idx, method='ffill')
-    states_cases_i = states_cases_i.rename(columns={'total':'total2'})
+    states_cases_i = states_cases_i.rename(columns={'Total':'Total2'})
     # Validate totals
     states_cases_i = states_cases_i[state_filter]
-    states_cases_i['total'] = states_cases_i.sum(axis=1)
+    states_cases_i['Total'] = states_cases_i.sum(axis=1)
 
     states_cases = states_cases_i.copy()
     states_cases = states_cases.reset_index()
     states_cases = states_cases.rename(columns={'index':'Date'})
 
     ## Deaths
-    db_deaths = CovidData.objects.filter(var = 'D').order_by('date')
-    states_deaths_i = read_frame(db_deaths, index_col='date')
+    db_deaths = CovidData.objects.filter(Var = 'D').order_by('Date')
+    states_deaths_i = read_frame(db_deaths, index_col='Date')
 
     states_deaths_i = states_deaths_i.reindex(idx, method='ffill')
 
     states_deaths_i.iloc[0, :] = states_deaths_i.iloc[0, :].replace({np.nan:0})
     states_deaths_i = states_deaths_i.ffill(axis=0)
-    states_deaths_i = states_deaths_i.rename(columns={'total':'total2'})
+    states_deaths_i = states_deaths_i.rename(columns={'Total':'Total2'})
     # Validate totals
     states_deaths_i = states_deaths_i[state_filter]
-    states_deaths_i['total'] = states_deaths_i.sum(axis=1)
+    states_deaths_i['Total'] = states_deaths_i.sum(axis=1)
 
     states_deaths = states_deaths_i.copy()
     states_deaths = states_deaths.reset_index()
     states_deaths = states_deaths.rename(columns={'index':'Date'})
 
     ## Recovery
-    db_recovery = CovidData.objects.filter(var = 'R').order_by('date')
-    states_recovery_i = read_frame(db_recovery, index_col='date')
+    db_recovery = CovidData.objects.filter(Var = 'R').order_by('Date')
+    states_recovery_i = read_frame(db_recovery, index_col='Date')
 
     states_recovery_i = states_recovery_i.reindex(idx, method='ffill')
 
     states_recovery_i.iloc[0, :] = states_recovery_i.iloc[0, :].replace({np.nan:0})
     states_recovery_i = states_recovery_i.ffill(axis=0)
-    states_recovery_i = states_recovery_i.rename(columns={'total':'total2'})
+    states_recovery_i = states_recovery_i.rename(columns={'Total':'Total2'})
     # Validate totals
     states_recovery_i = states_recovery_i[state_filter]
-    states_recovery_i['total'] = states_recovery_i.sum(axis=1)
+    states_recovery_i['Total'] = states_recovery_i.sum(axis=1)
 
     states_recovery = states_recovery_i.copy()
     states_recovery = states_recovery.reset_index()
     states_recovery = states_recovery.rename(columns={'index':'Date'})
 
-    ## Tests
-    db_tests = CovidData.objects.filter(var = 'T').order_by('date')
-    states_tests_i = read_frame(db_tests, index_col='date')
 
-    states_tests_i = states_tests_i.reindex(idx) #TODO temp remove -> , method='ffill'
+    ## Tests
+    db_tests = CovidData.objects.filter(Var = 'T').order_by('Date')
+    states_tests_i = read_frame(db_tests, index_col='Date')
+
+    #try:
+    #    states_tests_i = states_tests_i.reindex(idx)
+    #except:
+    states_tests_i = states_tests_i.reindex(idx, method='ffill')
 
     states_tests_i = states_tests_i.ffill(axis=0)
 
@@ -427,8 +435,12 @@ def trend_plots():
 
     analysis_all = pd.concat([analysis_cases, analysis_recovery, analysis_active, analysis_deaths])
 
-    analysis_states = analysis_all.query(f"Province != 'total'")
-    analysis_country = analysis_all.query(f"Province == 'total'")
+
+
+
+
+    analysis_states = analysis_all.query(f"Province != 'Total'")
+    analysis_country = analysis_all.query(f"Province == 'Total'")
 
 
     ## Plot analysis for provinces
@@ -451,7 +463,7 @@ def trend_plots():
 
     ## Plot analysis for deaths
 
-    analysis_states_deaths = analysis_deaths.query(f"Province != 'total'")
+    analysis_states_deaths = analysis_deaths.query(f"Province != 'Total'")
 
 
     fig_analysis_death = px.bar(analysis_states_deaths, title='Analysis For Deaths',
@@ -470,9 +482,9 @@ def trend_plots():
 
     ## Plot analysis for South Africa
 
-    states_tests['Province'] = 'total'
+    states_tests['Province'] = 'Total'
     states_tests['Data'] = 'Tests'
-    states_tests = states_tests.rename(columns={'total':'Value'})
+    states_tests = states_tests.rename(columns={'Total':'Value'})
 
     analysis_country = pd.concat([analysis_country, states_tests])
 
@@ -547,7 +559,7 @@ def trend_plots():
         if fil:
             all_df = states_df_i[state_filter_t]
         else:
-            all_df = states_df_i['total']
+            all_df = states_df_i['Total']
         daily_df_i = all_df.diff()
         daily_df_i = daily_df_i[1:]
         daily_df = daily_df_i.reset_index()
@@ -574,7 +586,7 @@ def trend_plots():
 
     daily_all = pd.concat([daily_melt_cases, daily_melt_active, daily_melt_recovery, daily_melt_deaths]) #daily_melt_smoothed
 
-    daily_country = daily_all.query(f"Province == 'total'")
+    daily_country = daily_all.query(f"Province == 'Total'")
     daily_country = pd.concat([daily_country, daily_melt_tests])
 
 
@@ -610,10 +622,10 @@ def trend_plots():
     # Plot daily change per provinces
 
     # Note: Made into separate plot, multiple variables is to cluttere, color='Data'
-    #daily_states = daily_all.query(f"Province != 'total'")
+    #daily_states = daily_all.query(f"Province != 'Total'")
 
     def daily_change_per_province(daily_melt_data, title, c):
-        daily_states = daily_melt_data.query(f"Province != 'total'")
+        daily_states = daily_melt_data.query(f"Province != 'Total'")
 
         max_daily = np.percentile(daily_states['Value'], 99)
         min_daily = min(daily_states['Value'])
@@ -648,11 +660,8 @@ def trend_plots():
     
     #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
     #state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
-    db_rep2 = ReproductionNum.objects.filter(var = 2).order_by('date')
+    db_rep2 = ReproductionNum.objects.filter(Var = 2).order_by('Date')
     state_rt_mcmc = read_frame(db_rep2)
-
-    state_rt_mcmc = state_rt_mcmc.rename(columns={'date':'Date'})
-    state_rt_mcmc = state_rt_mcmc.rename(columns={'rt':'Rt'})
 
 
     # Rt model 2 summary
@@ -668,8 +677,8 @@ def trend_plots():
 
     # Plot: Model 1: Rt for Covid-19 in South Africa
 
-    state_rt_mcmc["e_plus"] = state_rt_mcmc['high'].sub(state_rt_mcmc['Rt'])
-    state_rt_mcmc["e_minus"] = state_rt_mcmc['Rt'].sub(state_rt_mcmc['low'])
+    state_rt_mcmc["e_plus"] = state_rt_mcmc['High'].sub(state_rt_mcmc['Rt'])
+    state_rt_mcmc["e_minus"] = state_rt_mcmc['Rt'].sub(state_rt_mcmc['Low'])
 
     fig_rt2 = px.line(state_rt_mcmc, x='Date', y='Rt',
                 error_y='e_plus', error_y_minus='e_minus',
@@ -738,13 +747,13 @@ def future_plots():
 
     #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
     #state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
-    db_rep2 = ReproductionNum.objects.filter(var = 2).order_by('date')
+    db_rep2 = ReproductionNum.objects.filter(Var = 2).order_by('Date')
     state_rt_mcmc = read_frame(db_rep2)
 
     latest_rt2 = state_rt_mcmc.iloc[-1]
-    rt2 = float(latest_rt2['rt'])
-    rt2h = float(latest_rt2['high'])
-    rt2l = float(latest_rt2['low'])
+    rt2 = float(latest_rt2['Rt'])
+    rt2h = float(latest_rt2['High'])
+    rt2l = float(latest_rt2['Low'])
     rt2f = round(rt2, 2)
 
 
@@ -752,14 +761,13 @@ def future_plots():
 
     #url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
     #states_all_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=0)
-    db_cases = CovidData.objects.filter(var = 'C').order_by('date')
-    states_all_i = read_frame(db_cases, index_col='date')
+    db_cases = CovidData.objects.filter(Var = 'C').order_by('Date')
+    states_all_i = read_frame(db_cases, index_col='Date')
 
     states_all = states_all_i.copy()
     states_all = states_all.reset_index()
-    states_all = states_all.rename(columns={'date':'Date'})
 
-    cases_series = pd.Series(states_all_i['total'].values, index=states_all_i.index.values, name='Cases')
+    cases_series = pd.Series(states_all_i['Total'].values, index=states_all_i.index.values, name='Cases')
 
 
     # Forecast Calc
@@ -969,14 +977,11 @@ def rt_model1():
     # Rt mode 1
     #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
     #states_all_rt_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=[0,1])
-    db_rep1 = ReproductionNum.objects.filter(var = 2, index_col=['date','state']).order_by('date')
+    db_rep1 = ReproductionNum.objects.filter(Var = 2, index_col=['Date','State']).order_by('Date')
     states_all_rt_i = read_frame(db_rep1)
 
     states_all_rt = states_all_rt_i.copy()
     states_all_rt = states_all_rt.reset_index()
-    states_all_rt = states_all_rt.rename(columns={'date':'Date'})
-    states_all_rt = states_all_rt.rename(columns={'rt':'Rt'})
-    states_all_rt = states_all_rt.rename(columns={'state':'Province'})
 
 
     # Summary
@@ -984,7 +989,7 @@ def rt_model1():
     rt1_last_df = states_all_rt_i.groupby(level=0)[['rt']].last()
     rt1_states = rt1_last_df['rt'].to_dict()
 
-    state_single = states_all_rt.query("Province == 'total'")
+    state_single = states_all_rt.query("Province == 'Total'")
 
     #state_single["e_plus"] = state_single['High_90'].sub(state_single['Rt'])
     #state_single["e_minus"] = state_single['Rt'].sub(state_single['Low_90'])
@@ -1041,7 +1046,7 @@ def rt_model1():
 
     # Plot Rt for Covid-19 in South African provinces
 
-    states_rt = states_all_rt.query("Province != 'total'")
+    states_rt = states_all_rt.query("Province != 'Total'")
 
     fig_px = px.line(states_rt, x='Date', y='Rt', color='Province')
     fig_len = len(fig_px['data'])

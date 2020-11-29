@@ -11,8 +11,8 @@ class CovidData(models.Model):
         DEATHS = 'D'
         TESTS = 'T'
 
-    date = models.DateField()
-    var = models.CharField(max_length = 1 , choices = Vars.choices)
+    Date = models.DateField()
+    Var = models.CharField(max_length = 1 , choices = Vars.choices)
     EC = models.IntegerField(null=True)
     FS = models.IntegerField(null=True)
     GP = models.IntegerField(null=True)
@@ -22,20 +22,20 @@ class CovidData(models.Model):
     NC = models.IntegerField(null=True)
     NW = models.IntegerField(null=True)
     WC = models.IntegerField(null=True)
-    unknown = models.IntegerField(null=True)
-    total = models.IntegerField()
-    source = models.CharField(max_length = 200)
+    Unknown = models.IntegerField(null=True)
+    Total = models.IntegerField()
+    Source = models.CharField(max_length = 200)
 
 class ReproductionNum(models.Model):
 
-    date = models.DateField()
-    var = models.IntegerField()
-    state = models.CharField(max_length = 20, null=True)
-    rt = models.DecimalField(decimal_places = 3, max_digits = 5)
-    high = models.DecimalField(decimal_places = 3, max_digits = 5) # high confidence interval
-    low = models.DecimalField(decimal_places = 3, max_digits = 5) # low confidence interval
-    infect = models.DecimalField(decimal_places = 3, max_digits = 10, null=True) # infections
-    adj = models.DecimalField(decimal_places = 3, max_digits = 10, null=True) # adjusted positives
+    Date = models.DateField()
+    Var = models.IntegerField()
+    Province = models.CharField(max_length = 20, null=True)
+    Rt = models.DecimalField(decimal_places = 3, max_digits = 5)
+    High = models.DecimalField(decimal_places = 3, max_digits = 5) # high confidence interval
+    Low = models.DecimalField(decimal_places = 3, max_digits = 5) # low confidence interval
+    Infect = models.DecimalField(decimal_places = 3, max_digits = 10, null=True) # infections
+    Adj = models.DecimalField(decimal_places = 3, max_digits = 10, null=True) # adjusted positives
 
 class LatestUpdate(models.Model):
     
