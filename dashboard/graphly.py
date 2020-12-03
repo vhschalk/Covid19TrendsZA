@@ -40,16 +40,17 @@ def sync_all_data_providers():
     #except LatestUpdate.DoesNotExist:
     #    data_gen_provider('C', 'confirmed')
 
-
     print('START RECORDING')
+
     data_gen_shape('C', 'confirmed')
-    data_gen_shape('R', 'recoveries')
-    data_gen_shape('D', 'deaths')
-    data_active_shape()
+    #data_gen_shape('R', 'recoveries')
+    #data_gen_shape('D', 'deaths')
+    #data_active_shape()
     data_test_shape()
 
-    data_rep1_provider()
-    data_rep2_provider()
+    #data_rep1_provider()
+    #data_rep2_provider()
+
     print('DONE RECORDING')
 
 
@@ -156,9 +157,7 @@ def data_gen_shape(data_var, filepart):
 
         # Store data in DB table
         
-        for index, record in states_data_i.iterrows():
-
-            record_date = index
+        for record_date, record in states_data_i.iterrows():
 
             CovidData.objects.update_or_create(
                 Date = record_date, Var = data_var,
@@ -231,9 +230,7 @@ def data_active_shape():
 
         # Store data in DB table
         
-        for index, record in filter_active_i.iterrows():
-
-            record_date = index
+        for record_date, record in filter_active_i.iterrows():
 
             CovidData.objects.update_or_create(
                 Date = record_date, Var = data_var,
@@ -295,9 +292,7 @@ def data_test_shape():
 
         # Store data in DB table
         
-        for index, record in states_data_i.iterrows():
-
-            record_date = index
+        for record_date, record in states_data_i.iterrows():
 
             CovidData.objects.update_or_create(
                 Date = record_date, Var = data_var,
@@ -537,9 +532,6 @@ def trend_plots():
     states_cases_i = read_frame(db_cases, index_col='Date')
     states_cases = read_frame(db_cases)
 
-    #casezero = states_cases_i.index[0]
-    #caselast = states_cases_i.index[-1]
-
     ## Deaths
     db_deaths = CovidData.objects.filter(Var = 'D').order_by('Date')
     states_deaths_i = read_frame(db_deaths, index_col='Date')
@@ -660,7 +652,8 @@ def trend_plots():
 
     ## Summary
 
-    latest_date = date_last.strftime("%d %B %Y")
+    caselast = states_cases_i.index[-1]
+    latest_date = caselast.strftime("%d %B %Y")
 
     latest_cases = format_comma(states_cases_i.iloc[-1]['Total'])
     latest_recovery = format_comma(states_recovery_i.iloc[-1]['Total'])
