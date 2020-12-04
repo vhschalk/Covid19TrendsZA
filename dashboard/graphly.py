@@ -41,8 +41,6 @@ def sync_all_data_providers():
 
     print('START Saving')
 
-    data_rep2_provider()
-    
     data_gen_shape('C', 'confirmed')
     data_gen_shape('R', 'recoveries')
     data_gen_shape('D', 'deaths')
@@ -50,6 +48,7 @@ def sync_all_data_providers():
     data_test_shape()
 
     data_rep1_provider()
+    data_rep2_provider()
 
     print('DONE Saving')
 
