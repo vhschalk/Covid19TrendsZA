@@ -41,6 +41,8 @@ def sync_all_data_providers():
 
     print('START Saving')
 
+    data_rep2_provider()
+    
     data_gen_shape('C', 'confirmed')
     data_gen_shape('R', 'recoveries')
     data_gen_shape('D', 'deaths')
@@ -48,7 +50,6 @@ def sync_all_data_providers():
     data_test_shape()
 
     data_rep1_provider()
-    data_rep2_provider()
 
     print('DONE Saving')
 
@@ -800,6 +801,7 @@ def trend_plots():
     #state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
     db_rep2 = ReproductionNum.objects.filter(Var = 2).order_by('Date')
     state_rt_mcmc = read_frame(db_rep2)
+    print(state_rt_mcmc)
 
 
     # Rt model 2 summary
@@ -1117,7 +1119,7 @@ def rt_model1():
     #states_all_rt_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=[0,1])
     db_rep1 = ReproductionNum.objects.filter(Var = 1).order_by('Date')  
     states_all_rt_i = read_frame(db_rep1, index_col='Province')
-
+    
     states_all_rt = states_all_rt_i.copy()
     states_all_rt = states_all_rt.reset_index()
 
