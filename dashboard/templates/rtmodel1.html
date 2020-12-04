@@ -13,7 +13,7 @@
 
 <div class="container">
     <section class="section">
-        <div class="content">Latest Rt (first model version) for South Africa is {{ content.latest_rt }}, last calculated on {{ content.latest_rtdate }}. No testing data and back dating of cases was applied.</div>
+        <div class="content">This is the original first draft of the Reproduction Number (Rt) model. Latest Rt for South Africa is {{ content.latest_rt }}, last calculated on {{ content.latest_rtdate }}. No testing data and back dating of cases was applied.</div>
         <div class="content">{{ content.plot_rt1|safe }}</div>
     </section>
 
@@ -21,7 +21,7 @@
       <div class="columns is-mobile has-text-centered">
         <div class="column">
           <div class="box">
-            <p class="heading">Latest Provincial Reproduction Numbers</p>
+            <p class="heading">Latest Provincial Reproduction Numbers (First mode version)</p>
           </div>
         </div>
       </div>
@@ -102,6 +102,7 @@
         <div class="content">
           <h3 class="subtitle">The following assumptions were applied to calculate the trends for this model</h3>
           <ol>
+            <li>Firstly note that this is the original first draft of the Rt model. The 'second' model on the home page takes more variables into consideration for the country's trend.</li>
             <li>Applies to provincial Rt plots.</li>
             <li>Smoothed average data is used.</li>
             <li>The error bands, indicating the 90% credibility interval, has temporary been removed.</li>

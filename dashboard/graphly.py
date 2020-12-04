@@ -26,7 +26,6 @@ from plotly.subplots import make_subplots
 repo = 'dsfsi' #dsfsi
 
 
-
 ### TODO move to own class
 
 date_zero = None
@@ -40,18 +39,18 @@ def sync_all_data_providers():
     #except LatestUpdate.DoesNotExist:
     #    data_gen_provider('C', 'confirmed')
 
-    print('START RECORDING')
+    print('START Saving')
 
     data_gen_shape('C', 'confirmed')
-    #data_gen_shape('R', 'recoveries')
-    #data_gen_shape('D', 'deaths')
-    #data_active_shape()
+    data_gen_shape('R', 'recoveries')
+    data_gen_shape('D', 'deaths')
+    data_active_shape()
     data_test_shape()
 
-    #data_rep1_provider()
-    #data_rep2_provider()
+    data_rep1_provider()
+    data_rep2_provider()
 
-    print('DONE RECORDING')
+    print('DONE Saving')
 
 
 def data_gen_provider(data_var, filepart):
@@ -77,13 +76,13 @@ def data_gen_provider(data_var, filepart):
 
             ## Already up to date, DB save is not required
             if updated == last_date:
-                print('Not saving ' + data_var)
+                print('Not Saving ' + data_var)
                 return None
 
             
             covid_reader = csv.reader(decode_content, delimiter=',')
             next(covid_reader, None) #skip the header
-            print('Recording: ' + data_var)
+            print('Saving: ' + data_var)
 
             for record in covid_reader:
 
@@ -113,7 +112,7 @@ def data_gen_provider(data_var, filepart):
             )
 
         except:
-            print('Recording ERROR for ' + data_var + ':', sys.exc_info())
+            print('Saving ERROR for ' + data_var + ':', sys.exc_info())
 
 
 def data_gen_shape(data_var, filepart):
@@ -138,7 +137,7 @@ def data_gen_shape(data_var, filepart):
 
         ## Already up to date, DB save is not required
         if updated == date_last:
-            print('Not saving ' + data_var)
+            print('Not Saving ' + data_var)
             return None
 
         # Shape data
@@ -184,7 +183,7 @@ def data_gen_shape(data_var, filepart):
         print('SAVED ' + data_var)
 
     except:
-        print('Recording ERROR for ' + data_var + ':', sys.exc_info())
+        print('Saving ERROR for ' + data_var + ':', sys.exc_info())
 
 
 def data_active_shape():
@@ -202,7 +201,7 @@ def data_active_shape():
 
         ## Already up to date, DB save is not required
         if updated == date_last:
-            print('Not saving ' + data_var)
+            print('Not Saving ' + data_var)
             return None
 
         # Get latest data sets
@@ -257,7 +256,7 @@ def data_active_shape():
         print('SAVED ' + data_var)
 
     except:
-        print('Recording ERROR for ' + data_var + ':', sys.exc_info())
+        print('Saving ERROR for ' + data_var + ':', sys.exc_info())
 
 
 def data_test_shape():
@@ -277,7 +276,7 @@ def data_test_shape():
     try:
         ## Already up to date, DB save is not required
         if updated == date_last:
-            print('Not saving ' + data_var)
+            print('Not Saving ' + data_var)
             return None
 
         # Shape data
@@ -291,8 +290,13 @@ def data_test_shape():
         states_data_i = states_data_i.ffill(axis=0)
 
         # Store data in DB table
+
+        global backend_test
+        backend_test = []
         
         for record_date, record in states_data_i.iterrows():
+
+            backend_test.append(record_date)
 
             CovidData.objects.update_or_create(
                 Date = record_date, Var = data_var,
@@ -309,7 +313,7 @@ def data_test_shape():
         print('SAVED ' + data_var)
 
     except:
-        print('Recording ERROR for ' + data_var + ':', sys.exc_info())
+        print('Saving ERROR for ' + data_var + ':', sys.exc_info())
 
 
 def data_test_provider():
@@ -336,13 +340,13 @@ def data_test_provider():
 
             ## Already up to date, DB save is not required
             if updated == last_date:
-                print('Not saving ' + data_var)
+                print('Not Saving ' + data_var)
                 return None
 
             
             covid_reader = csv.reader(decode_content, delimiter=',')
             next(covid_reader, None) #skip the header
-            print('Recording: ' + data_var)
+            print('Saving: ' + data_var)
 
             for record in covid_reader:
 
@@ -362,7 +366,7 @@ def data_test_provider():
             )
 
         except:
-            print('Recording ERROR for ' + data_var + ':', sys.exc_info())
+            print('Saving ERROR for ' + data_var + ':', sys.exc_info())
 
 
 def data_rep1_provider():
@@ -389,13 +393,13 @@ def data_rep1_provider():
 
             ## Already up to date, DB save is not required
             if updated == last_date:
-                print('Not saving ' + data_var)
+                print('Not Saving ' + data_var)
                 return None
 
             
             covid_reader = csv.reader(decode_content, delimiter=',')
             next(covid_reader, None) #skip the header
-            print('Recording: ' + data_var)
+            print('Saving: ' + data_var)
             
             for record in covid_reader:
 
@@ -405,7 +409,7 @@ def data_rep1_provider():
                 record_date = datetime.strptime(record[1], '%Y-%m-%d')
 
                 ReproductionNum.objects.update_or_create(
-                    Date = record_date, Var = 1,
+                    Date = record_date, Var = 1, Province = state,
                     defaults = {
                         'Rt' : parse_dec(record[2]),
                         'High' : parse_dec(record[3]),
@@ -419,7 +423,7 @@ def data_rep1_provider():
             )
 
         except:
-            print('Recording ERROR for ' + data_var + ':', sys.exc_info())
+            print('Saving ERROR for ' + data_var + ':', sys.exc_info())
 
 
 def data_rep2_provider():
@@ -446,20 +450,20 @@ def data_rep2_provider():
 
             ## Already up to date, DB save is not required
             if updated == last_date:
-                print('Not saving ' + data_var)
+                print('Not Saving ' + data_var)
                 return None
 
             
             covid_reader = csv.reader(decode_content, delimiter=',')
             next(covid_reader, None) #skip the header
-            print('Recording: ' + data_var)
+            print('Saving: ' + data_var)
             
             for record in covid_reader:
 
                 record_date = datetime.strptime(record[0], '%Y-%m-%d')
 
                 ReproductionNum.objects.update_or_create(
-                    Date = record_date, Var = 2,
+                    Date = record_date, Var = 2, Province = 'RSA',
                     defaults = {
                         'Rt' : parse_dec(record[1]),
                         'High' : parse_dec(record[2]),
@@ -475,7 +479,7 @@ def data_rep2_provider():
             )
 
         except:
-            print('Recording ERROR for ' + data_var + ':', sys.exc_info())
+            print('Saving ERROR for ' + data_var + ':', sys.exc_info())
 
 
 def parse_int(str):
@@ -1111,24 +1115,24 @@ def rt_model1():
     # Rt mode 1
     #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
     #states_all_rt_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=[0,1])
-    db_rep1 = ReproductionNum.objects.filter(Var = 2, index_col=['Date','State']).order_by('Date')
-    states_all_rt_i = read_frame(db_rep1)
+    db_rep1 = ReproductionNum.objects.filter(Var = 1).order_by('Date')  
+    states_all_rt_i = read_frame(db_rep1, index_col='Province')
 
     states_all_rt = states_all_rt_i.copy()
     states_all_rt = states_all_rt.reset_index()
 
 
     # Summary
+    rt1_last_df = states_all_rt_i.groupby(level=0)[['Rt']].last()
+    rt1_states = rt1_last_df['Rt'].to_dict()
 
-    rt1_last_df = states_all_rt_i.groupby(level=0)[['rt']].last()
-    rt1_states = rt1_last_df['rt'].to_dict()
-
-    state_single = states_all_rt.query("Province == 'Total'")
+    state_single = states_all_rt.query("Province == 'RSA'")
 
     #state_single["e_plus"] = state_single['High_90'].sub(state_single['Rt'])
     #state_single["e_minus"] = state_single['Rt'].sub(state_single['Low_90'])
 
-    X0rt1 = state_single.iloc[0]['Date']
+    X0rt1 = states_all_rt_i.iloc[0]['Date']
+
     latest_result_rt = state_single.iloc[-1]
     X2rt1 = latest_result_rt['Date']
     rt1 = latest_result_rt['Rt']
@@ -1137,11 +1141,7 @@ def rt_model1():
 
 
     # Find errors in data
-
-    ss = 0
-    pp = 0
     state_label_err = []
-
     for key in state_key:
         if key in rt1_states:
             state_label_err.append(state_key.get(key))
@@ -1150,7 +1150,7 @@ def rt_model1():
     # Plot Rt country
 
     fig_rt1 = px.line(state_single, x='Date', y='Rt',
-                title='Rt for Covid-19 in South Africa (First model)', line_shape='spline')
+                title='Rt for Covid-19 in South Africa (First model version)', line_shape='spline')
                 #error_y='e_plus', error_y_minus='e_minus',
     fig_rt1.update_traces(hovertemplate=None)
     fig_rt1.update_layout(hovermode="x")
@@ -1180,7 +1180,7 @@ def rt_model1():
 
     # Plot Rt for Covid-19 in South African provinces
 
-    states_rt = states_all_rt.query("Province != 'Total'")
+    states_rt = states_all_rt.query("Province != 'RSA'")
 
     fig_px = px.line(states_rt, x='Date', y='Rt', color='Province')
     fig_len = len(fig_px['data'])
@@ -1211,7 +1211,7 @@ def rt_model1():
             dash='dash'
         ))
 
-    fig_rt_province.update_layout(title_text="Rt for Covid-19 in South African Provinces (First model)", height=700)
+    fig_rt_province.update_layout(title_text="Rt for Covid-19 in South African Provinces (First model version)", height=700)
     fig_rt_province.update_traces(hovertemplate=None)
     fig_rt_province.update_layout(hovermode="x")
 
