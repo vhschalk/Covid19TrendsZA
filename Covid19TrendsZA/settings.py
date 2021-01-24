@@ -11,8 +11,11 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-import dj_database_url
-#import dotenv
+import environ
+env = environ.Env()
+environ.Env.read_env()
+
+#import dj_database_url #HEROKU
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,11 +25,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = False
+DEBUG = env('DJANGO_DEBUG') == "1"
 
-SECRET_KEY = os.environ['SECRET_KEY']
+SECRET_KEY = env('SECRET_KEY')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost',env('ALLOWED_HOSTS')]
 
 # Application definition
 
@@ -81,11 +84,21 @@ WSGI_APPLICATION = 'Covid19TrendsZA.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {}
-DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+#DATABASES = {}
+#DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
 #DATABASES = {'default': { 'ENGINE':'django.db.backends.sqlite3','NAME': os.path.join(BASE_DIR,'db.sqlite3'),}}
 
+DATABASES = {
+    'default': {
+        'ENGINE': env('DB_ENGINE'),
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': env('DB_HOST'),
+        'PORT': env('DB_PORT'),
+    }
+}
 
 
 # Password validation
@@ -145,8 +158,8 @@ STATICFILES_FINDERS = [
 
 
 # Configure Django App for Heroku.
-import django_heroku
-django_heroku.settings(locals())
+#import django_heroku
+#django_heroku.settings(locals())
 # hack to allow local sqllite without ssl
-options = DATABASES['default'].get('OPTIONS', {})
-options.pop('sslmode', None)
+#options = DATABASES['default'].get('OPTIONS', {})
+#options.pop('sslmode', None)

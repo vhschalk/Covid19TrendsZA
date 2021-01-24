@@ -347,10 +347,12 @@ def data_test_provider():
             covid_reader = csv.reader(decode_content, delimiter=',')
             next(covid_reader, None) #skip the header
             print('Saving: ' + data_var)
-
+            record_date = ''
+            
             for record in covid_reader:
 
-                record_date = datetime.strptime(record[0], '%d-%m-%Y')
+                index_date = record[0]
+                record_date = datetime.strptime(index_date, '%d-%m-%Y')
 
                 CovidData.objects.update_or_create(
                     Date = record_date, Var = data_var,
@@ -366,7 +368,8 @@ def data_test_provider():
             )
 
         except:
-            print('Saving ERROR for ' + data_var + ':', sys.exc_info())
+            message = 'Saving ERROR for ' + data_var + ' on ' + index_date + ':', sys.exc_info()
+            print(message)
 
 
 def data_rep1_provider():
@@ -800,7 +803,6 @@ def trend_plots():
     #state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
     db_rep2 = ReproductionNum.objects.filter(Var = 2).order_by('Date')
     state_rt_mcmc = read_frame(db_rep2)
-    print(state_rt_mcmc)
 
 
     # Rt model 2 summary
