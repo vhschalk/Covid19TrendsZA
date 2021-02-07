@@ -29,7 +29,7 @@ DEBUG = env('DJANGO_DEBUG') == "1"
 
 SECRET_KEY = env('SECRET_KEY')
 
-ALLOWED_HOSTS = ['localhost',env('ALLOWED_HOSTS')]
+ALLOWED_HOSTS = ['localhost','127.0.0.1',env('ALLOWED_HOSTS')]
 
 # Application definition
 

@@ -24,7 +24,7 @@ class CovidData(models.Model):
     WC = models.IntegerField(null=True)
     Unknown = models.IntegerField(null=True)
     Total = models.IntegerField()
-    Source = models.CharField(max_length = 200)
+    Source = models.CharField(max_length = 400)
 
 class ReproductionNum(models.Model):
 

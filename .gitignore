@@ -133,3 +133,5 @@ staticfiles/
 runlocal
 runstatic
 runmigration
+.env copy
+.env copy 2

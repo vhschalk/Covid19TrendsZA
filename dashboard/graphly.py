@@ -297,12 +297,21 @@ def data_test_shape():
         for record_date, record in states_data_i.iterrows():
 
             backend_test.append(record_date)
+            
+            source = record['source']
+            if type(source) == str:
+                l = len(record['source'])
+                if (l > 400):
+                    source = source[:400]
+            else:
+                source = ''
+            print(record_date)
 
             CovidData.objects.update_or_create(
                 Date = record_date, Var = data_var,
                 defaults = {
                     'Total' : parse_int(record['cumulative_tests']),
-                    'Source' : record['source']
+                    'Source' : source
                 },
             )
 
@@ -666,7 +675,7 @@ def trend_plots():
     latest_recovery = format_comma(states_recovery_i.iloc[-1]['Total'])
     latest_active = format_comma(states_active_i.iloc[-1]['Total'])
     latest_deaths = format_comma(states_deaths_i.iloc[-1]['Total'])
-    latest_tests = ''#format_comma(states_tests_i.iloc[-1]['Total'])
+    latest_tests = format_comma(states_tests_i.iloc[-1]['Total'])
 
 
     ## Plot analysis per province
