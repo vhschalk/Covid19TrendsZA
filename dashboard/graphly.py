@@ -5,6 +5,8 @@ import sys
 import os
 from datetime import timedelta, date, datetime
 
+from django.core.exceptions import MultipleObjectsReturned
+
 from django_pandas.io import read_frame
 
 from decimal import Decimal
@@ -111,6 +113,9 @@ def data_gen_provider(data_var, filepart):
                 defaults = {'Date' : last_date}
             )
 
+        except MultipleObjectsReturned:
+            print('Saving ERROR for ' + data_var + ' at ' + str(record_date) + ':', sys.exc_info())
+
         except:
             print('Saving ERROR for ' + data_var + ':', sys.exc_info())
 
@@ -181,6 +186,9 @@ def data_gen_shape(data_var, filepart):
             defaults = {'Date' : date_last}
         )
         print('SAVED ' + data_var)
+
+    except MultipleObjectsReturned:
+        print('Saving ERROR for ' + data_var + ' at ' + str(record_date) + ':', sys.exc_info())
 
     except:
         print('Saving ERROR for ' + data_var + ':', sys.exc_info())
@@ -255,6 +263,9 @@ def data_active_shape():
         )
         print('SAVED ' + data_var)
 
+    except MultipleObjectsReturned:
+        print('Saving ERROR for ' + data_var + ' at ' + str(record_date) + ':', sys.exc_info())
+
     except:
         print('Saving ERROR for ' + data_var + ':', sys.exc_info())
 
@@ -321,64 +332,11 @@ def data_test_shape():
         )
         print('SAVED ' + data_var)
 
+    except MultipleObjectsReturned:
+        print('Saving ERROR for ' + data_var + ' at ' + str(record_date) + ':', sys.exc_info())
+
     except:
         print('Saving ERROR for ' + data_var + ':', sys.exc_info())
-
-
-def data_test_provider():
-    data_var = 'T'
-
-    urlC = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_timeline_testing.csv'
-    with requests.Session() as s:
-        download = s.get(urlC)
-
-        decode_content = download.content.decode('utf-8').splitlines()
-
-        covid_reader = csv.reader(decode_content, delimiter=',')
-        try:
-            updated = LatestUpdate.objects.get(Var = data_var).Date
-        except LatestUpdate.DoesNotExist:
-            updated = date(2000,1,1)
-        except:
-            print('No updated record ERROR for ' + data_var + ':', sys.exc_info())
-        
-
-        try:
-            covid_data_list = list(covid_reader)
-            last_date = datetime.strptime(covid_data_list[-1][0], '%d-%m-%Y').date()
-
-            ## Already up to date, DB save is not required
-            if updated == last_date:
-                print('Not Saving ' + data_var)
-                return None
-
-            
-            covid_reader = csv.reader(decode_content, delimiter=',')
-            next(covid_reader, None) #skip the header
-            print('Saving: ' + data_var)
-            record_date = ''
-            
-            for record in covid_reader:
-
-                index_date = record[0]
-                record_date = datetime.strptime(index_date, '%d-%m-%Y')
-
-                CovidData.objects.update_or_create(
-                    Date = record_date, Var = data_var,
-                    defaults = {
-                        'Total' : parse_int(record[2]),
-                        'Source' : record[13]
-                    }
-                )
-            
-            LatestUpdate.objects.update_or_create(
-                Var = data_var,
-                defaults = {'Date' : last_date}
-            )
-
-        except:
-            message = 'Saving ERROR for ' + data_var + ' on ' + index_date + ':', sys.exc_info()
-            print(message)
 
 
 def data_rep1_provider():
@@ -433,6 +391,9 @@ def data_rep1_provider():
                 Var = data_var,
                 defaults = {'Date' : last_date}
             )
+
+        except MultipleObjectsReturned:
+            print('Saving ERROR for ' + data_var + ' ' + state + ' at ' + str(record_date) + ':', sys.exc_info())
 
         except:
             print('Saving ERROR for ' + data_var + ':', sys.exc_info())
@@ -489,6 +450,9 @@ def data_rep2_provider():
                 Var = data_var,
                 defaults = {'Date' : last_date}
             )
+
+        except MultipleObjectsReturned:
+            print('Saving ERROR for ' + data_var + ' at ' + str(record_date) + ':', sys.exc_info())
 
         except:
             print('Saving ERROR for ' + data_var + ':', sys.exc_info())
