@@ -316,7 +316,6 @@ def data_test_shape():
                     source = source[:400]
             else:
                 source = ''
-            print(record_date)
 
             CovidData.objects.update_or_create(
                 Date = record_date, Var = data_var,

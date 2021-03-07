@@ -44,6 +44,21 @@ Local run:
 After local session changes (due to WSGI config): 
 `touch Covid19TrendsZA/wsgi.py`
 
-Other commands:
+Docker hosting:
+`docker build -t covid19trends .`
+
+Nginx:
+Include this in your Nginx config
+```Nginx
+location ^/static {
+    autoindex on;
+    alias /static/;
+}
+```
+
+Caprover:
+Self host with Caprover! See the simple captain-definition config file, linked to Docker.
+
+Heoku alternative hosting:
 `heroku run bash -a APP`
 `heroku dynon:restart -a APP`
