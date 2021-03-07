@@ -11,9 +11,10 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-import environ
-env = environ.Env()
-environ.Env.read_env()
+#import environ
+
+#env = environ.Env()
+#environ.Env.read_env()
 
 #import dj_database_url #HEROKU
 
@@ -25,11 +26,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = env('DJANGO_DEBUG') == "1"
+DEBUG = os.environ.get('DJANGO_DEBUG') == "1"
 
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
-ALLOWED_HOSTS = ['localhost','127.0.0.1',env('ALLOWED_HOSTS')]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', os.environ.get('ALLOWED_HOSTS')]
 
 # Application definition
 
@@ -91,12 +92,12 @@ WSGI_APPLICATION = 'Covid19TrendsZA.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': env('DB_ENGINE'),
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'),
-        'PORT': env('DB_PORT'),
+        'ENGINE': os.environ.get('DB_ENGINE'),
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
     }
 }
 
