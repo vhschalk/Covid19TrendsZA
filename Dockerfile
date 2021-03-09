@@ -23,6 +23,7 @@ RUN mkdir -p /staticfiles
 RUN python -m pip install --upgrade pip
 RUN pip install -r requirements.txt
 RUN python manage.py collectstatic --noinput
+RUN python manage.py migrate 
 
 EXPOSE 8000
 # For production
