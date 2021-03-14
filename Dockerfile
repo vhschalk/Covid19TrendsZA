@@ -1,4 +1,5 @@
-FROM python:3.7.6-alpine
+FROM python:3.7.6
+#-slim-buster
 
 ARG SECRET_KEY=${SECRET_KEY}
 ARG DJANGO_DEBUG=${DJANGO_DEBUG}
@@ -14,20 +15,21 @@ ARG G_ANALYTICS_ID=${G_ANALYTICS_ID}
 ARG SCRIPT_ID=${G_ANALYTICS_ID}
 ARG SECRET_KEY=${SECRET_KEY}
 
-RUN apk update
-RUN apk upgrade
-RUN apk add --no-cache make g++ bash git openssh postgresql-dev curl
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+WORKDIR /
+COPY . /
 
-COPY ./requirements.txt /usr/src/app/
-RUN pip install --no-cache-dir -r /usr/src/app/requirements.txt
+RUN mkdir -p /staticfiles
 
-COPY ./ /usr/src/app
-RUN mkdir -p /usr/src/app/staticfiles
+RUN python -m pip install --upgrade pip
+RUN pip install -r requirements.txt
 
 RUN python manage.py collectstatic --noinput
+RUN python manage.py migrate
 
 EXPOSE 8000
 # For production
