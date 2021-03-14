@@ -29,10 +29,9 @@ RUN python -m pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 RUN python manage.py collectstatic --noinput
-RUN python manage.py migrate
 
 EXPOSE 8000
-# For production
+# TODO: switch to a batch script
 CMD ["gunicorn", "Covid19TrendsZA.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "4"]
 # For localhost testing
 #CMD [ "python", "./manage.py", "runserver", "0.0.0.0:8000" ]
