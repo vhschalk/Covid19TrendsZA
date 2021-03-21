@@ -29,6 +29,7 @@ RUN python -m pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 RUN python manage.py collectstatic --noinput
+#RUN python manage.py migrate #TODO: does not load all env params correctly to execute
 
 EXPOSE 8000
 # TODO: switch to a batch script

@@ -45,15 +45,15 @@ After local session changes (due to WSGI config):
 `touch Covid19TrendsZA/wsgi.py`
 
 Docker hosting:
-`docker build -t covid19trends .`
+`docker build --rm -t covid19trends .`
 
 Nginx:
 Include this in your Nginx config
 ```Nginx
-location ^/static {
-    autoindex on;
-    alias /static/;
-}
+        location ^/static {
+            autoindex on;
+            alias /static/;
+        }
 ```
 
 Caprover:
