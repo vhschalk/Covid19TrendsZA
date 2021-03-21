@@ -1,5 +1,4 @@
 FROM python:3.7.6
-#-slim-buster
 
 ARG SECRET_KEY=${SECRET_KEY}
 ARG DJANGO_DEBUG=${DJANGO_DEBUG}
@@ -29,7 +28,7 @@ RUN python -m pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 RUN python manage.py collectstatic --noinput
-#RUN python manage.py migrate #TODO: does not load all env params correctly to execute
+#RUN python manage.py migrate #TODO: does not load all env params correctly in caprover
 
 EXPOSE 8000
 # TODO: switch to a batch script

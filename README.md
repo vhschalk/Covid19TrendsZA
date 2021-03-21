@@ -17,8 +17,9 @@ The dashboard is build with Django. The analytics engine currently runs on the [
 
 ### TODOs
 
-1. Consider using a cron job to store the latest Rt data with PostgreSQL DB
-1. Consider running the analytics engine directly in this project (low priority)
+1. Consider using a cron job to store the latest Rt data
+1. Consider running the analytics engine directly in this project
+1. Use a faster front-end plotting framework/method
 
 ## Local install
 
@@ -44,9 +45,6 @@ Local run:
 After local session changes (due to WSGI config): 
 `touch Covid19TrendsZA/wsgi.py`
 
-Docker hosting:
-`docker build --rm -t covid19trends .`
-
 Nginx:
 Include this in your Nginx config
 ```Nginx
@@ -56,9 +54,11 @@ Include this in your Nginx config
         }
 ```
 
+Docker build:
+`docker build --rm -t covid19trends .`
+
+Docker migration (complete your params):
+`docker run --rm -e SECRET_KEY="" -e DJANGO_DEBUG="0" -e ALLOWED_HOSTS="" -e DB_ENGINE="django.db.backends.postgresql_psycopg2" -e DB_NAME="" -e DB_USER="" -e DB_PASSWORD="" -e DB_HOST="" -e DB_PORT="5432" -e RUN_MIGRATE="1" --network <correct_docker_network> covid19trends python manage.py migrate`
+
 Caprover:
 Self host with Caprover! See the simple captain-definition config file, linked to Docker.
-
-Heoku alternative hosting:
-`heroku run bash -a APP`
-`heroku dynon:restart -a APP`
