@@ -13,6 +13,7 @@ from decimal import Decimal
 import csv
 import requests
 import threading
+import json
 
 from .models import CovidData, LatestUpdate, ReproductionNum
 
@@ -304,13 +305,8 @@ def data_test_shape():
         states_data_i = states_data_i.ffill(axis=0)
 
         # Store data in DB table
-
-        global backend_test
-        backend_test = []
         
         for record_date, record in states_data_i.iterrows():
-
-            backend_test.append(record_date)
             
             source = record['source']
             if type(source) == str:
@@ -486,19 +482,6 @@ def trend_shape():
 
 ## Graphly
 
-states_cases_i = None
-states_cases = None
-states_deaths_i = None
-states_deaths = None
-states_recovery_i = None
-states_recovery = None
-states_active_i = None
-states_active = None
-states_tests_i = None
-states_tests = None
-state_rt_mcmc = None
-
-
 def trend_plots():
 
     # Load Data Providers
@@ -512,44 +495,46 @@ def trend_plots():
     # Setup common variables
 
     content_trend = {}
-    
+    content_session = {}
+
 
     # Download and fill stats
 
     ## Cases
-    global states_cases_i
-    global states_cases
     db_cases = CovidData.objects.filter(Var = 'C').order_by('Date')
     states_cases_i = read_frame(db_cases, index_col='Date')
     states_cases = read_frame(db_cases)
+    content_session['states_cases_i'] = states_cases_i.to_json(orient='split')
+    content_session['states_cases'] = states_cases.to_json(orient='split')
+    
 
     ## Deaths
-    global states_deaths_i
-    global states_deaths
     db_deaths = CovidData.objects.filter(Var = 'D').order_by('Date')
     states_deaths_i = read_frame(db_deaths, index_col='Date')
     states_deaths = read_frame(db_deaths)
+    content_session['states_deaths_i'] = states_deaths_i.to_json(orient='split')
+    content_session['states_deaths'] = states_deaths.to_json(orient='split')
 
     ## Recovery
-    global states_recovery_i
-    global states_recovery
     db_recovery = CovidData.objects.filter(Var = 'R').order_by('Date')
     states_recovery_i = read_frame(db_recovery, index_col='Date')
     states_recovery = read_frame(db_recovery)
+    content_session['states_recovery_i'] = states_recovery_i.to_json(orient='split')
+    content_session['states_recovery'] = states_recovery.to_json(orient='split')
 
     ## Active
-    global states_active_i
-    global states_active
     db_active = CovidData.objects.filter(Var = 'A').order_by('Date')
     states_active_i = read_frame(db_active, index_col='Date')
     states_active = read_frame(db_active)
+    content_session['states_active_i'] = states_active_i.to_json(orient='split')
+    content_session['states_active'] = states_active.to_json(orient='split')
 
     ## Tests
-    global states_tests_i
-    global states_tests
     db_tests = CovidData.objects.filter(Var = 'T').order_by('Date')
     states_tests_i = read_frame(db_tests, index_col='Date')
     states_tests = read_frame(db_tests)
+    content_session['states_tests_i'] = states_tests_i.to_json(orient='split')
+    content_session['states_tests'] = states_tests.to_json(orient='split')
 
     # Summary
 
@@ -572,9 +557,9 @@ def trend_plots():
 
     # Rt model 2 summary
     
-    global state_rt_mcmc
     db_rep2 = ReproductionNum.objects.filter(Var = 2).order_by('Date')
     state_rt_mcmc = read_frame(db_rep2)
+    content_session['state_rt_mcmc'] = state_rt_mcmc.to_json(orient='split')
 
     latest_rt2 = state_rt_mcmc.iloc[-1]
     rt2 = round(latest_rt2['Rt'], 2)
@@ -585,16 +570,21 @@ def trend_plots():
     content_trend['latest_rt'] = rt2
     content_trend['latest_rt2date'] = latest_d_rt2
 
-    return content_trend
+    return content_trend, content_session
 
 
-def plot_rt_country():
+def session_df(content_session_tag):
+    return pd.read_json(content_session_tag, orient='split')
+    #return pd.json_normalize(json.loads(content_session_tag))
+
+
+def plot_rt_country(content_session):
 
     content_trend = {}
 
     # Plot: Model 2: Rt for Covid-19 in South Africa
     
-    global state_rt_mcmc
+    state_rt_mcmc = session_df(content_session['state_rt_mcmc'])
     state_rt_mcmc["e_plus"] = state_rt_mcmc['High'].sub(state_rt_mcmc['Rt'])
     state_rt_mcmc["e_minus"] = state_rt_mcmc['Rt'].sub(state_rt_mcmc['Low'])
 
@@ -637,10 +627,7 @@ def plot_rt_country():
     return content_trend
 
 
-analysis_states = None
-analysis_country = None
-
-def plot_analysis_for_prov():
+def plot_analysis_for_prov(content_session):
 
     content_trend = {}
 
@@ -649,32 +636,33 @@ def plot_analysis_for_prov():
     colour_series = px.colors.qualitative.Vivid
     global state_filter_all
 
-    global states_cases
+    states_cases = session_df(content_session['states_cases'])
     filter_cases = states_cases[state_filter_all]
     analysis_cases = filter_cases.melt(id_vars='Date', var_name='Province', value_name='Value')
     analysis_cases['Data'] = 'Cases'
 
-    global states_recovery
+    states_recovery = session_df(content_session['states_recovery'])
     filter_recovery = states_recovery[state_filter_all]
     analysis_recovery = filter_recovery.melt(id_vars='Date', var_name='Province', value_name='Value')
     analysis_recovery['Data'] = 'Recovered'
 
-    global states_deaths
+    states_deaths = session_df(content_session['states_deaths'])
     filter_deaths = states_deaths[state_filter_all]
     analysis_deaths = filter_deaths.melt(id_vars='Date', var_name='Province', value_name='Value')
     analysis_deaths['Data'] = 'Deaths'
 
-    global states_active
+    states_active = session_df(content_session['states_active'])
     filter_active = states_active[state_filter_all]
     analysis_active = filter_active.melt(id_vars='Date', var_name='Province', value_name='Value')
     analysis_active['Data'] = 'Active'
 
     analysis_all = pd.concat([analysis_cases, analysis_recovery, analysis_active, analysis_deaths])
 
-    global analysis_states
     analysis_states = analysis_all.query(f"Province != 'Total'")
-    global analysis_country
+    content_session['analysis_states'] = analysis_states.to_json(orient='split')
+
     analysis_country = analysis_all.query(f"Province == 'Total'")
+    content_session['analysis_country'] = analysis_country.to_json(orient='split')
 
 
     ## Plot analysis for provinces
@@ -716,26 +704,26 @@ def plot_analysis_for_prov():
 
     print('plot_analysis_for_prov')
 
-    return content_trend
+    return content_trend, content_session
 
 
-def plot_analysis_sa():
+def plot_analysis_sa(content_session):
 
     content_trend = {}
 
     ## Plot analysis for South Africa
 
-    global states_tests
+    states_tests = session_df(content_session['states_tests'])
     states_tests['Province'] = 'Total'
     states_tests['Data'] = 'Tests'
     states_tests = states_tests.rename(columns={'Total':'Value'})
     states_tests = states_tests[['Date','Province','Value','Data']]
 
-    global analysis_country
-    analysis_country = pd.concat([analysis_country, states_tests])
+    analysis_country = session_df(content_session['analysis_country'])
+    analysis_country_all = pd.concat([analysis_country, states_tests])
 
 
-    px_data_sa = px.line(analysis_country, x='Date', y='Value', color='Data') #, line_shape='spline' -- "hv" | "vh" | "hvh" | "vhv"
+    px_data_sa = px.line(analysis_country_all, x='Date', y='Value', color='Data') #, line_shape='spline' -- "hv" | "vh" | "hvh" | "vhv"
     fig_analysis_sa = make_subplots(specs=[[{"secondary_y": True}]])
 
 
@@ -766,12 +754,13 @@ def plot_analysis_sa():
     return content_trend
 
 
-def plot_analysis_per_prov():
+def plot_analysis_per_prov(content_session):
 
     content_trend = {}
 
     ## Plot analysis per province
 
+    analysis_states = session_df(content_session['analysis_states'])
     max_states = np.percentile(analysis_states['Value'], 99)
 
     colour_series = px.colors.qualitative.Vivid
@@ -802,18 +791,13 @@ def plot_analysis_per_prov():
     return content_trend
 
 
-def plot_daily_sa():
+def plot_daily_sa(content_session):
 
     content_trend = {}
 
     # Daily analaysis
 
     global state_filter
-    global states_cases_i
-    global states_active_i
-    global states_recovery_i
-    global states_deaths_i
-    global states_tests_i
 
     state_filter_t = copy.deepcopy(state_filter)
     state_filter_t.insert(0,'Total')
@@ -830,6 +814,12 @@ def plot_daily_sa():
         daily_melt_df = daily_df.melt(id_vars='Date', var_name='Province', value_name='Value')
         daily_melt_df['Data'] = label
         return daily_melt_df #, daily_df_i
+
+    states_cases_i = session_df(content_session['states_cases_i'])
+    states_active_i = session_df(content_session['states_active_i'])
+    states_recovery_i = session_df(content_session['states_recovery_i'])
+    states_deaths_i = session_df(content_session['states_deaths_i'])
+    states_tests_i = session_df(content_session['states_tests_i'])
 
     daily_melt_cases = shape_daily(states_cases_i, 'Cases') #, daily_cases -> was previously returned in daily_fd_i
     daily_melt_active = shape_daily(states_active_i, 'Active')
@@ -917,7 +907,7 @@ def plot_daily_sa():
     return content_trend
 
 
-def future_plots():
+def future_plots(content_session):
 
     # Setup common variables
 
@@ -927,7 +917,7 @@ def future_plots():
 
 
     # Downloads Rt model 2 calc data
-    global state_rt_mcmc
+    state_rt_mcmc = session_df(content_session['state_rt_mcmc'])
 
     latest_rt2 = state_rt_mcmc.iloc[-1]
     rt2 = float(latest_rt2['Rt'])
@@ -938,7 +928,7 @@ def future_plots():
 
     # Download latest stats
 
-    global states_cases_i
+    states_cases_i = session_df(content_session['states_cases_i'])
 
     states_all = states_cases_i.copy()
     states_all = states_all.reset_index()

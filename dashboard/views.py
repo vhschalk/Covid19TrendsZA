@@ -1,4 +1,5 @@
 from django.shortcuts import render
+
 from .matplot import get_matplot
 from .graphly import trend_plots, plot_rt_country, plot_analysis_for_prov, plot_analysis_sa, plot_analysis_per_prov, plot_daily_sa, future_plots, rt_model1
 
@@ -9,44 +10,46 @@ def home(request):
 
 def home_stats(request):
 
-    content = trend_plots()
+    content, content_session = trend_plots()
+    request.session['content_session'] = content_session
 
     return render(request, 'home_stats.html', {'content':content})
 
 def home_rt_country(request):
 
-    content = plot_rt_country()
+    content = plot_rt_country(request.session['content_session'])
 
     return render(request, 'home_rt_country.html', {'content':content})
 
 def home_analysis_for_prov(request):
 
-    content = plot_analysis_for_prov()
+    content, content_session = plot_analysis_for_prov(request.session['content_session'])
+    request.session['content_session'] = content_session
 
     return render(request, 'home_analysis_for_prov.html', {'content':content})
 
 def home_analysis_sa(request):
 
-    content = plot_analysis_sa()
+    content = plot_analysis_sa(request.session['content_session'])
 
     return render(request, 'home_analysis_sa.html', {'content':content})
 
 def home_analysis_per_prov(request):
 
-    content = plot_analysis_per_prov()
+    content = plot_analysis_per_prov(request.session['content_session'])
 
     return render(request, 'home_analysis_per_prov.html', {'content':content})
 
 def home_daily_sa(request):
 
-    content = plot_daily_sa()
+    content = plot_daily_sa(request.session['content_session'])
 
     return render(request, 'home_daily_sa.html', {'content':content})
 
 
 def home_forecast(request):
 
-    content = future_plots()
+    content = future_plots(request.session['content_session'])
 
     return render(request, 'home_forecast.html', {'content':content})
 
