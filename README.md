@@ -17,8 +17,9 @@ The dashboard is build with Django. The analytics engine currently runs on the [
 
 ### TODOs
 
-1. Consider using a cron job to store the latest Rt data
-1. Consider running the analytics engine directly in this project
+1. Use a cron job to store the latest Rt data
+1. Run the Rt analytics engine directly in this project
+1. Optomise the incremental ajax loading methods
 1. Use a faster front-end plotting framework/method
 
 ## Local install
@@ -34,16 +35,27 @@ The dashboard is build with Django. The analytics engine currently runs on the [
 1. `cd ../..`
 1. `pip install -r requirements.txt`
 
-### Run
+### Run Local
 
-After adding new images:
+After adding new static file images, js, etc:
 `python manage.py collectstatic --noinput`
+
+Setup DB:
+`initdb /usr/local/var/postgres`
+`pg_ctl -D /usr/local/var/postgres -l logfile start`
+`createdb covid19trendsdb`
+
+`psql covid19trendsdb`
+`CREATE USER <db_user> WITH PASSWORD '<db_password>';`
+`GRANT ALL PRIVILEGES ON DATABASE <db_name> to <db_user>;`
 
 Local run:
 `python manage.py runserver`
 
 After local session changes (due to WSGI config): 
 `touch Covid19TrendsZA/wsgi.py`
+
+### Run Production
 
 Nginx:
 Include this in your Nginx config

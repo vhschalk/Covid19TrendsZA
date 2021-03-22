@@ -1,0 +1,32 @@
+
+    <section class="section">
+      <div class="content">
+        The latest Rt value for the country is <strong>{{ content.latest_rt }}</strong>,
+        last calculated on {{ content.latest_rt2date }}. This means that each newly infected
+        person is likely to infect {{ content.latest_rt }} more people.
+      </div>
+    </section>
+  
+    <section class="section">
+        <div class="content">{{ content.plot_rt_country|safe }}</div>
+    </section>
+  
+    <section class="hero is-danger is-bold">
+      <div class="hero-body">
+        <div class="content">
+          <h3 class="subtitle">The following assumptions were applied to calculate the trends</h3>
+          <ol>
+            <li>Where testing data is available, an advanced multi-variable model can be used.</li>
+            <li>Applies to South Africa country Rt plot.</li>
+            <li>Testing and case data are the two input dimensions for the model.</li>
+            <li>Considering 10 days for the virus to incubate, all case data are back-dated.</li>
+            <li>The error bands indicate the 80% credibility interval.</li>
+            <li>Forecasted plots will use the latest calculated Rt from this model.</li>
+          </ol>
+      </div>
+    </section>
+  
+    <section class="section">
+        <div class="content"><a href="rtmodel1">Get</a> the first version of the Rt model for South Africa.</div>
+    </section>
+  

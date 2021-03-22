@@ -123,38 +123,28 @@
 
 <div class="container">
 
-  <section class="section">
-    <div class="content">
-      The latest Rt value for the country is <strong>{{ content.latest_rt }}</strong>,
-      last calculated on {{ content.latest_rt2date }}. This means that each newly infected
-      person is likely to infect {{ content.latest_rt }} more people.
-    </div>
-  </section>
-
-  <section class="section">
-      <div class="content">{{ content.plot_rt_country|safe }}</div>
-  </section>
-
-  <section class="hero is-danger is-bold">
-    <div class="hero-body">
-      <div class="content">
-        <h3 class="subtitle">The following assumptions were applied to calculate the trends</h3>
-        <ol>
-          <li>Where testing data is available, an advanced multi-variable model can be used.</li>
-          <li>Applies to South Africa country Rt plot.</li>
-          <li>Testing and case data are the two input dimensions for the model.</li>
-          <li>Considering 10 days for the virus to incubate, all case data are back-dated.</li>
-          <li>The error bands indicate the 80% credibility interval.</li>
-          <li>Forecasted plots will use the latest calculated Rt from this model.</li>
-        </ol>
-    </div>
-  </section>
-
-  <section class="section">
-      <div class="content"><a href="rtmodel1">Get</a> the first version of the Rt model for South Africa.</div>
-  </section>
+  <div id="home_rt_country">
+    <br>
+    <section class="hero is-link is-bold">
+      <div class="hero-body">
+        <div class="container">
+          <h2 class="subtitle">Loading...</h2>
+          <progress class="progress is-large is-info" max="100"></progress>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <script>
+    $(document).ready(function() {
+      $('#home_rt_country').load('/home_rt_country/', function() {
+        console.log('Done home_rt_country')
+      })
+    });
+  </script>
 
 </div>
+
 
 <section class="hero is-dark is-bold">
   <div class="container">
@@ -166,32 +156,61 @@
 
 <div class="container">
 
-
-  <section class="section">
-    <div class="content">{{ content.plot_analsysis_prov|safe }}</div>
-  </section>
-
-  <section class="hero is-info is-bold">
-    <div class="hero-body">
-        <h2 class="subtitle">Tips</h2>
-        <div class="content">
-          <ul>
-            <li>You can interact with all the plots. </li>
-            <li>Use the home icon (<span class="icon"><i class="fas fa-home"></i></span>) to reset the plot to its original zoom.</li>
-            <li>Move the slider to see the effect of different types of data.</li>
-            <li>Use the arrows icon (<span class="icon"><i class="fas fa-expand-arrows-alt"></i></span>) to auto zoom if changes on the plot seem to small.</li>
-          </ul>
+  <div id="home_analysis_for_prov">
+    <br>
+    <section class="hero is-link is-bold">
+      <div class="hero-body">
+        <div class="container">
+          <h2 class="subtitle">Loading...</h2>
+          <progress class="progress is-large is-info" max="100"></progress>
         </div>
-    </div>
-  </section>
+      </div>
+    </section>
+  </div>
 
-  <section class="section">
-      <div class="content">{{ content.plot_analsysis_deaths|safe }}</div>
-      <div class="content">{{ content.plot_analysis_sa|safe }}</div>
-      <div class="content">{{ content.plot_analsysis_prov2|safe }}</div>
-  </section>
+  <div id="home_analysis_sa">
+    <br>
+    <section class="hero is-link is-bold">
+      <div class="hero-body">
+        <div class="container">
+          <h2 class="subtitle">Loading...</h2>
+          <progress class="progress is-large is-info" max="100"></progress>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="home_analysis_per_prov">
+    <br>
+    <section class="hero is-link is-bold">
+      <div class="hero-body">
+        <div class="container">
+          <h2 class="subtitle">Loading...</h2>
+          <progress class="progress is-large is-info" max="100"></progress>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <script>
+    $(document).ready(function() {
+      $('#home_analysis_for_prov').load('/home_analysis_for_prov/', function() {
+
+        console.log('Done home_analysis_for_prov')
+        $('#home_analysis_sa').load('/home_analysis_sa/', function() {
+
+          console.log('Done home_analysis_per_prov')
+          $('#home_analysis_per_prov').load('/home_analysis_per_prov/', function() {
+
+            console.log('Done home_analysis_per_prov')
+          })
+        })
+      })
+    });
+  </script>
 
 </div>
+
 
 <section class="hero is-dark is-bold">
   <div class="container">
@@ -203,13 +222,23 @@
 
 <div class="container">
 
-  <section class="section">
-      <div class="content">{{ content.plot_daily_sa|safe }}</div>
-      <div class="content">{{ content.plot_daily_prov_cases|safe }}</div>
-      <div class="content">{{ content.plot_daily_prov_recovery|safe }}</div>
-      <div class="content">{{ content.plot_daily_prov_active|safe }}</div>
-      <div class="content">{{ content.plot_daily_prov_deaths|safe }}</div>
-  </section>
+  <div id="home_daily_sa">
+    <br>
+    <section class="hero is-link is-bold">
+      <div class="hero-body">
+        <div class="container">
+          <h2 class="subtitle">Loading...</h2>
+          <progress class="progress is-large is-info" max="100"></progress>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <script>
+    $(document).ready(function() {
+      $('#home_daily_sa').load('/home_daily_sa/')
+    });
+  </script>
 
 </div>
 
@@ -224,7 +253,7 @@
 
 <div class="container">
 
-  <div id="output_box">
+  <div id="home_forecast">
     <br>
     <section class="hero is-link is-bold">
       <div class="hero-body">
@@ -238,9 +267,8 @@
   
   <script>
     $(document).ready(function() {
-      $('#output_box').load('/forecast/')
+      $('#home_forecast').load('/home_forecast/')
     });
-    console.log('Start Backend Test')
   </script>
 
 </div>

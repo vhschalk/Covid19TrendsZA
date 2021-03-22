@@ -27,11 +27,14 @@ from plotly.subplots import make_subplots
 # Change to avoid temporary delays
 repo = 'dsfsi' #dsfsi
 
-
-### TODO move to own class
+# Global variables
 
 date_zero = None
 date_last = None
+
+template_h = '%{y}'
+
+
 
 def sync_all_data_providers():
 
@@ -483,6 +486,18 @@ def trend_shape():
 
 ## Graphly
 
+states_cases_i = None
+states_cases = None
+states_deaths_i = None
+states_deaths = None
+states_recovery_i = None
+states_recovery = None
+states_active_i = None
+states_active = None
+states_tests_i = None
+states_tests = None
+state_rt_mcmc = None
+
 
 def trend_plots():
 
@@ -492,144 +507,51 @@ def trend_plots():
     thread.start()
     
     print('Graphing')
-
+    
 
     # Setup common variables
 
     content_trend = {}
-
-    state_filter_t = copy.deepcopy(state_filter)
-    state_filter_t.insert(0,'Total')
-
-    # SA Population
-
+    
 
     # Download and fill stats
 
     ## Cases
+    global states_cases_i
+    global states_cases
     db_cases = CovidData.objects.filter(Var = 'C').order_by('Date')
     states_cases_i = read_frame(db_cases, index_col='Date')
     states_cases = read_frame(db_cases)
 
     ## Deaths
+    global states_deaths_i
+    global states_deaths
     db_deaths = CovidData.objects.filter(Var = 'D').order_by('Date')
     states_deaths_i = read_frame(db_deaths, index_col='Date')
     states_deaths = read_frame(db_deaths)
 
     ## Recovery
+    global states_recovery_i
+    global states_recovery
     db_recovery = CovidData.objects.filter(Var = 'R').order_by('Date')
     states_recovery_i = read_frame(db_recovery, index_col='Date')
     states_recovery = read_frame(db_recovery)
 
     ## Active
+    global states_active_i
+    global states_active
     db_active = CovidData.objects.filter(Var = 'A').order_by('Date')
     states_active_i = read_frame(db_active, index_col='Date')
     states_active = read_frame(db_active)
 
     ## Tests
+    global states_tests_i
+    global states_tests
     db_tests = CovidData.objects.filter(Var = 'T').order_by('Date')
     states_tests_i = read_frame(db_tests, index_col='Date')
     states_tests = read_frame(db_tests)
 
-
-    # Analysis per province
-
-    colour_series = px.colors.qualitative.Vivid
-
-    filter_cases = states_cases[state_filter_all]
-    analysis_cases = filter_cases.melt(id_vars='Date', var_name='Province', value_name='Value')
-    analysis_cases['Data'] = 'Cases'
-
-    filter_recovery = states_recovery[state_filter_all]
-    analysis_recovery = filter_recovery.melt(id_vars='Date', var_name='Province', value_name='Value')
-    analysis_recovery['Data'] = 'Recovered'
-
-    filter_deaths = states_deaths[state_filter_all]
-    analysis_deaths = filter_deaths.melt(id_vars='Date', var_name='Province', value_name='Value')
-    analysis_deaths['Data'] = 'Deaths'
-
-    filter_active = states_active[state_filter_all]
-    analysis_active = filter_active.melt(id_vars='Date', var_name='Province', value_name='Value')
-    analysis_active['Data'] = 'Active'
-
-    analysis_all = pd.concat([analysis_cases, analysis_recovery, analysis_active, analysis_deaths])
-
-    analysis_states = analysis_all.query(f"Province != 'Total'")
-    analysis_country = analysis_all.query(f"Province == 'Total'")
-
-
-    ## Plot analysis for provinces
-
-    template_h = '%{y}'
-
-    fig_analysis_prov = px.bar(analysis_states, title='Analysis For Provinces',
-                x='Date', y='Value', color='Province', animation_frame='Data',
-                barmode='relative', color_discrete_sequence=colour_series)
-
-    fig_analysis_prov.update_layout(plot_bgcolor="#FFF",hovermode="x", height=650)
-    fig_analysis_prov.update_xaxes(linecolor="#BCCCDC")
-    fig_analysis_prov.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
-
-    fig_analysis_prov.update_traces(hovertemplate=template_h)
-    fig_analysis_prov["layout"].pop("updatemenus") # remove play controls
-
-    plot_analsysis_prov = plot(fig_analysis_prov, output_type='div', include_plotlyjs=False, auto_play=False)
-
-
-    ## Plot analysis for deaths
-
-    analysis_states_deaths = analysis_deaths.query(f"Province != 'Total'")
-
-
-    fig_analysis_death = px.bar(analysis_states_deaths, title='Analysis For Deaths',
-                x='Date', y='Value', color='Province',
-                barmode='relative', color_discrete_sequence=colour_series)
-
-    fig_analysis_death.update_layout(plot_bgcolor="#FFF")
-    fig_analysis_death.update_xaxes(linecolor="#BCCCDC")
-    fig_analysis_death.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
-
-    fig_analysis_death.update_traces(hovertemplate=None)
-    fig_analysis_death.update_layout(hovermode="x")
-
-    plot_analsysis_deaths = plot(fig_analysis_death, output_type='div', include_plotlyjs=False)
-
-
-    ## Plot analysis for South Africa
-
-    states_tests['Province'] = 'Total'
-    states_tests['Data'] = 'Tests'
-    states_tests = states_tests.rename(columns={'Total':'Value'})
-    states_tests = states_tests[['Date','Province','Value','Data']]
-
-    analysis_country = pd.concat([analysis_country, states_tests])
-
-
-    px_data_sa = px.line(analysis_country, x='Date', y='Value', color='Data') #, line_shape='spline' -- "hv" | "vh" | "hvh" | "vhv"
-    fig_analysis_sa = make_subplots(specs=[[{"secondary_y": True}]])
-
-
-    fig_analysis_sa.add_trace(px_data_sa['data'][0], secondary_y=True)
-    fig_analysis_sa.add_trace(px_data_sa['data'][1], secondary_y=True)
-    fig_analysis_sa.add_trace(px_data_sa['data'][2], secondary_y=True)
-    fig_analysis_sa.add_trace(px_data_sa['data'][3], secondary_y=True)
-    fig_analysis_sa.add_trace(px_data_sa['data'][4], secondary_y=False)
-
-    fig_analysis_sa.update_yaxes(title_text="Rest of Data", secondary_y=True)
-    fig_analysis_sa.update_yaxes(title_text="Tests", secondary_y=False)
-    fig_analysis_sa.update_layout(title="Analysis for South Africa")
-
-    fig_analysis_sa.update_layout(plot_bgcolor="#FFF", hovermode="x")
-
-    fig_analysis_sa.update_xaxes(showspikes=True, spikesnap="cursor", spikemode="across", spikethickness=1, linecolor="#BCCCDC")
-    fig_analysis_sa.update_yaxes(showspikes=True, spikethickness=1, linecolor="#BCCCDC", gridcolor='#D3D3D3')
-    fig_analysis_sa.update_layout(spikedistance=1000, hoverdistance=100)
-
-    fig_analysis_sa.update_traces(hovertemplate=None)
-
-    plot_analysis_sa = plot(fig_analysis_sa, output_type='div', include_plotlyjs=False)
-
-    ## Summary
+    # Summary
 
     caselast = states_cases_i.index[-1]
     latest_date = caselast.strftime("%d %B %Y")
@@ -640,209 +562,28 @@ def trend_plots():
     latest_deaths = format_comma(states_deaths_i.iloc[-1]['Total'])
     latest_tests = format_comma(states_tests_i.iloc[-1]['Total'])
 
-
-    ## Plot analysis per province
-
-    max_states = np.percentile(analysis_states['Value'], 99)
-
-
-    fig_analaysis_prov2 = px.line(analysis_states, title='Analysis Per Provinces',
-                x='Date', y='Value', color='Data', animation_frame='Province',
-                line_shape='spline', range_y=[0, max_states],
-                color_discrete_sequence=colour_series)
-
-    fig_analaysis_prov2.update_layout(plot_bgcolor="#FFF", height=550)
-    fig_analaysis_prov2.update_xaxes(linecolor="#BCCCDC")
-    fig_analaysis_prov2.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
-
-    fig_analaysis_prov2.update_xaxes(showspikes=True, spikesnap="cursor", spikemode="across", spikethickness=1)
-    fig_analaysis_prov2.update_yaxes(showspikes=True, spikethickness=1)
-    fig_analaysis_prov2.update_layout(spikedistance=1000, hoverdistance=100)
-
-    fig_analaysis_prov2.update_traces(hovertemplate=template_h)
-    fig_analaysis_prov2.update_layout(hovermode="x")
-    fig_analaysis_prov2["layout"].pop("updatemenus") # remove play controls
-
-    plot_analsysis_prov2 = plot(fig_analaysis_prov2, output_type='div', include_plotlyjs=False, auto_play=False)
-
-
-    # Daily analaysis
-
-    def shape_daily(states_df_i, label, fil=True):
-        if fil:
-            all_df = states_df_i[state_filter_t]
-        else:
-            all_df = states_df_i['Total']
-        daily_df_i = all_df.diff()
-        daily_df_i = daily_df_i[1:]
-        daily_df = daily_df_i.reset_index()
-        daily_df = daily_df.rename(columns={'index':'Date'})
-        daily_melt_df = daily_df.melt(id_vars='Date', var_name='Province', value_name='Value')
-        daily_melt_df['Data'] = label
-        return daily_melt_df #, daily_df_i
-
-    daily_melt_cases = shape_daily(states_cases_i, 'Cases') #, daily_cases -> was previously returned in daily_fd_i
-    daily_melt_active = shape_daily(states_active_i, 'Active')
-    daily_melt_recovery = shape_daily(states_recovery_i, 'Recovery')
-    daily_melt_deaths = shape_daily(states_deaths_i, 'Deaths')
-    daily_melt_tests = shape_daily(states_tests_i, 'Tests', False)
-
-    # Note: Makes the plot more cluttered
-    #states_cases_smoothed = daily_cases.rolling(7,
-    #    win_type='gaussian',
-    #    min_periods=1,
-    #    center=True).mean(std=2).round()
-    #daily_smoothed = states_cases_smoothed.reset_index()
-    #daily_smoothed = daily_smoothed.rename(columns={'index':'Date'})
-    #daily_melt_smoothed = daily_smoothed.melt(id_vars='Date', var_name='Province', value_name='Value')
-    #daily_melt_smoothed['Data'] = 'Cases Smoothed'
-
-    daily_all = pd.concat([daily_melt_cases, daily_melt_active, daily_melt_recovery, daily_melt_deaths]) #daily_melt_smoothed
-
-    daily_country = daily_all.query(f"Province == 'Total'")
-    daily_country = pd.concat([daily_country, daily_melt_tests])
-
-
-    ## Plot daily change for South Africa
-
-    px_daily_sa = px.line(daily_country, x='Date', y='Value', color='Data') # temporary remove line_shape='spline'
-    fig_daily_sa = make_subplots(rows=1, cols=2)
-
-
-    #visible="legendonly"
-    fig_daily_sa.add_trace(px_daily_sa['data'][0], row=1, col=1)
-    fig_daily_sa.add_trace(px_daily_sa['data'][1], row=1, col=2)
-    fig_daily_sa.add_trace(px_daily_sa['data'][2], row=1, col=2)
-    fig_daily_sa.add_trace(px_daily_sa['data'][3], row=1, col=2)
-    fig_daily_sa.add_trace(px_daily_sa['data'][4], row=1, col=1)
-
-    fig_daily_sa.update_layout(plot_bgcolor="#FFF")
-    fig_daily_sa.update_xaxes(linecolor="#BCCCDC")
-    fig_daily_sa.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
-
-    fig_daily_sa.update_layout(title="Daily Change for South Africa")
-
-    fig_daily_sa.update_xaxes(showspikes=True, spikesnap="cursor", spikemode="across", spikethickness=1)
-    fig_daily_sa.update_yaxes(showspikes=True, spikethickness=1, spikemode="across")
-    fig_daily_sa.update_layout(spikedistance=1000, hoverdistance=100)
-
-    fig_daily_sa.update_traces(hovertemplate=None)
-    fig_daily_sa.update_layout(hovermode="x")
-
-    plot_daily_sa = plot(fig_daily_sa, output_type='div', include_plotlyjs=False)
-
-
-    # Plot daily change per provinces
-
-    # Note: Made into separate plot, multiple variables is to cluttere, color='Data'
-    #daily_states = daily_all.query(f"Province != 'Total'")
-
-    def daily_change_per_province(daily_melt_data, title, c):
-        daily_states = daily_melt_data.query(f"Province != 'Total'")
-
-        max_daily = np.percentile(daily_states['Value'], 99)
-        min_daily = min(daily_states['Value'])
-        fig_daily_prov = px.line(daily_states, title='Daily Change For ' + title + ' Per Provinces',
-                    x='Date', y='Value', animation_frame='Province',
-                    range_y=[min_daily, max_daily],
-                    line_shape='spline', color_discrete_sequence=[colour_series[c]])
-
-        fig_daily_prov.update_layout(plot_bgcolor="#FFF", height=550)
-        fig_daily_prov.update_xaxes(linecolor="#BCCCDC")
-        fig_daily_prov.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
-
-        fig_daily_prov.update_traces(hovertemplate=template_h)
-        fig_daily_prov.update_layout(hovermode="x")
-        fig_daily_prov["layout"].pop("updatemenus") # remove play controls
-
-        fig_daily_prov.update_xaxes(showspikes=True, spikesnap="cursor", spikemode="across", spikethickness=1)
-        fig_daily_prov.update_yaxes(showspikes=True, spikethickness=1)
-        fig_daily_prov.update_layout(spikedistance=1000, hoverdistance=100)
-
-        return plot(fig_daily_prov, output_type='div', include_plotlyjs=False, auto_play=False)
-
-    plot_daily_prov_cases = daily_change_per_province(daily_melt_cases, 'Cases', 0)
-    plot_daily_prov_recovery = daily_change_per_province(daily_melt_recovery, 'Recovered', 1)
-    plot_daily_prov_active = daily_change_per_province(daily_melt_active, 'Active', 2)
-    plot_daily_prov_deaths = daily_change_per_province(daily_melt_deaths, 'Deaths', 3)
-
-
-    # Rt analysis
-
-    # Rt model 2
-    
-    #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
-    #state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
-    db_rep2 = ReproductionNum.objects.filter(Var = 2).order_by('Date')
-    state_rt_mcmc = read_frame(db_rep2)
-
-
-    # Rt model 2 summary
-
-    X0rt2 = state_rt_mcmc.iloc[0,:]['Date']
-
-    latest_rt2 = state_rt_mcmc.iloc[-1]
-    rt2 = round(latest_rt2['Rt'], 2)
-
-    X2rt2 = latest_rt2['Date']
-    latest_d_rt2 = X2rt2.strftime("%d %B %Y")
-
-
-    # Plot: Model 1: Rt for Covid-19 in South Africa
-
-    state_rt_mcmc["e_plus"] = state_rt_mcmc['High'].sub(state_rt_mcmc['Rt'])
-    state_rt_mcmc["e_minus"] = state_rt_mcmc['Rt'].sub(state_rt_mcmc['Low'])
-
-    fig_rt2 = px.line(state_rt_mcmc, x='Date', y='Rt',
-                error_y='e_plus', error_y_minus='e_minus',
-                title='Rt for Covid-19 in South Africa', line_shape='spline')
-    fig_rt2.update_traces(hovertemplate=None)
-    fig_rt2.update_layout(hovermode="x")
-    fig_rt2['data'][0]['error_y']['color'] = 'lightblue'
-
-    fig_rt2.add_shape(
-        type="line",
-        xref="x",
-        yref="y",
-        x0=X0rt2,
-        y0=1,
-        x1=X2rt2,
-        y1=1,
-        opacity=0.6,
-        line=dict(
-            color="Crimson",
-            width=2,
-            dash='dash'
-    ))
-
-    fig_rt2.update_layout(plot_bgcolor="#FFF")
-    fig_rt2.update_xaxes(linecolor="#BCCCDC")
-    fig_rt2.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
-
-    plot_rt_country = plot(fig_rt2, output_type='div', include_plotlyjs=False)
-
-
-    ## Complete content dict
-
-    content_trend['plot_rt_country'] = plot_rt_country
-    content_trend['latest_rt'] = rt2
-    content_trend['latest_rt2date'] = latest_d_rt2
-    content_trend['plot_analsysis_prov'] = plot_analsysis_prov
-    content_trend['plot_analsysis_deaths'] = plot_analsysis_deaths
-    content_trend['plot_analysis_sa'] = plot_analysis_sa
-    content_trend['plot_analsysis_prov2'] = plot_analsysis_prov2
-    content_trend['plot_daily_sa'] = plot_daily_sa
-    #content_trend['plot_daily_prov'] = plot_daily_prov
-    content_trend['plot_daily_prov_cases'] = plot_daily_prov_cases
-    content_trend['plot_daily_prov_recovery'] = plot_daily_prov_recovery
-    content_trend['plot_daily_prov_active'] = plot_daily_prov_active
-    content_trend['plot_daily_prov_deaths'] = plot_daily_prov_deaths
     content_trend['cases'] = latest_cases
     content_trend['recovered'] = latest_recovery
     content_trend['deaths'] = latest_deaths
     content_trend['active'] = latest_active
     content_trend['tests'] = latest_tests
     content_trend['latest_date'] = latest_date
+
+
+    # Rt model 2 summary
+    
+    global state_rt_mcmc
+    db_rep2 = ReproductionNum.objects.filter(Var = 2).order_by('Date')
+    state_rt_mcmc = read_frame(db_rep2)
+
+    latest_rt2 = state_rt_mcmc.iloc[-1]
+    rt2 = round(latest_rt2['Rt'], 2)
+
+    X1rt2 = latest_rt2['Date']
+    latest_d_rt2 = X1rt2.strftime("%d %B %Y")
+    
+    content_trend['latest_rt'] = rt2
+    content_trend['latest_rt2date'] = latest_d_rt2
 
     return content_trend
 
@@ -857,11 +598,7 @@ def future_plots():
 
 
     # Downloads Rt model 2 calc data
-
-    #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
-    #state_rt_mcmc = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True)
-    db_rep2 = ReproductionNum.objects.filter(Var = 2).order_by('Date')
-    state_rt_mcmc = read_frame(db_rep2)
+    global state_rt_mcmc
 
     latest_rt2 = state_rt_mcmc.iloc[-1]
     rt2 = float(latest_rt2['Rt'])
@@ -1074,6 +811,319 @@ def future_plots():
     return content_future
 
 
+def plot_rt_country():
+
+    content_trend = {}
+
+    # Plot: Model 2: Rt for Covid-19 in South Africa
+
+    state_rt_mcmc["e_plus"] = state_rt_mcmc['High'].sub(state_rt_mcmc['Rt'])
+    state_rt_mcmc["e_minus"] = state_rt_mcmc['Rt'].sub(state_rt_mcmc['Low'])
+
+    X0rt2 = state_rt_mcmc.iloc[0,:]['Date']
+    latest_rt2 = state_rt_mcmc.iloc[-1]
+    X1rt2 = latest_rt2['Date']
+
+    fig_rt2 = px.line(state_rt_mcmc, x='Date', y='Rt',
+                error_y='e_plus', error_y_minus='e_minus',
+                title='Rt for Covid-19 in South Africa', line_shape='spline')
+    fig_rt2.update_traces(hovertemplate=None)
+    fig_rt2.update_layout(hovermode="x")
+    fig_rt2['data'][0]['error_y']['color'] = 'lightblue'
+
+    fig_rt2.add_shape(
+        type="line",
+        xref="x",
+        yref="y",
+        x0=X0rt2,
+        y0=1,
+        x1=X1rt2,
+        y1=1,
+        opacity=0.6,
+        line=dict(
+            color="Crimson",
+            width=2,
+            dash='dash'
+    ))
+
+    fig_rt2.update_layout(plot_bgcolor="#FFF")
+    fig_rt2.update_xaxes(linecolor="#BCCCDC")
+    fig_rt2.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
+
+    plot_rt_country = plot(fig_rt2, output_type='div', include_plotlyjs=False)
+    
+    content_trend['plot_rt_country'] = plot_rt_country
+    
+    return content_trend
+
+
+analysis_states = None
+analysis_country = None
+
+def plot_analysis_for_prov():
+
+    content_trend = {}
+
+    # Analysis per province
+
+    colour_series = px.colors.qualitative.Vivid
+
+    global states_cases
+    filter_cases = states_cases[state_filter_all]
+    analysis_cases = filter_cases.melt(id_vars='Date', var_name='Province', value_name='Value')
+    analysis_cases['Data'] = 'Cases'
+
+    global states_recovery
+    filter_recovery = states_recovery[state_filter_all]
+    analysis_recovery = filter_recovery.melt(id_vars='Date', var_name='Province', value_name='Value')
+    analysis_recovery['Data'] = 'Recovered'
+
+    global states_deaths
+    filter_deaths = states_deaths[state_filter_all]
+    analysis_deaths = filter_deaths.melt(id_vars='Date', var_name='Province', value_name='Value')
+    analysis_deaths['Data'] = 'Deaths'
+
+    global states_active
+    filter_active = states_active[state_filter_all]
+    analysis_active = filter_active.melt(id_vars='Date', var_name='Province', value_name='Value')
+    analysis_active['Data'] = 'Active'
+
+    analysis_all = pd.concat([analysis_cases, analysis_recovery, analysis_active, analysis_deaths])
+
+    global analysis_states
+    analysis_states = analysis_all.query(f"Province != 'Total'")
+    global analysis_country
+    analysis_country = analysis_all.query(f"Province == 'Total'")
+
+
+    ## Plot analysis for provinces
+
+    fig_analysis_prov = px.bar(analysis_states, title='Analysis For Provinces',
+                x='Date', y='Value', color='Province', animation_frame='Data',
+                barmode='relative', color_discrete_sequence=colour_series)
+
+    fig_analysis_prov.update_layout(plot_bgcolor="#FFF",hovermode="x", height=650)
+    fig_analysis_prov.update_xaxes(linecolor="#BCCCDC")
+    fig_analysis_prov.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
+
+    fig_analysis_prov.update_traces(hovertemplate=template_h)
+    fig_analysis_prov["layout"].pop("updatemenus") # remove play controls
+
+    plot_analysis_prov = plot(fig_analysis_prov, output_type='div', include_plotlyjs=False, auto_play=False)
+
+    content_trend['plot_analysis_for_prov'] = plot_analysis_prov
+
+
+    ## Plot analysis for deaths
+
+    analysis_states_deaths = analysis_deaths.query(f"Province != 'Total'")
+
+    fig_analysis_death = px.bar(analysis_states_deaths, title='Analysis For Deaths',
+                x='Date', y='Value', color='Province',
+                barmode='relative', color_discrete_sequence=colour_series)
+
+    fig_analysis_death.update_layout(plot_bgcolor="#FFF")
+    fig_analysis_death.update_xaxes(linecolor="#BCCCDC")
+    fig_analysis_death.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
+
+    fig_analysis_death.update_traces(hovertemplate=None)
+    fig_analysis_death.update_layout(hovermode="x")
+
+    plot_analysis_deaths = plot(fig_analysis_death, output_type='div', include_plotlyjs=False)
+
+    content_trend['plot_analysis_deaths'] = plot_analysis_deaths
+
+
+    return content_trend
+
+
+def plot_analysis_sa():
+
+    content_trend = {}
+
+    ## Plot analysis for South Africa
+
+    global states_tests
+    states_tests['Province'] = 'Total'
+    states_tests['Data'] = 'Tests'
+    states_tests = states_tests.rename(columns={'Total':'Value'})
+    states_tests = states_tests[['Date','Province','Value','Data']]
+
+    global analysis_country
+    analysis_country = pd.concat([analysis_country, states_tests])
+
+
+    px_data_sa = px.line(analysis_country, x='Date', y='Value', color='Data') #, line_shape='spline' -- "hv" | "vh" | "hvh" | "vhv"
+    fig_analysis_sa = make_subplots(specs=[[{"secondary_y": True}]])
+
+
+    fig_analysis_sa.add_trace(px_data_sa['data'][0], secondary_y=True)
+    fig_analysis_sa.add_trace(px_data_sa['data'][1], secondary_y=True)
+    fig_analysis_sa.add_trace(px_data_sa['data'][2], secondary_y=True)
+    fig_analysis_sa.add_trace(px_data_sa['data'][3], secondary_y=True)
+    fig_analysis_sa.add_trace(px_data_sa['data'][4], secondary_y=False)
+
+    fig_analysis_sa.update_yaxes(title_text="Rest of Data", secondary_y=True)
+    fig_analysis_sa.update_yaxes(title_text="Tests", secondary_y=False)
+    fig_analysis_sa.update_layout(title="Analysis for South Africa")
+
+    fig_analysis_sa.update_layout(plot_bgcolor="#FFF", hovermode="x")
+
+    fig_analysis_sa.update_xaxes(showspikes=True, spikesnap="cursor", spikemode="across", spikethickness=1, linecolor="#BCCCDC")
+    fig_analysis_sa.update_yaxes(showspikes=True, spikethickness=1, linecolor="#BCCCDC", gridcolor='#D3D3D3')
+    fig_analysis_sa.update_layout(spikedistance=1000, hoverdistance=100)
+
+    fig_analysis_sa.update_traces(hovertemplate=None)
+
+    plot_analysis_sa = plot(fig_analysis_sa, output_type='div', include_plotlyjs=False)
+
+    content_trend['plot_analysis_sa'] = plot_analysis_sa
+    
+
+    return content_trend
+
+
+def plot_analysis_per_prov():
+
+    content_trend = {}
+
+    ## Plot analysis per province
+
+    max_states = np.percentile(analysis_states['Value'], 99)
+
+    colour_series = px.colors.qualitative.Vivid
+
+    fig_analaysis_prov2 = px.line(analysis_states, title='Analysis Per Provinces',
+                x='Date', y='Value', color='Data', animation_frame='Province',
+                line_shape='spline', range_y=[0, max_states],
+                color_discrete_sequence=colour_series)
+
+    fig_analaysis_prov2.update_layout(plot_bgcolor="#FFF", height=550)
+    fig_analaysis_prov2.update_xaxes(linecolor="#BCCCDC")
+    fig_analaysis_prov2.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
+
+    fig_analaysis_prov2.update_xaxes(showspikes=True, spikesnap="cursor", spikemode="across", spikethickness=1)
+    fig_analaysis_prov2.update_yaxes(showspikes=True, spikethickness=1)
+    fig_analaysis_prov2.update_layout(spikedistance=1000, hoverdistance=100)
+
+    fig_analaysis_prov2.update_traces(hovertemplate=template_h)
+    fig_analaysis_prov2.update_layout(hovermode="x")
+    fig_analaysis_prov2["layout"].pop("updatemenus") # remove play controls
+
+    plot_analysis_prov2 = plot(fig_analaysis_prov2, output_type='div', include_plotlyjs=False, auto_play=False)
+
+    content_trend['plot_analysis_per_prov'] = plot_analysis_prov2
+    
+
+    return content_trend
+
+
+def plot_daily_sa():
+
+    content_trend = {}
+
+    # Daily analaysis
+
+    state_filter_t = copy.deepcopy(state_filter)
+    state_filter_t.insert(0,'Total')
+
+    def shape_daily(states_df_i, label, fil=True):
+        if fil:
+            all_df = states_df_i[state_filter_t]
+        else:
+            all_df = states_df_i['Total']
+        daily_df_i = all_df.diff()
+        daily_df_i = daily_df_i[1:]
+        daily_df = daily_df_i.reset_index()
+        daily_df = daily_df.rename(columns={'index':'Date'})
+        daily_melt_df = daily_df.melt(id_vars='Date', var_name='Province', value_name='Value')
+        daily_melt_df['Data'] = label
+        return daily_melt_df #, daily_df_i
+
+    daily_melt_cases = shape_daily(states_cases_i, 'Cases') #, daily_cases -> was previously returned in daily_fd_i
+    daily_melt_active = shape_daily(states_active_i, 'Active')
+    daily_melt_recovery = shape_daily(states_recovery_i, 'Recovery')
+    daily_melt_deaths = shape_daily(states_deaths_i, 'Deaths')
+    daily_melt_tests = shape_daily(states_tests_i, 'Tests', False)
+
+    daily_all = pd.concat([daily_melt_cases, daily_melt_active, daily_melt_recovery, daily_melt_deaths]) #daily_melt_smoothed
+
+    daily_country = daily_all.query(f"Province == 'Total'")
+    daily_country = pd.concat([daily_country, daily_melt_tests])
+
+
+    ## Plot daily change for South Africa
+
+    px_daily_sa = px.line(daily_country, x='Date', y='Value', color='Data') # temporary remove line_shape='spline'
+    fig_daily_sa = make_subplots(rows=1, cols=2)
+
+
+    #visible="legendonly"
+    fig_daily_sa.add_trace(px_daily_sa['data'][0], row=1, col=1)
+    fig_daily_sa.add_trace(px_daily_sa['data'][1], row=1, col=2)
+    fig_daily_sa.add_trace(px_daily_sa['data'][2], row=1, col=2)
+    fig_daily_sa.add_trace(px_daily_sa['data'][3], row=1, col=2)
+    fig_daily_sa.add_trace(px_daily_sa['data'][4], row=1, col=1)
+
+    fig_daily_sa.update_layout(plot_bgcolor="#FFF")
+    fig_daily_sa.update_xaxes(linecolor="#BCCCDC")
+    fig_daily_sa.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
+
+    fig_daily_sa.update_layout(title="Daily Change for South Africa")
+
+    fig_daily_sa.update_xaxes(showspikes=True, spikesnap="cursor", spikemode="across", spikethickness=1)
+    fig_daily_sa.update_yaxes(showspikes=True, spikethickness=1, spikemode="across")
+    fig_daily_sa.update_layout(spikedistance=1000, hoverdistance=100)
+
+    fig_daily_sa.update_traces(hovertemplate=None)
+    fig_daily_sa.update_layout(hovermode="x")
+
+    plot_daily_sa = plot(fig_daily_sa, output_type='div', include_plotlyjs=False)
+
+    content_trend['plot_daily_sa'] = plot_daily_sa
+
+
+    # Plot daily change per provinces
+
+    colour_series = px.colors.qualitative.Vivid
+
+    def daily_change_per_province(daily_melt_data, title, c):
+        daily_states = daily_melt_data.query(f"Province != 'Total'")
+
+        max_daily = np.percentile(daily_states['Value'], 99)
+        min_daily = min(daily_states['Value'])
+        fig_daily_prov = px.line(daily_states, title='Daily Change For ' + title + ' Per Provinces',
+                    x='Date', y='Value', animation_frame='Province',
+                    range_y=[min_daily, max_daily],
+                    line_shape='spline', color_discrete_sequence=[colour_series[c]])
+
+        fig_daily_prov.update_layout(plot_bgcolor="#FFF", height=550)
+        fig_daily_prov.update_xaxes(linecolor="#BCCCDC")
+        fig_daily_prov.update_yaxes(linecolor="#BCCCDC", gridcolor='#D3D3D3')
+
+        fig_daily_prov.update_traces(hovertemplate=template_h)
+        fig_daily_prov.update_layout(hovermode="x")
+        fig_daily_prov["layout"].pop("updatemenus") # remove play controls
+
+        fig_daily_prov.update_xaxes(showspikes=True, spikesnap="cursor", spikemode="across", spikethickness=1)
+        fig_daily_prov.update_yaxes(showspikes=True, spikethickness=1)
+        fig_daily_prov.update_layout(spikedistance=1000, hoverdistance=100)
+
+        return plot(fig_daily_prov, output_type='div', include_plotlyjs=False, auto_play=False)
+
+    plot_daily_prov_cases = daily_change_per_province(daily_melt_cases, 'Cases', 0)
+    plot_daily_prov_recovery = daily_change_per_province(daily_melt_recovery, 'Recovered', 1)
+    plot_daily_prov_active = daily_change_per_province(daily_melt_active, 'Active', 2)
+    plot_daily_prov_deaths = daily_change_per_province(daily_melt_deaths, 'Deaths', 3)
+
+    content_trend['plot_daily_prov_cases'] = plot_daily_prov_cases
+    content_trend['plot_daily_prov_recovery'] = plot_daily_prov_recovery
+    content_trend['plot_daily_prov_active'] = plot_daily_prov_active
+    content_trend['plot_daily_prov_deaths'] = plot_daily_prov_deaths    
+
+    return content_trend
+
+
 def format_comma(num):
     return f'{num:,.0f}'
 
@@ -1088,8 +1138,6 @@ def rt_model1():
 
 
     # Rt mode 1
-    #url = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
-    #states_all_rt_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=[0,1])
     db_rep1 = ReproductionNum.objects.filter(Var = 1).order_by('Date')  
     states_all_rt_i = read_frame(db_rep1, index_col='Province')
     
