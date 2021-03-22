@@ -33,12 +33,34 @@
 
           console.log('Done home_stats')
           $('#home_rt_country').load('/home_rt_country/', function() {
+
             console.log('Done home_rt_country')
+            $('#home_analysis_for_prov').load('/home_analysis_for_prov/', function() {
+
+              console.log('Done home_analysis_for_prov')
+              $('#home_analysis_sa').load('/home_analysis_sa/', function() {
+
+                console.log('Done home_analysis_sa')
+                $('#home_analysis_per_prov').load('/home_analysis_per_prov/', function() {
+
+                  console.log('Done home_analysis_per_prov')
+
+                  $('#home_daily_sa').load('/home_daily_sa/', function(){
+                    
+                    console.log('Done home_daily_sa')
+                    $('#home_forecast').load('/home_forecast/', function(){
+
+                      console.log('Done home_forecast')
+                    })
+                  })
+                })
+              })
+            })
           })
         })
       });
     </script>
-    
+
     <div class="content is-size-7">
       All the Covid-19 data are curated and verified by the <a href="#ref1">DSFSI</a>.
       Thus, there is a delay from the data announced by the various government departments.
@@ -155,23 +177,6 @@
       </div>
     </section>
   </div>
-  
-  <script>
-    $(document).ready(function() {
-      $('#home_analysis_for_prov').load('/home_analysis_for_prov/', function() {
-
-        console.log('Done home_analysis_for_prov')
-        $('#home_analysis_sa').load('/home_analysis_sa/', function() {
-
-          console.log('Done home_analysis_per_prov')
-          $('#home_analysis_per_prov').load('/home_analysis_per_prov/', function() {
-
-            console.log('Done home_analysis_per_prov')
-          })
-        })
-      })
-    });
-  </script>
 
 </div>
 
@@ -197,12 +202,6 @@
       </div>
     </section>
   </div>
-  
-  <script>
-    $(document).ready(function() {
-      $('#home_daily_sa').load('/home_daily_sa/')
-    });
-  </script>
 
 </div>
 
@@ -228,12 +227,6 @@
       </div>
     </section>
   </div>
-  
-  <script>
-    $(document).ready(function() {
-      $('#home_forecast').load('/home_forecast/')
-    });
-  </script>
 
 </div>
 

@@ -938,15 +938,12 @@ def future_plots():
 
     # Download latest stats
 
-    #url = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
-    #states_all_i = pd.read_csv(url, parse_dates=['date'], dayfirst=True, squeeze=True, index_col=0)
-    db_cases = CovidData.objects.filter(Var = 'C').order_by('Date')
-    states_all_i = read_frame(db_cases, index_col='Date')
+    global states_cases_i
 
-    states_all = states_all_i.copy()
+    states_all = states_cases_i.copy()
     states_all = states_all.reset_index()
 
-    cases_series = pd.Series(states_all_i['Total'].values, index=states_all_i.index.values, name='Cases')
+    cases_series = pd.Series(states_cases_i['Total'].values, index=states_cases_i.index.values, name='Cases')
 
 
     # Forecast Calc
