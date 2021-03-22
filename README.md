@@ -19,6 +19,7 @@ The dashboard is build with Django. The analytics engine currently runs on the [
 
 1. Use a cron job to store the latest Rt data
 1. Run the Rt analytics engine directly in this project
+1. Change loading animation
 1. Optomise the incremental ajax loading methods
 1. Use a faster front-end plotting framework/method
 
