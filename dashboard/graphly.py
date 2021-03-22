@@ -563,12 +563,8 @@ def trend_plots():
 
     latest_rt2 = state_rt_mcmc.iloc[-1]
     rt2 = round(latest_rt2['Rt'], 2)
-
-    X1rt2 = latest_rt2['Date']
-    latest_d_rt2 = X1rt2.strftime("%d %B %Y")
     
-    content_trend['latest_rt'] = rt2
-    content_trend['latest_rt2date'] = latest_d_rt2
+    content_trend['latest_rt2'] = rt2
 
     return content_trend, content_session
 
@@ -589,8 +585,16 @@ def plot_rt_country(content_session):
     state_rt_mcmc["e_minus"] = state_rt_mcmc['Rt'].sub(state_rt_mcmc['Low'])
 
     X0rt2 = state_rt_mcmc.iloc[0,:]['Date']
+
     latest_rt2 = state_rt_mcmc.iloc[-1]
     X1rt2 = latest_rt2['Date']
+    rt2 = round(latest_rt2['Rt'], 2)
+
+    X1rt2 = latest_rt2['Date']
+    latest_date_rt2 = X1rt2.strftime("%d %B %Y")
+
+    content_trend['latest_rt2'] = rt2
+    content_trend['latest_rt2_date'] = latest_date_rt2
 
     fig_rt2 = px.line(state_rt_mcmc, x='Date', y='Rt',
                 error_y='e_plus', error_y_minus='e_minus',
