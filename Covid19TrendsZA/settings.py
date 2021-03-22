@@ -157,6 +157,7 @@ STATICFILES_FINDERS = [
   'django_simple_bulma.finders.SimpleBulmaFinder',
 ]
 
+#BULMA_SETTINGS = {}
 
 # Configure Django App for Heroku.
 #import django_heroku
