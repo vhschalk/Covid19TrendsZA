@@ -14,59 +14,31 @@
 <div class="container">
 
   <section class="section">
-    <div class="columns is-mobile has-text-centered">
-      <div class="column">
-        <div class="box">
-          <p class="heading">South African Covid-19 Summary</p>
+    
+    <div id="home_stats">
+      <br>
+      <section class="hero is-link is-bold">
+        <div class="hero-body">
+          <div class="container">
+            <h2 class="subtitle">Loading...</h2>
+            <progress class="progress is-large is-info" max="100"></progress>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
+    
+    <script>
+      $(document).ready(function() {
+        $('#home_stats').load('/home_stats/', function() {
 
-    <div class="columns is-mobile has-text-centered">
-      <div class="column is-one-third">
-        <div class="box">
-          <p class="heading">Total Cases</p>
-          <p class="title">{{ content.cases }}</p>
-        </div>
-      </div>
-      <div class="column is-one-third">
-        <div class="box">
-          <p class="heading">Total Recovered</p>
-          <p class="title">{{ content.recovered }}</p> 
-        </div>
-      </div>
-      <div class="column is-one-third">
-        <div class="box">
-          <p class="heading">Total Active</p>
-          <p class="title">{{ content.active }}</p> 
-        </div>
-      </div>
-    </div>
-
-    <div class="columns is-mobile has-text-centered">
-      <div class="column is-one-third">
-        <div class="box">
-          <p class="heading">Total Tests</p>
-          <p class="title">{{ content.tests }}</p> 
-        </div>
-      </div>
-      <div class="column is-one-third">
-        <div class="box">
-          <p class="heading">Total Deaths</p>
-          <p class="title">{{ content.deaths }}</p> 
-        </div>
-      </div>
-      <div class="column is-one-third">
-        <div class="box">
-          <p class="heading">Reproduction No.</p>
-          <p class="title">{{ content.latest_rt}}</p> 
-        </div>
-      </div>
-    </div>
-
-    <div class="content">
-      Case data last updated on <strong>{{ content.latest_date }}</strong>.
-    </div>
+          console.log('Done home_stats')
+          $('#home_rt_country').load('/home_rt_country/', function() {
+            console.log('Done home_rt_country')
+          })
+        })
+      });
+    </script>
+    
     <div class="content is-size-7">
       All the Covid-19 data are curated and verified by the <a href="#ref1">DSFSI</a>.
       Thus, there is a delay from the data announced by the various government departments.
@@ -134,14 +106,6 @@
       </div>
     </section>
   </div>
-  
-  <script>
-    $(document).ready(function() {
-      $('#home_rt_country').load('/home_rt_country/', function() {
-        console.log('Done home_rt_country')
-      })
-    });
-  </script>
 
 </div>
 

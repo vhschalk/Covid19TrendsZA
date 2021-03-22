@@ -5,9 +5,13 @@ from .graphly import trend_plots, plot_rt_country, plot_analysis_for_prov, plot_
 
 def home(request):
 
+    return render(request, 'home.html')
+
+def home_stats(request):
+
     content = trend_plots()
 
-    return render(request, 'home.html', {'content':content})
+    return render(request, 'home_stats.html', {'content':content})
 
 def home_rt_country(request):
 

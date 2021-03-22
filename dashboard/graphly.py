@@ -593,7 +593,8 @@ def plot_rt_country():
     content_trend = {}
 
     # Plot: Model 2: Rt for Covid-19 in South Africa
-
+    
+    global state_rt_mcmc
     state_rt_mcmc["e_plus"] = state_rt_mcmc['High'].sub(state_rt_mcmc['Rt'])
     state_rt_mcmc["e_minus"] = state_rt_mcmc['Rt'].sub(state_rt_mcmc['Low'])
 
@@ -646,6 +647,7 @@ def plot_analysis_for_prov():
     # Analysis per province
 
     colour_series = px.colors.qualitative.Vivid
+    global state_filter_all
 
     global states_cases
     filter_cases = states_cases[state_filter_all]
@@ -805,6 +807,13 @@ def plot_daily_sa():
     content_trend = {}
 
     # Daily analaysis
+
+    global state_filter
+    global states_cases_i
+    global states_active_i
+    global states_recovery_i
+    global states_deaths_i
+    global states_tests_i
 
     state_filter_t = copy.deepcopy(state_filter)
     state_filter_t.insert(0,'Total')
