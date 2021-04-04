@@ -28,6 +28,9 @@ RUN python -m pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 RUN python manage.py collectstatic --noinput
+RUN echo "Secret: "$SECRET_KEY
+RUN echo "Debug: "$DJANGO_DEBUG
+RUN echo "DB: "$DB_ENGINE
 #RUN python manage.py migrate #TODO: does not load all env params correctly in caprover
 
 EXPOSE 8000
