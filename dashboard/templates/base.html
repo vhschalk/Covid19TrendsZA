@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="has-navbar-fixed-top">
 
   <head>
     <meta name="description" content="Covid-19 trends in South Africa, with analytics, reproduction number calculation and forecasts"/>
@@ -15,6 +15,7 @@
       href="{% static 'favicon.ico' %}">
     <script src="https://code.jquery.com/jquery-latest.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="{% static 'js/script.js' %}"></script>
 
     {% block head %}
 
@@ -52,16 +53,16 @@
       </div>
     </section>
 
-    <nav class="navbar" role="navigation" aria-label="main navigation">
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
         <a class="navbar-item" href="/">
           <span class="icon is-large">
-            <img src="{% static "icon.svg" %}"></img>
+            <img src="{% static 'icon.svg' %}"></img>
             <!-- <i class="fas fa-chart-area"></i> -->
           </span>
         </a>
 
-        <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarTrends">
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarTrends">
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
@@ -70,8 +71,14 @@
 
       <div id="navbarTrends" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" href="/">Trends</a>
           <a class="navbar-item" href="https://sacoronavirus.co.za/" target="_blank">COVID-19 SA Goverment Portal</a>
+          <a class="navbar-item" href="#summary">Summary</a>
+          <a class="navbar-item" href="#rtcountry">Rt Country</a>
+          <a class="navbar-item" href="#analysisforprov">Analysis for Provinces</a>
+          <a class="navbar-item" href="#analysissa">Analysis Country</a>
+          <a class="navbar-item" href="#analysisperprov">Analysis per Provinces</a>
+          <a class="navbar-item" href="#dailysa">Daily Analysis</a>
+          <a class="navbar-item" href="#forecast">Forecast</a>
         </div>
 
         <div class="navbar-end">

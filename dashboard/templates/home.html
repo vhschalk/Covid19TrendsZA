@@ -15,7 +15,7 @@
 
   <section class="section">
     
-    <div id="home_stats">
+    <div id="summary">
       <br>
       <section class="hero is-link is-bold">
         <div class="hero-body">
@@ -29,28 +29,27 @@
     
     <script>
       $(document).ready(function() {
-        $('#home_stats').load('/home_stats/', function() {
+        $('#summary').load('/home_stats/', function() {
 
-          console.log('Done home_stats')
-          $('#home_rt_country').load('/home_rt_country/', function() {
+          //console.log('Done home_stats')
+          $('#rtcountry').load('/home_rt_country/', function() {
 
-            console.log('Done home_rt_country')
-            $('#home_analysis_for_prov').load('/home_analysis_for_prov/', function() {
+            //console.log('Done home_rt_country')
+            $('#analysisforprov').load('/home_analysis_for_prov/', function() {
 
-              console.log('Done home_analysis_for_prov')
-              $('#home_analysis_sa').load('/home_analysis_sa/', function() {
+              //console.log('Done home_analysis_for_prov')
+              $('#analysissa').load('/home_analysis_sa/', function() {
 
-                console.log('Done home_analysis_sa')
-                $('#home_analysis_per_prov').load('/home_analysis_per_prov/', function() {
+                //console.log('Done home_analysis_sa')
+                $('#analysisperprov').load('/home_analysis_per_prov/', function() {
 
-                  console.log('Done home_analysis_per_prov')
-
-                  $('#home_daily_sa').load('/home_daily_sa/', function(){
+                  //console.log('Done home_analysis_per_prov')
+                  $('#dailysa').load('/home_daily_sa/', function(){
                     
-                    console.log('Done home_daily_sa')
+                    //console.log('Done home_daily_sa')
                     $('#home_forecast').load('/home_forecast/', function(){
 
-                      console.log('Done home_forecast')
+                      //console.log('Done home_forecast')
                     })
                   })
                 })
@@ -96,7 +95,7 @@
 
 <div class="container">
 
-  <div id="home_rt_country">
+  <div id="rtcountry">
     <br>
     <section class="hero is-link is-bold">
       <div class="hero-body">
@@ -121,7 +120,7 @@
 
 <div class="container">
 
-  <div id="home_analysis_for_prov">
+  <div id="analysisforprov">
     <br>
     <section class="hero is-link is-bold">
       <div class="hero-body">
@@ -133,7 +132,7 @@
     </section>
   </div>
 
-  <div id="home_analysis_sa">
+  <div id="analysissa">
     <br>
     <section class="hero is-link is-bold">
       <div class="hero-body">
@@ -145,7 +144,7 @@
     </section>
   </div>
 
-  <div id="home_analysis_per_prov">
+  <div id="analysisperprov">
     <br>
     <section class="hero is-link is-bold">
       <div class="hero-body">
@@ -168,7 +167,7 @@
   </div>
 </section>
 
-<div class="container">
+<div class="container" id="dailysa">
 
   <div id="home_daily_sa">
     <br>
@@ -185,7 +184,7 @@
 </div>
 
 
-<section class="hero is-dark is-bold">
+<section class="hero is-dark is-bold" id="forecast">
   <div class="container">
     <div class="hero-body">
         <h2 class="subtitle">Forecast</h2>
