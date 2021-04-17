@@ -26,7 +26,8 @@ from plotly.offline import plot
 from plotly.subplots import make_subplots
 
 # Change to avoid temporary delays
-repo = 'dsfsi' #dsfsi
+repo = 'dsfsi'
+repo_rt = 'heerden'
 
 # Global variables
 
@@ -61,7 +62,7 @@ def sync_all_data_providers():
 
 def data_gen_provider(data_var, filepart):
 
-    urlC = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_' + filepart + '.csv'
+    urlC = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/covid19za_provincial_cumulative_timeline_' + filepart + '.csv'
     with requests.Session() as s:
         download = s.get(urlC)
         decode_content = download.content.decode('utf-8').splitlines()
@@ -126,7 +127,7 @@ def data_gen_provider(data_var, filepart):
 
 def data_gen_shape(data_var, filepart):
 
-    urlC = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_' + filepart + '.csv'
+    urlC = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/covid19za_provincial_cumulative_timeline_' + filepart + '.csv'
 
     states_data_i = pd.read_csv(urlC, parse_dates=['date'], dayfirst=True, index_col=0)
 
@@ -277,7 +278,7 @@ def data_active_shape():
 def data_test_shape():
 
     data_var = 'T'
-    urlC = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_timeline_testing.csv'
+    urlC = 'https://raw.githubusercontent.com/' + repo + '/covid19za/master/data/covid19za_timeline_testing.csv'
 
     states_data_i = pd.read_csv(urlC, parse_dates=['date'], dayfirst=True, index_col=0)
 
@@ -340,7 +341,7 @@ def data_test_shape():
 def data_rep1_provider():
     data_var = '1'
     
-    urlC = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
+    urlC = 'https://raw.githubusercontent.com/' + repo_rt + '/covid19za/master/data/calc/calculated_rt_sa_provincial_cumulative.csv'
     with requests.Session() as s:
         download = s.get(urlC)
 
@@ -400,7 +401,7 @@ def data_rep1_provider():
 def data_rep2_provider():
     data_var = '2'
     
-    urlC = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
+    urlC = 'https://raw.githubusercontent.com/' + repo_rt + '/covid19za/master/data/calc/calculated_rt_sa_mcmc.csv'
     with requests.Session() as s:
         download = s.get(urlC)
 

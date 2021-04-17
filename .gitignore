@@ -135,3 +135,4 @@ runstatic
 runmigration
 .env copy
 .env copy 2
+.idea/
