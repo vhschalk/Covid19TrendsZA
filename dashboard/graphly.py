@@ -27,7 +27,7 @@ from plotly.subplots import make_subplots
 
 # Change to avoid temporary delays
 repo = 'dsfsi'
-repo_rt = 'heerden'
+repo_rt = 'dsfsi'
 
 # Global variables
 
