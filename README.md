@@ -4,9 +4,9 @@
 
 This is a Covid-19 analytics dashboard for South Africa. The focus is on the Effective Reproduction Number (Rt).
 
-This project was inspired by analytics on USA data, [Rt.live](https://rt.live). The South African model was refined by the [Data Science for Social Impact research group](https://github.com/dsfsi/covid19za/blob/master/notebooks/Realtime%20R0.ipynb) (DFSI).
+This project was inspired by analytics on USA data, [Rt.live](https://rt.live). The South African model was refined by the [Data Science for Social Impact research group](https://github.com/dsfsi/covid19za/blob/master/notebooks/covid-model/rtlive-model-za.ipynb) (DFSI).
 
-The dashboard is build with Django. The analytics engine currently runs on the [DFSI](https://github.com/dsfsi/covid19za) repo.
+The dashboard is build with Django. The analytics engine currently runs from a Github Actions pipeline at the [DFSI](https://github.com/dsfsi/covid19za) repo.
 
 ## Contributing
 
@@ -20,7 +20,7 @@ The dashboard is build with Django. The analytics engine currently runs on the [
 1. Use a cron job to store the latest Rt data
 1. Run the Rt analytics engine directly in this project
 1. Change loading animation
-1. Consider optomising page loading by using a daily shared cache in db
+1. Consider optimising page loading by using a daily shared cache in db
 1. Use a faster front-end plotting framework/method
 
 ## Local install
@@ -42,13 +42,13 @@ After adding new static file images, js, etc:
 `python manage.py collectstatic --noinput`
 
 Setup DB:
-`initdb /usr/local/var/postgres`
-`pg_ctl -D /usr/local/var/postgres -l logfile start`
-`createdb covid19trendsdb`
+1. `initdb /usr/local/var/postgres`
+1. `pg_ctl -D /usr/local/var/postgres -l logfile start`
+1. `createdb covid19trendsdb`
 
-`psql covid19trendsdb`
-`CREATE USER <db_user> WITH PASSWORD '<db_password>';`
-`GRANT ALL PRIVILEGES ON DATABASE <db_name> to <db_user>;`
+1. `psql covid19trendsdb`
+1. `CREATE USER <db_user> WITH PASSWORD '<db_password>';`
+1. `GRANT ALL PRIVILEGES ON DATABASE <db_name> to <db_user>;`
 
 Local run:
 `python manage.py runserver`
@@ -56,7 +56,7 @@ Local run:
 After local session changes (due to WSGI config): 
 `touch Covid19TrendsZA/wsgi.py`
 
-### Run Production
+## Production Install
 
 Nginx:
 Include this in your Nginx config
@@ -73,5 +73,5 @@ Docker build:
 Docker migration (complete your params):
 `docker run --rm -e SECRET_KEY="" -e DJANGO_DEBUG="0" -e ALLOWED_HOSTS="" -e DB_ENGINE="django.db.backends.postgresql_psycopg2" -e DB_NAME="" -e DB_USER="" -e DB_PASSWORD="" -e DB_HOST="" -e DB_PORT="5432" -e RUN_MIGRATE="1" --network <correct_docker_network> covid19trends python manage.py migrate`
 
-Caprover:
+**Caprover**:
 Self host with Caprover! See the simple captain-definition config file, linked to Docker.
