@@ -2,7 +2,7 @@ Django==3.2.4
 psycopg2-binary>=2.8
 gunicorn>=20.0
 whitenoise>=5.2
-django-simple-bulma>=2.1
+django-simple-bulma==2.4.0
 urllib3>=1.26
 matplotlib>=3.3
 scipy==1.6.1
