@@ -42,11 +42,20 @@ After adding new static file images, js, etc:
 `python manage.py collectstatic --noinput`
 
 Setup DB:
+Mac
 1. `initdb /usr/local/var/postgres`
 1. `pg_ctl -D /usr/local/var/postgres -l logfile start`
-1. `createdb covid19trendsdb`
+1. `createdb <db_name>`
+1. `psql <db_name>`
 
-1. `psql covid19trendsdb`
+Ubuntu
+1. `sudo apt-get install postgresql postgresql-contrib`
+1. `sudo su - postgres`
+1. `psql`
+1. CTRL + D
+1. `createdb <db_name>`
+
+General
 1. `CREATE USER <db_user> WITH PASSWORD '<db_password>';`
 1. `GRANT ALL PRIVILEGES ON DATABASE <db_name> to <db_user>;`
 
