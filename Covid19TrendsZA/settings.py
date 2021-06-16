@@ -41,8 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'dashboard',
-    'django_simple_bulma'
+    'dashboard'
 ]
 
 MIDDLEWARE = [
@@ -146,18 +145,6 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
-
-# For Bulma module
-STATICFILES_FINDERS = [
-  # First add the two default Finders, since this will overwrite the default.
-  'django.contrib.staticfiles.finders.FileSystemFinder',
-  'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-
-  # Now add our custom SimpleBulma one.
-  'django_simple_bulma.finders.SimpleBulmaFinder',
-]
-
-#BULMA_SETTINGS = {}
 
 # Configure Django App for Heroku.
 #import django_heroku
