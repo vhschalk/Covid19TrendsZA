@@ -6,7 +6,7 @@ urllib3>=1.26
 matplotlib>=3.3
 scipy==1.6.1
 pandas==1.0.1
-numpy==1.18.1
+numpy==1.21.0
 plotly>=4.14
 django-pandas>=0.6
 requests==2.25
